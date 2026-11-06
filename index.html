@@ -91,6 +91,7 @@ const hn=m[1],st=m[2].toUpperCase().replace(/'/g,"''");
 try{
 const q="https://data.cityofnewyork.us/resource/3h2n-5cm9.json?$where=house_number='"+hn+"' AND upper(street) like '%25"+encodeURIComponent(st)+"%25'&$order=issue_date DESC&$limit=50";
 const rows=await(await fetch(q)).json();
+if(!Array.isArray(rows))throw new Error('bad');
 if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><div class="finding clear"><h3>✓ No DOB violations on record for this address</h3><p>Live query against NYC Open Data DOB Violations returned nothing. That is not proof the building is clear - check the dataset notes. <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">Source dataset ↗</a></p></div>';return}
 const act=rows.filter(x=>(x.violation_category||'').includes('ACTIVE')).length;
 let h='<h3 style="margin:0 0 4px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><p class="muted" style="margin:0 0 6px">Live from NYC Open Data · DOB Violations · '+rows.length+' record'+(rows.length>1?'s':'')+' ('+act+' active)</p>';
@@ -106,6 +107,7 @@ const addr=raw.toUpperCase().replace(/'/g,"''");
 try{
 const q="https://data.cityofchicago.org/resource/22u3-xenr.json?$where=upper(address) like '%25"+encodeURIComponent(addr)+"%25'&$order=violation_date DESC&$limit=50";
 const rows=await(await fetch(q)).json();
+if(!Array.isArray(rows))throw new Error('bad');
 if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><div class="finding clear"><h3>✓ No building violations on record for this address</h3><p>Live query against the Chicago Building Violations dataset returned nothing. That is not proof the building is clear - check the dataset notes. <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Source dataset ↗</a></p></div>';return}
 const open=rows.filter(x=>(x.violation_status||'').toUpperCase()==='OPEN').length;
 let h='<h3 style="margin:0 0 4px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><p class="muted" style="margin:0 0 6px">Live from data.cityofchicago.org · Building Violations · '+rows.length+' record'+(rows.length>1?'s':'')+' ('+open+' open)</p>';
