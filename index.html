@@ -4,11 +4,13 @@
 <style>:root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#101214;color:#e8eaed}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#101214}main{max-width:900px;margin:0 auto;padding:40px 22px 80px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #2a2d31;padding-bottom:18px}.mark{font-size:15px;letter-spacing:.2em;color:#dfe5ec}.tag{font-size:11px;letter-spacing:.08em;color:#8f959d}h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,8vw,76px);font-weight:400;letter-spacing:-.045em;line-height:1;margin:56px 0 18px}.lead{font-size:15px;line-height:1.7;color:#b9bec5;max-width:680px}section{margin-top:38px}.label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#9aa1a9;margin:0 0 14px}form{padding:0;background:none}input{display:block;width:100%;border:0;border-bottom:1px solid #4b5057;outline:0;background:none;color:#f5f7f9;font:inherit;font-size:17px;line-height:1.5;padding:10px 2px}input:focus{border-bottom-color:#dfe5ec}input::placeholder{color:#7d838b}.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px}button{cursor:pointer;border:0;border-radius:0;background:#dfe5ec;color:#16181c;font:inherit;font-weight:700;padding:12px 18px}button:hover{background:#f7fafc}button:disabled{opacity:.6;cursor:wait}.hint{font-size:11px;color:#969da6}.chips{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px}.chips button{font-size:13px;font-weight:400;background:none;color:#c3c9d0;border:0;border-bottom:1px solid #41464d;padding:2px 0}.chips button:hover{color:#fff;border-bottom-color:#dfe5ec;background:none}.suggest{margin-top:10px;display:none}.suggest button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #26292d;color:#e2e5e9;font:inherit;font-weight:400;font-size:13px;padding:11px 2px;border-radius:0}.suggest button:hover{color:#fff}.suggest button:last-child{border-bottom:0}.suggest .n{color:#8f959d;font-size:11px}.panel{border-top:1px solid #2e3237;padding:18px 0 4px;font-size:13px;line-height:1.8;overflow-wrap:anywhere}.finding{border-top:1px solid #2e3237;padding:16px 0;margin:0}.finding h3{margin:0 0 6px;font-size:14px;font-weight:700}.finding.warn h3{color:#e8b9c4}.finding.clear h3{color:#9cd8ae}.finding p{margin:6px 0;color:#c6cbd1;font-size:12.5px}.finding .count{font-size:26px;font-family:Georgia,serif;color:#f7fafc}.muted{color:#878d95;font-size:12px}footer{margin-top:45px;border-top:1px solid #2a2d31;padding-top:20px;font-size:11px;color:#8f959d;line-height:1.8}a{color:#dfe5ec}ul{margin:8px 0;padding-left:18px}li{margin:5px 0;color:#c6cbd1;font-size:12.5px}
 .tabs{display:flex;gap:28px;margin-top:24px;border-bottom:1px solid #2a2d31}.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:#8f959d;font:inherit;font-size:13px;letter-spacing:.15em;padding:10px 0;cursor:pointer;font-weight:400;margin-bottom:-1px}.tabs button.on{color:#fff;border-bottom-color:#dfe5ec;font-weight:700;background:none}
 .cities{display:flex;gap:8px 18px;flex-wrap:wrap;margin-bottom:14px}.cities button{font-size:13px;background:none;color:#c3c9d0;border:0;border-bottom:1px solid #41464d;padding:2px 0;cursor:pointer}.cities button:hover{color:#fff;border-bottom-color:#dfe5ec}.cities button.on{color:#fff;border-bottom-color:#dfe5ec}
-.vrow{margin-top:6px}.vrow .v{border-bottom:1px solid #26292d;padding:11px 2px;margin:0;font-size:12.5px}.vrow .v:last-child{border-bottom:0}.vrow .v b{color:#dfe5ec}button,.chips,.tabs,.label,.mark,.tag,.hint,.controls,.suggest{user-select:none;-webkit-user-select:none}</style></head><body><main>
+.vrow{margin-top:6px}.vrow .v{border-bottom:1px solid #26292d;padding:11px 2px;margin:0;font-size:12.5px}.vrow .v:last-child{border-bottom:0}.vrow .v b{color:#dfe5ec}button,.chips,.tabs,.label,.mark,.tag,.hint,.controls,.suggest{user-select:none;-webkit-user-select:none}
+.coverage{max-width:680px;margin:20px 0 0;border-bottom:1px solid #2a2d31;padding:0 0 14px}.coverage summary{cursor:pointer;list-style:none;font-size:13px;color:#b9bec5;padding:12px 0;min-height:44px}.coverage summary::-webkit-details-marker{display:none}.coverage summary span{float:right;font-size:20px;line-height:16px}.coverage[open] summary span{transform:rotate(45deg)}.coverage .lead{margin:6px 0 12px}.reveal-word{white-space:nowrap;display:inline-block}.reveal-char{opacity:1;display:inline-block;transition:opacity .28s ease,transform .45s cubic-bezier(.2,.7,.2,1)}.reveal-pending .reveal-char{opacity:0;transform:translateY(.24em)}.reveal-playing .reveal-char{opacity:1;transform:none;transition-delay:var(--char-delay,0ms)}.reveal-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(prefers-reduced-motion:reduce){.reveal-char{transition:none!important;opacity:1!important;transform:none!important}}
+</style></head><body><main>
 <header><div class="mark">RE-AGENT</div><div class="tag">RECORDS · MARKET DATA · WORLDWIDE CITY SEARCH</div></header>
 <div class="tabs"><button id="tabBuy" class="on" type="button">BUY</button><button id="tabSell" type="button">SELL</button></div>
 <h1>Know the city.<br>Know the building.</h1>
-<p class="lead">Type a city. RE-agent resolves 34,000+ cities worldwide (population 15k+) and shows what public data says: live building-records lookup in Hong Kong, New York City and Chicago, Zillow value and rent indices for 20 US cities, official sold-price indices for 14 UK cities, and real listing routes where they exist. Every figure names its source and date. Nothing here is invented or scored.</p>
+<details class="coverage"><summary>What this agent covers <span aria-hidden="true">+</span></summary><p class="lead">Type a city. RE-agent resolves 34,000+ cities worldwide (population 15k+) and shows what public data says: live building-records lookup in Hong Kong, New York City and Chicago, Zillow value and rent indices for 20 US cities, official sold-price indices for 14 UK cities, and real listing routes where they exist. Every figure names its source and date. Nothing here is invented or scored.</p></details>
 <div id="buyView"><section><p class="label">01 / The city</p>
 <form id="askcity" autocomplete="off"><input id="qc" maxlength="80" aria-label="City you want to buy in" placeholder="e.g. Manchester, New York City, Hong Kong, Tokyo"><div class="controls"><span class="hint">Records live: Hong Kong · New York City · Chicago · market data: 20 US + 14 UK cities · 34,000+ cities resolve</span><button type="submit">Explore →</button></div></form>
 <div class="chips"><button type="button" data-c="Hong Kong">Hong Kong</button><button type="button" data-c="New York">New York City</button><button type="button" data-c="San Francisco">San Francisco</button><button type="button" data-c="Miami">Miami</button><button type="button" data-c="Los Angeles">Los Angeles</button><button type="button" data-c="Chicago">Chicago</button><button type="button" data-c="Las Vegas">Las Vegas</button><button type="button" data-c="Manchester">Manchester</button><button type="button" data-c="London">London</button></div>
@@ -199,5 +201,35 @@ r.innerHTML=h;
 <script>
 (function(){if(window.parent!==window){document.body.style.minHeight='0'}var last=0;function tell(){var h=document.body.scrollHeight;if(h!==last){last=h;try{parent.postMessage({reagentHeight:h},'*')}catch(e){}}}
 if(typeof ResizeObserver!=='undefined'){new ResizeObserver(tell).observe(document.body)}window.addEventListener('load',tell);setInterval(tell,800);tell()})();
+</script>
+
+<script>
+/* One-time scroll-triggered type reveal. Full text remains accessible and selectable. */
+(function(){
+ const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+ if(motion.matches || !('IntersectionObserver' in window))return;
+ const items=Array.from(document.querySelectorAll('h1, .label, #sellView .panel > p'));
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  const el=entry.target;el.classList.remove('reveal-pending');el.classList.add('reveal-playing');observer.unobserve(el);
+  setTimeout(()=>el.classList.remove('reveal-playing'),1600);
+ }),{threshold:0.25});
+ items.forEach(el=>{
+  if(!el.textContent.trim())return;
+  const original=el.cloneNode(true);const visual=document.createElement('span');visual.setAttribute('aria-hidden','true');
+  let count=0;const duration=950;const length=Math.max(1,el.textContent.length);
+  function copy(node,parent){
+   if(node.nodeType===3){node.textContent.split(/(\s+)/).forEach(word=>{
+    if(!word)return;if(/^\s+$/.test(word)){parent.appendChild(document.createTextNode(word));count+=word.length;return;}
+    const group=document.createElement('span');group.className='reveal-word';
+    Array.from(word).forEach(char=>{const part=document.createElement('span');part.className='reveal-char';part.style.setProperty('--char-delay',Math.round(count++/length*duration)+'ms');part.textContent=char;group.appendChild(part)});parent.appendChild(group);
+   });}else if(node.nodeType===1){const child=node.cloneNode(false);parent.appendChild(child);node.childNodes.forEach(n=>copy(n,child));}
+  }
+  original.childNodes.forEach(n=>copy(n,visual));
+  const accessible=document.createElement('span');accessible.className='reveal-accessible';accessible.textContent=el.textContent;
+  el.replaceChildren(accessible,visual);el.classList.add('reveal-pending');observer.observe(el);
+ });
+ motion.addEventListener('change',e=>{if(e.matches){observer.disconnect();items.forEach(el=>el.classList.remove('reveal-pending','reveal-playing'));}});
+})();
 </script>
 </body></html>
