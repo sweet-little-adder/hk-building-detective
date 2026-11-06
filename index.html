@@ -34,7 +34,11 @@
 <li><b>Listings open on external portals</b> (Zillow, 28Hse). RE-agent does not verify them. No valuations, no investment scores, no recommendation to buy or avoid anything.</li>
 </ul>
 </div></section></div>
-<div id="sellView" style="display:none"><section><p class="label">01 / Sell</p><div class="panel"><p>Seller tools are being built - there is no listing upload or valuation here yet.</p><p style="margin-top:10px">What you can do today: check your own building's public record before you list, so you know exactly what a buyer's search will surface. Switch to BUY, pick your city, run your address.</p><p class="muted" style="margin-top:10px">Nothing here is invented, estimated or scored.</p></div></section></div>
+<div id="sellView" style="display:none"><section><p class="label">01 / Sell</p><div class="panel"><p>No listing upload or valuation here yet - those need data we don't invent. What you can do today is see exactly what a buyer sees about your property before you list.</p></div>
+<p class="label" style="margin-top:26px">02 / Your city</p>
+<form id="asksellcity" autocomplete="off"><input id="qsc" maxlength="80" aria-label="City your property is in" placeholder="e.g. New York City, Hong Kong"><div class="controls"><span class="hint">The same public records and market data buyers use here</span><button type="submit">Check →</button></div></form>
+<div class="chips"><button type="button" data-sc="Hong Kong">Hong Kong</button><button type="button" data-sc="New York">New York City</button><button type="button" data-sc="Chicago">Chicago</button><button type="button" data-sc="Miami">Miami</button></div>
+<div id="sellPanel" style="margin-top:16px"></div></section></div>
 <footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live), Chicago <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Building Violations</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026. More jurisdictions in progress. Not legal, surveying or investment advice.</footer>
 </main><script>
 let DATA=null;
@@ -101,6 +105,18 @@ rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+(x.issue_date?x.issue_date.s
 h+='</div><p class="muted" style="margin-bottom:0">Clues, not a verdict. A records lookup, not a survey or legal advice.</p>';
 r.innerHTML=h;
 }catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>NYC Open Data did not answer. Try again in a moment.</p></div>'}});
+const sp=document.querySelector('#sellPanel');
+function sellToBuy(c){document.querySelector('#tabBuy').click();document.querySelector('#qc').value=c;pick(c)}
+function sellPick(raw){const c=resolveCity(raw);if(!c)return;
+let h='';
+if(c==='HK'){h='<div class="finding"><h3>Selling in Hong Kong</h3><p>A buyer using this app can pull your building\'s live s.24 and s.26 order record (Buildings Department datasets, orders issued since 1 May 2023). Run your own address first so nothing in it surprises you.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="Hong Kong">Check my building →</button></p></div>'}
+else if(c==='New York'){h='<div class="finding"><h3>Selling in New York City</h3><p>A buyer using this app sees your building\'s live DOB violations record, plus the city market snapshot (Zillow indices, Sep 2026). Check your address the way they will.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="New York">Check my building →</button></p></div>'}
+else if(c==='Chicago'){h='<div class="finding"><h3>Selling in Chicago</h3><p>A buyer using this app sees your building\'s live Building Violations record, plus the city market snapshot (Zillow indices, Sep 2026). Check your address the way they will.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="Chicago">Check my building →</button></p></div>'}
+else if(CITY_MARKET[c]){h='<div class="finding"><h3>Selling in '+c+'</h3><p>Buyers here see the '+c+' market snapshot (Zillow value and rent indices, Sep 2026) and portal listings. Building-records lookup is not live for '+c+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+c+'">See the buyer view →</button></p></div>'}
+else{h='<div class="finding warn"><h3>Coverage in progress</h3><p>Records lookup is live in Hong Kong, New York City and Chicago; market snapshots cover 20 US cities. Your city tells us where to go next.</p></div>'}
+sp.innerHTML=h;sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
+document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});
+document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{document.querySelector('#qsc').value=b.dataset.sc;sellPick(b.dataset.sc)});
 document.querySelector('#askchi').addEventListener('submit',async e=>{e.preventDefault();
 const raw=document.querySelector('#qchi').value.trim();const r=document.querySelector('#report');if(!raw)return;
 r.innerHTML='Checking Chicago open data…';
