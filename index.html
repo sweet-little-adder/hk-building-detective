@@ -29,7 +29,7 @@
 <li><b>Chicago records are live</b> from the city's Building Violations dataset. Status (open/complied) is as published; absence of records is not proof a building is clear.</li>
 <li><b>Market figures are Zillow Research indices</b>, city-level, Sep 2026: ZHVI (typical value of all homes: single-family + condo) and ZORI (typical asking rent across all rentals incl. multifamily). They describe the city, not any specific home, and they cover different housing stock - so no yield or return is computed from them.</li>
 <li><b>UK market figures are official sold prices</b>: average price of properties actually sold and year-on-year change, from the UK House Price Index (HM Land Registry / ONS), Aug 2026, per local authority area. They describe the area, not any specific home.</li>
-<li><b>City search works worldwide</b> via OpenStreetMap. Outside the bundled US/UK market cities and the HK/NYC/Chicago records areas, RE-agent resolves the city and points to a listing route where one is wired (US, UK, Hong Kong) - elsewhere it says so plainly instead of inventing data.</li>
+<li><b>City search works worldwide</b> via the bundled GeoNames city database - resolved on your device, no lookup is sent anywhere. Outside the bundled US/UK market cities and the HK/NYC/Chicago records areas, RE-agent resolves the city and points to a listing route where one is wired (US, UK, Hong Kong) - elsewhere it says so plainly instead of inventing data.</li>
 <li><b>Listings open on external portals</b> (Zillow, Rightmove, 28Hse). RE-agent does not verify them. No valuations, no investment scores, no recommendation to buy or avoid anything.</li>
 </ul>
 </div></section></div>
@@ -38,7 +38,7 @@
 <form id="asksellcity" autocomplete="off"><input id="qsc" maxlength="80" aria-label="City your property is in" placeholder="e.g. Manchester, New York City, Hong Kong"><div class="controls"><span class="hint">The same public records and market data buyers use here</span><button type="submit">Check →</button></div></form>
 <div class="chips"><button type="button" data-sc="Hong Kong">Hong Kong</button><button type="button" data-sc="New York">New York City</button><button type="button" data-sc="Chicago">Chicago</button><button type="button" data-sc="Miami">Miami</button><button type="button" data-sc="Manchester">Manchester</button><button type="button" data-sc="London">London</button></div>
 <div id="sellPanel" style="margin-top:16px"></div></section></div>
-<footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live), Chicago <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Building Violations</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026 (US); <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">UK House Price Index</a>, HM Land Registry / ONS, Aug 2026. Listings: Zillow, <a href="https://www.rightmove.co.uk/">Rightmove</a>, 28Hse. City resolution: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via Nominatim. More jurisdictions in progress. Not legal, surveying or investment advice.</footer>
+<footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live), Chicago <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Building Violations</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026 (US); <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">UK House Price Index</a>, HM Land Registry / ONS, Aug 2026. Listings: Zillow, <a href="https://www.rightmove.co.uk/">Rightmove</a>, 28Hse. City data: <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0), bundled. More jurisdictions in progress. Not legal, surveying or investment advice.</footer>
 </main><script>
 let DATA=null;
 const norm=s=>s.toUpperCase().replace(/[^A-Z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
@@ -81,19 +81,20 @@ function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /
 function marketCard(c){const d=CITY_MARKET[c];return '<div class="finding"><h3>'+c+', '+d.st+' - market snapshot</h3><p>Typical home value <b>'+fmt(d.zhvi)+'</b> · typical rent <b>'+fmt(d.zori)+'/mo</b></p><p class="muted">Zillow Research: ZHVI (typical value, all homes: single-family + condo) and ZORI (typical asking rent, all rentals incl. multifamily), '+CITY_MARKET._meta.zhvi_month.slice(0,7)+'. The two indices cover different housing stock - no yield is computed from them. <a href="https://www.zillow.com/research/data/">Source ↗</a></p><p style="margin-top:10px"><a href="'+zlink(c,d.st)+'">Browse '+c+' listings on Zillow ↗</a> · <a href="'+zlux(c,d.st)+'">Luxury listings, price high to low ↗</a></p></div>'}
 function marketCardUK(slug){const d=UK_MARKET[slug];const gbp='\u00a3'+Math.round(d.avg).toLocaleString('en-GB');const yoy=(d.yoy>0?'+':'')+d.yoy+'%';
 return '<div class="finding"><h3>'+d.label+' - market snapshot</h3><p>Average sold price <b>'+gbp+'</b> · '+yoy+' year on year</p><p class="muted">UK House Price Index (HM Land Registry / ONS), Aug 2026: average price of properties actually sold in the '+d.label+' local authority area. Area-level context, not a valuation of any home. <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">Source ↗</a></p><p style="margin-top:10px"><a href="https://www.rightmove.co.uk/property-for-sale/'+d.rm+'.html">Browse '+d.label+' listings on Rightmove ↗</a> · <a href="https://www.rightmove.co.uk/property-for-sale/'+d.rm+'.html?sortType=2">Highest priced first ↗</a></p></div>'}
-async function resolveWorld(q){const ck='nom:'+q.toLowerCase();
-try{const c=localStorage.getItem(ck);if(c)return JSON.parse(c)}catch(e){}
-try{const resp=await fetch('/api/geocode?q='+encodeURIComponent(q));
-if(!resp.ok)return null;
-const r=await resp.json();
-if(Array.isArray(r)&&r.length){const d={name:r[0].display_name};try{localStorage.setItem(ck,JSON.stringify(d))}catch(e){}return d}}catch(e){}
+let CITIES=null;
+async function resolveWorld(q){
+try{if(!CITIES){CITIES=await(await fetch('cities.json')).json()}}catch(e){return null}
+const key=q.toLowerCase().split(',')[0].replace(/\s+/g,' ').trim();
+let hit=null;
+for(const c of CITIES){const n=c[0].toLowerCase();if(n===key){hit=c;break}if(!hit&&key.length>3&&n.indexOf(key)===0)hit=c}
+if(hit)return {name:hit[0]+', '+hit[1]};
 return null}
 function worldPanel(name){const parts=name.split(',').map(x=>x.trim());const city=parts[0],country=parts[parts.length-1];let route='';
 if(country==='United Kingdom'){route='<p style="margin-top:10px"><a href="https://www.rightmove.co.uk/property-for-sale/'+encodeURIComponent(city)+'.html">Browse '+esc(city)+' listings on Rightmove ↗</a></p>'}
 else if(country==='Hong Kong'){route='<p style="margin-top:10px"><a href="https://www.28hse.com/en/buy/">Browse Hong Kong listings on 28Hse ↗</a></p>'}
 else if(country==='United States'){route='<p class="muted" style="margin-top:10px">For the US, listing routes and market data are wired for the 20 bundled cities - try one of the chips.</p>'}
 else{route='<p class="muted" style="margin-top:10px">A listing-portal route is not wired for '+esc(country)+' yet - no invented links.</p>'}
-return '<div class="finding"><h3>'+esc(city)+', '+esc(country)+'</h3><p>Resolved worldwide via OpenStreetMap. Building-records lookup is live only in Hong Kong, New York City and Chicago; bundled market data covers 20 US and 14 UK cities - '+esc(city)+' is outside those today, so no figures are shown rather than invented.</p>'+route+'</div>'}
+return '<div class="finding"><h3>'+esc(city)+', '+esc(country)+'</h3><p>Resolved from the GeoNames city database (34,000+ cities). Building-records lookup is live only in Hong Kong, New York City and Chicago; bundled market data covers 20 US and 14 UK cities - '+esc(city)+' is outside those today, so no figures are shown rather than invented.</p>'+route+'</div>'}
 async function pick(raw){const c=resolveCity(raw);const r=document.querySelector('#report');
 hkF.style.display='none';nycF.style.display='none';chiF.style.display='none';hkL.style.display='none';
 if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Hong Kong</h3><p>Building-records lookup is live below (BD s.24 + s.26 order datasets, snapshot 2026-10-15). City-level market indices for Hong Kong are not bundled yet.</p><p style="margin-top:10px"><a href="https://www.28hse.com/en/buy/">Browse Hong Kong listings on 28Hse ↗</a></p></div>';r.innerHTML='Search a building to see its record.';return}
@@ -104,7 +105,7 @@ if(CITY_MARKET[c]){cp.innerHTML=marketCard(c)+'<p class="muted" style="margin-to
 if(c==='OTHER'){cp.innerHTML='<p class="muted">Resolving '+esc(raw)+' worldwide…</p>';
 const w=await resolveWorld(raw);
 if(w){cp.innerHTML=worldPanel(w.name);r.innerHTML='City resolved above. Records and bundled market data do not cover it yet.'}
-else{cp.innerHTML='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (OpenStreetMap) found no match for what was typed. Live today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities. Try a nearby major city.</p></div>';r.innerHTML='Pick a covered city to see its data.'}return}}
+else{cp.innerHTML='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (GeoNames database) found no match for what was typed. Live today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities. Try a nearby major city.</p></div>';r.innerHTML='Pick a covered city to see its data.'}return}}
 
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
 document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{document.querySelector('#qc').value=b.dataset.c;pick(b.dataset.c)});
@@ -136,7 +137,7 @@ else if(c.indexOf('UK:')===0){const d=UK_MARKET[c.slice(3)];h='<div class="findi
 else if(CITY_MARKET[c]){h='<div class="finding"><h3>Selling in '+c+'</h3><p>Buyers here see the '+c+' market snapshot (Zillow value and rent indices, Sep 2026) and portal listings. Building-records lookup is not live for '+c+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+c+'">See the buyer view →</button></p></div>'}
 else{sp.innerHTML='<p class="muted">Resolving '+esc(raw)+' worldwide…</p>';
 const w=await resolveWorld(raw);
-if(w){const parts=w.name.split(',').map(x=>x.trim());h='<div class="finding"><h3>Selling in '+esc(parts[0])+', '+esc(parts[parts.length-1])+'</h3><p>Resolved worldwide via OpenStreetMap. Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(raw)+'">See the buyer view →</button></p></div>'}
+if(w){const parts=w.name.split(',').map(x=>x.trim());h='<div class="finding"><h3>Selling in '+esc(parts[0])+', '+esc(parts[parts.length-1])+'</h3><p>Resolved from the GeoNames city database (34,000+ cities). Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(raw)+'">See the buyer view →</button></p></div>'}
 else{h='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search found no match. Live coverage today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities.</p></div>'}}
 sp.innerHTML=h;sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
 
