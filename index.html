@@ -81,15 +81,11 @@ function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /
 function marketCard(c){const d=CITY_MARKET[c];return '<div class="finding"><h3>'+c+', '+d.st+' - market snapshot</h3><p>Typical home value <b>'+fmt(d.zhvi)+'</b> · typical rent <b>'+fmt(d.zori)+'/mo</b></p><p class="muted">Zillow Research: ZHVI (typical value, all homes: single-family + condo) and ZORI (typical asking rent, all rentals incl. multifamily), '+CITY_MARKET._meta.zhvi_month.slice(0,7)+'. The two indices cover different housing stock - no yield is computed from them. <a href="https://www.zillow.com/research/data/">Source ↗</a></p><p style="margin-top:10px"><a href="'+zlink(c,d.st)+'">Browse '+c+' listings on Zillow ↗</a> · <a href="'+zlux(c,d.st)+'">Luxury listings, price high to low ↗</a></p></div>'}
 function marketCardUK(slug){const d=UK_MARKET[slug];const gbp='\u00a3'+Math.round(d.avg).toLocaleString('en-GB');const yoy=(d.yoy>0?'+':'')+d.yoy+'%';
 return '<div class="finding"><h3>'+d.label+' - market snapshot</h3><p>Average sold price <b>'+gbp+'</b> · '+yoy+' year on year</p><p class="muted">UK House Price Index (HM Land Registry / ONS), Aug 2026: average price of properties actually sold in the '+d.label+' local authority area. Area-level context, not a valuation of any home. <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">Source ↗</a></p><p style="margin-top:10px"><a href="https://www.rightmove.co.uk/property-for-sale/'+d.rm+'.html">Browse '+d.label+' listings on Rightmove ↗</a> · <a href="https://www.rightmove.co.uk/property-for-sale/'+d.rm+'.html?sortType=2">Highest priced first ↗</a></p></div>'}
-const GEOCONF={enabled:true,endpoint:'https://nominatim.openstreetmap.org/search'};
-fetch('https://raw.githubusercontent.com/sweet-little-adder/hk-building-detective/main/geoconf.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(c=>{if(c){if(c.enabled===false)GEOCONF.enabled=false;if(typeof c.endpoint==='string'&&c.endpoint)GEOCONF.endpoint=c.endpoint}}).catch(()=>{});
-let lastGeo=0;function geoThrottle(){const w=1100-(Date.now()-lastGeo);lastGeo=Date.now()+(w>0?w:0);return w>0?new Promise(r=>setTimeout(r,w)):Promise.resolve()}
-async function resolveWorld(q){if(!GEOCONF.enabled)return null;
-const ck='nom:'+q.toLowerCase();
+async function resolveWorld(q){const ck='nom:'+q.toLowerCase();
 try{const c=localStorage.getItem(ck);if(c)return JSON.parse(c)}catch(e){}
-try{await geoThrottle();
-const u=GEOCONF.endpoint+'?format=jsonv2&limit=1&featureType=city&q='+encodeURIComponent(q);
-const r=await(await fetch(u)).json();
+try{const resp=await fetch('/api/geocode?q='+encodeURIComponent(q));
+if(!resp.ok)return null;
+const r=await resp.json();
 if(Array.isArray(r)&&r.length){const d={name:r[0].display_name};try{localStorage.setItem(ck,JSON.stringify(d))}catch(e){}return d}}catch(e){}
 return null}
 function worldPanel(name){const parts=name.split(',').map(x=>x.trim());const city=parts[0],country=parts[parts.length-1];let route='';
