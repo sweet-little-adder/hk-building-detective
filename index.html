@@ -29,7 +29,7 @@
 <li><b>Chicago records are live</b> from the city's Building Violations dataset. Status (open/complied) is as published; absence of records is not proof a building is clear.</li>
 <li><b>Market figures are Zillow Research indices</b>, city-level, Sep 2026: ZHVI (typical value of all homes: single-family + condo) and ZORI (typical asking rent across all rentals incl. multifamily). They describe the city, not any specific home, and they cover different housing stock - so no yield or return is computed from them.</li>
 <li><b>UK market figures are official sold prices</b>: average price of properties actually sold and year-on-year change, from the UK House Price Index (HM Land Registry / ONS), Aug 2026, per local authority area. They describe the area, not any specific home.</li>
-<li><b>City search works worldwide</b> via the bundled GeoNames city database - resolved on your device, no lookup is sent anywhere. Outside the bundled US/UK market cities and the HK/NYC/Chicago records areas, RE-agent resolves the city and points to a listing route where one is wired (US, UK, Hong Kong) - elsewhere it says so plainly instead of inventing data.</li>
+<li><b>City search covers 34,000+ cities worldwide</b> (population 15k+) via the bundled GeoNames city database - resolved on your device, no lookup is sent anywhere. Smaller towns: search the nearest major city. Outside the bundled US/UK market cities and the HK/NYC/Chicago records areas, RE-agent resolves the city and points to a listing route where one is wired (US, UK, Hong Kong) - elsewhere it says so plainly instead of inventing data.</li>
 <li><b>Listings open on external portals</b> (Zillow, Rightmove, 28Hse). RE-agent does not verify them. No valuations, no investment scores, no recommendation to buy or avoid anything.</li>
 </ul>
 </div></section></div>
@@ -102,7 +102,7 @@ if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marke
 if(c==='Chicago'){chiF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('Chicago');r.innerHTML='Market snapshot above · run an address below for its live violations record.';return}
 if(c&&c.indexOf('UK:')===0){cp.innerHTML=marketCardUK(c.slice(3));r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}
 if(CITY_MARKET[c]){cp.innerHTML=marketCard(c)+'<p class="muted" style="margin-top:8px">Building-records lookup for '+c+' is in progress - live today in Hong Kong, New York City and Chicago.</p>';r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}
-if(c==='OTHER'){cp.innerHTML='<p class="muted">Resolving '+esc(raw)+' worldwide…</p>';
+if(c==='OTHER'){cp.innerHTML='<p class="muted">Resolving '+esc(raw)+'…</p>';
 const w=await resolveWorld(raw);
 if(w){cp.innerHTML=worldPanel(w.name);r.innerHTML='City resolved above. Records and bundled market data do not cover it yet.'}
 else{cp.innerHTML='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (GeoNames database) found no match for what was typed. Live today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities. Try a nearby major city.</p></div>';r.innerHTML='Pick a covered city to see its data.'}return}}
@@ -135,10 +135,10 @@ else if(c==='New York'){h='<div class="finding"><h3>Selling in New York City</h3
 else if(c==='Chicago'){h='<div class="finding"><h3>Selling in Chicago</h3><p>A buyer using this app sees your building\'s live Building Violations record, plus the city market snapshot (Zillow indices, Sep 2026). Check your address the way they will.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="Chicago">Check my building →</button></p></div>'}
 else if(c.indexOf('UK:')===0){const d=UK_MARKET[c.slice(3)];h='<div class="finding"><h3>Selling in '+d.label+'</h3><p>Buyers here see the '+d.label+' market snapshot (UK House Price Index average sold price, Aug 2026) and Rightmove listings. Building-records lookup is not live for '+d.label+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+d.label+'">See the buyer view →</button></p></div>'}
 else if(CITY_MARKET[c]){h='<div class="finding"><h3>Selling in '+c+'</h3><p>Buyers here see the '+c+' market snapshot (Zillow value and rent indices, Sep 2026) and portal listings. Building-records lookup is not live for '+c+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+c+'">See the buyer view →</button></p></div>'}
-else{sp.innerHTML='<p class="muted">Resolving '+esc(raw)+' worldwide…</p>';
+else{sp.innerHTML='<p class="muted">Resolving '+esc(raw)+'…</p>';
 const w=await resolveWorld(raw);
 if(w){const parts=w.name.split(',').map(x=>x.trim());h='<div class="finding"><h3>Selling in '+esc(parts[0])+', '+esc(parts[parts.length-1])+'</h3><p>Resolved from the GeoNames city database (34,000+ cities). Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(raw)+'">See the buyer view →</button></p></div>'}
-else{h='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search found no match. Live coverage today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities.</p></div>'}}
+else{h='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search found no match - try the nearest major city. Live coverage today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities.</p></div>'}}
 sp.innerHTML=h;sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
 
 document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});
