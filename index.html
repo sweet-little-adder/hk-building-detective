@@ -197,7 +197,7 @@ r.innerHTML=h;
 })();
 </script>
 <script>
-(function(){if(window.parent!==window){document.body.style.minHeight='0'}var last=0;function tell(){var h=document.documentElement.scrollHeight;if(h!==last){last=h;try{parent.postMessage({reagentHeight:h},'*')}catch(e){}}}
+(function(){if(window.parent!==window){document.body.style.minHeight='0'}var last=0;function tell(){var h=document.body.scrollHeight;if(h!==last){last=h;try{parent.postMessage({reagentHeight:h},'*')}catch(e){}}}
 if(typeof ResizeObserver!=='undefined'){new ResizeObserver(tell).observe(document.body)}window.addEventListener('load',tell);setInterval(tell,800);tell()})();
 </script>
 </body></html>
