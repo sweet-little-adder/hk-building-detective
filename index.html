@@ -8,16 +8,17 @@
 .cities{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.cities button{font-size:12px;background:#23262a;color:#ffd6a8;border:1px solid #4d4433;padding:8px 11px;cursor:pointer}.cities button.on{background:#ffb35e;color:#241a06;border-color:#ffb35e}
 .vrow{margin-top:10px}.vrow .v{border:1px solid #3a3326;padding:12px;margin:8px 0;background:#191b1d;font-size:12.5px}.vrow .v b{color:#ffb35e}
 </style></head><body><main>
-<header><div class="mark">✳ RE-AGENT</div><div class="tag">PUBLIC RECORDS · HK + NYC LIVE</div></header>
+<header><div class="mark">✳ RE-AGENT</div><div class="tag">PUBLIC RECORDS · HK + NYC + CHICAGO</div></header>
 <div class="tabs"><button id="tabBuy" class="on" type="button">BUY</button><button id="tabSell" type="button">SELL</button></div>
 <h1>Know the city.<br>Know the building.</h1>
-<p class="lead">Type a city. RE-agent shows what public data says about it: live building-records lookup in Hong Kong and New York City, Zillow value and rent indices for 20 US cities, and where to browse real listings. Every figure names its source and date. Nothing here is invented or scored.</p>
+<p class="lead">Type a city. RE-agent shows what public data says about it: live building-records lookup in Hong Kong, New York City and Chicago, Zillow value and rent indices for 20 US cities, and where to browse real listings. Every figure names its source and date. Nothing here is invented or scored.</p>
 <div id="buyView"><section><p class="label">01 / The city</p>
-<form id="askcity" autocomplete="off"><input id="qc" maxlength="80" aria-label="City you want to buy in" placeholder="e.g. New York City, Miami, Hong Kong"><div class="controls"><span class="hint">Records live: Hong Kong + New York City · market indices: 20 US cities</span><button type="submit">Explore →</button></div></form>
+<form id="askcity" autocomplete="off"><input id="qc" maxlength="80" aria-label="City you want to buy in" placeholder="e.g. New York City, Miami, Hong Kong"><div class="controls"><span class="hint">Records live: Hong Kong · New York City · Chicago · market indices: 20 US cities</span><button type="submit">Explore →</button></div></form>
 <div class="chips"><button type="button" data-c="Hong Kong">Hong Kong</button><button type="button" data-c="New York">New York City</button><button type="button" data-c="San Francisco">San Francisco</button><button type="button" data-c="Miami">Miami</button><button type="button" data-c="Los Angeles">Los Angeles</button><button type="button" data-c="Chicago">Chicago</button><button type="button" data-c="Las Vegas">Las Vegas</button></div>
 <div id="cityPanel" style="margin-top:16px"></div>
 <p class="label" style="margin-top:26px" id="hkLabel">02 / The building</p>
 <div id="nycForm" style="display:none"><form id="asknyc" autocomplete="off"><input id="qnyc" maxlength="120" aria-label="NYC building address" placeholder="e.g. 452 Fifth Avenue"><div class="controls"><span class="hint">Live NYC DOB violations · NYC Open Data</span><button type="submit">Investigate →</button></div></form></div>
+<div id="chiForm" style="display:none"><form id="askchi" autocomplete="off"><input id="qchi" maxlength="120" aria-label="Chicago building address" placeholder="e.g. 233 S Wacker Dr"><div class="controls"><span class="hint">Live Chicago building violations · data.cityofchicago.org</span><button type="submit">Investigate →</button></div></form></div>
 <div id="hkForm"><form id="ask" autocomplete="off"><input id="q" maxlength="120" aria-label="Building name or street" placeholder="e.g. New Lucky House, Nathan Road, Chungking Mansions">
 <div class="controls"><span class="hint">English names as published by BD · snapshot 2026-10-15</span><button id="submit" type="submit">Investigate →</button></div></form>
 <div class="suggest" id="suggest"></div>
@@ -28,12 +29,13 @@
 <ul>
 <li><b>Hong Kong records: not listed ≠ no problems.</b> The s.24 and s.26 datasets only cover orders issued <b>after 1 May 2023</b>, refreshed monthly. Older orders, other order types, and every other kind of defect are outside this snapshot. Counts are cumulative orders issued, not outstanding - check per-order status in the <a href="https://www.bd.gov.hk/en/resources/online-tools/orders-search/ordersearch.html">BD order search</a>. Addresses are BD's published English names; confirm the address, not just the name.</li>
 <li><b>New York City records are live</b> from NYC Open Data's DOB Violations dataset. Dismissed violations are history, not current state; absence of records is not proof a building is clear.</li>
+<li><b>Chicago records are live</b> from the city's Building Violations dataset. Status (open/complied) is as published; absence of records is not proof a building is clear.</li>
 <li><b>Market figures are Zillow Research indices</b>, city-level, Sep 2026: ZHVI (typical value of all homes: single-family + condo) and ZORI (typical asking rent across all rentals incl. multifamily). They describe the city, not any specific home, and they cover different housing stock - so no yield or return is computed from them.</li>
 <li><b>Listings open on external portals</b> (Zillow, 28Hse). RE-agent does not verify them. No valuations, no investment scores, no recommendation to buy or avoid anything.</li>
 </ul>
 </div></section></div>
 <div id="sellView" style="display:none"><section><p class="label">01 / Sell</p><div class="panel"><p>Seller tools are being built - there is no listing upload or valuation here yet.</p><p style="margin-top:10px">What you can do today: check your own building's public record before you list, so you know exactly what a buyer's search will surface. Switch to BUY, pick your city, run your address.</p><p class="muted" style="margin-top:10px">Nothing here is invented, estimated or scored.</p></div></section></div>
-<footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026. More jurisdictions in progress. Not legal, surveying or investment advice.</footer>
+<footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live), Chicago <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Building Violations</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026. More jurisdictions in progress. Not legal, surveying or investment advice.</footer>
 </main><script>
 let DATA=null;
 const norm=s=>s.toUpperCase().replace(/[^A-Z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
@@ -66,18 +68,19 @@ function renderNone(term){report.innerHTML='<h3 style="margin:0 0 8px;font-size:
 const buy=document.querySelector('#tabBuy'),sell=document.querySelector('#tabSell');
 buy.onclick=()=>{buy.classList.add('on');sell.classList.remove('on');document.querySelector('#buyView').style.display='';document.querySelector('#sellView').style.display='none'};
 sell.onclick=()=>{sell.classList.add('on');buy.classList.remove('on');document.querySelector('#buyView').style.display='none';document.querySelector('#sellView').style.display=''};
-const hkF=document.querySelector('#hkForm'),nycF=document.querySelector('#nycForm'),hkL=document.querySelector('#hkLabel'),cp=document.querySelector('#cityPanel');
+const hkF=document.querySelector('#hkForm'),nycF=document.querySelector('#nycForm'),chiF=document.querySelector('#chiForm'),hkL=document.querySelector('#hkLabel'),cp=document.querySelector('#cityPanel');
 const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
-const ALIAS={'hong kong':'HK','hk':'HK','hongkong':'HK','new york':'New York','nyc':'New York','new york city':'New York'};
+const ALIAS={'hong kong':'HK','hk':'HK','hongkong':'HK','new york':'New York','nyc':'New York','new york city':'New York','chicago':'Chicago','chi':'Chicago'};
 function resolveCity(s){s=(s||'').trim();if(!s)return null;const key=s.toLowerCase().split(',')[0].replace(/\s+/g,' ').trim();if(ALIAS[key])return ALIAS[key];for(const c in CITY_MARKET){if(c==='_meta')continue;if(c.toLowerCase()===key)return c}return 'OTHER'}
 function zlink(c,st){return 'https://www.zillow.com/homes/'+c.replace(/ /g,'-')+',-'+st+'_rb/'}
 function marketCard(c){const d=CITY_MARKET[c];return '<div class="finding"><h3>'+c+', '+d.st+' - market snapshot</h3><p>Typical home value <b>'+fmt(d.zhvi)+'</b> · typical rent <b>'+fmt(d.zori)+'/mo</b></p><p class="muted">Zillow Research: ZHVI (typical value, all homes: single-family + condo) and ZORI (typical asking rent, all rentals incl. multifamily), '+CITY_MARKET._meta.zhvi_month.slice(0,7)+'. The two indices cover different housing stock - no yield is computed from them. <a href="https://www.zillow.com/research/data/">Source ↗</a></p><p style="margin-top:10px"><a href="'+zlink(c,d.st)+'">Browse '+c+' listings on Zillow ↗</a></p></div>'}
 function pick(raw){const c=resolveCity(raw);const r=document.querySelector('#report');
-hkF.style.display='none';nycF.style.display='none';hkL.style.display='none';
+hkF.style.display='none';nycF.style.display='none';chiF.style.display='none';hkL.style.display='none';
 if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Hong Kong</h3><p>Building-records lookup is live below (BD s.24 + s.26 order datasets, snapshot 2026-10-15). City-level market indices for Hong Kong are not bundled yet.</p><p style="margin-top:10px"><a href="https://www.28hse.com/en/buy/">Browse Hong Kong listings on 28Hse ↗</a></p></div>';r.innerHTML='Search a building to see its record.';return}
 if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('New York');r.innerHTML='Market snapshot above · run an address below for its live DOB record.';return}
-if(CITY_MARKET[c]){cp.innerHTML=marketCard(c)+'<p class="muted" style="margin-top:8px">Building-records lookup for '+c+' is in progress - live today in Hong Kong and New York City.</p>';r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}
-if(c==='OTHER'){cp.innerHTML='<div class="finding warn"><h3>Coverage in progress</h3><p>No records lookup or market index for that city yet. Live today: records in Hong Kong and New York City, market indices for '+(Object.keys(CITY_MARKET).length-1)+' US cities. The city you typed tells us where to go next.</p></div>';r.innerHTML='Pick a covered city to see its data.';return}}
+if(c==='Chicago'){chiF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('Chicago');r.innerHTML='Market snapshot above · run an address below for its live violations record.';return}
+if(CITY_MARKET[c]){cp.innerHTML=marketCard(c)+'<p class="muted" style="margin-top:8px">Building-records lookup for '+c+' is in progress - live today in Hong Kong, New York City and Chicago.</p>';r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}
+if(c==='OTHER'){cp.innerHTML='<div class="finding warn"><h3>Coverage in progress</h3><p>No records lookup or market index for that city yet. Live today: records in Hong Kong, New York City and Chicago, market indices for '+(Object.keys(CITY_MARKET).length-1)+' US cities. The city you typed tells us where to go next.</p></div>';r.innerHTML='Pick a covered city to see its data.';return}}
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
 document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{document.querySelector('#qc').value=b.dataset.c;pick(b.dataset.c)});
 document.querySelector('#asknyc').addEventListener('submit',async e=>{e.preventDefault();
@@ -96,6 +99,21 @@ rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+(x.issue_date?x.issue_date.s
 h+='</div><p class="muted" style="margin-bottom:0">Clues, not a verdict. A records lookup, not a survey or legal advice.</p>';
 r.innerHTML=h;
 }catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>NYC Open Data did not answer. Try again in a moment.</p></div>'}});
+document.querySelector('#askchi').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qchi').value.trim();const r=document.querySelector('#report');if(!raw)return;
+r.innerHTML='Checking Chicago open data…';
+const addr=raw.toUpperCase().replace(/'/g,"''");
+try{
+const q="https://data.cityofchicago.org/resource/22u3-xenr.json?$where=upper(address) like '%25"+encodeURIComponent(addr)+"%25'&$order=violation_date DESC&$limit=50";
+const rows=await(await fetch(q)).json();
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><div class="finding clear"><h3>✓ No building violations on record for this address</h3><p>Live query against Chicago's Building Violations dataset returned nothing. That is not proof the building is clear - check the dataset notes. <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Source dataset ↗</a></p></div>';return}
+const open=rows.filter(x=>(x.violation_status||'').toUpperCase()==='OPEN').length;
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><p class="muted" style="margin:0 0 6px">Live from data.cityofchicago.org · Building Violations · '+rows.length+' record'+(rows.length>1?'s':'')+' ('+open+' open)</p>';
+h+='<div class="finding '+(open?'warn':'clear')+'"><h3>'+(open?'⚠ ':'✓ ')+'Building violations: '+open+' open of '+rows.length+' shown</h3><p>Newest records below. Statuses and descriptions are as published by the City of Chicago. <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Source dataset ↗</a></p></div><div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+((x.violation_date||'').slice(0,10))+'</b> · '+(x.violation_status||'')+' · '+(x.violation_code||'')+'<br>'+((x.violation_description||'').trim().slice(0,120))+(x.violation_inspector_comments?('<br><span class="muted">'+x.violation_inspector_comments.slice(0,140)+'</span>'):'')+'</div>'});
+h+='</div><p class="muted" style="margin-bottom:0">Clues, not a verdict. A records lookup, not a survey or legal advice.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>Chicago open data did not answer. Try again in a moment.</p></div>'}});
 })();
 </script>
 <script>
