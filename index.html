@@ -345,4 +345,74 @@ if(typeof ResizeObserver!=='undefined'){new ResizeObserver(tell).observe(documen
  motion.addEventListener('change',e=>{if(e.matches){observer.disconnect();items.forEach(el=>el.classList.remove('reveal-pending','reveal-playing'));}});
 })();
 </script>
-</body></html>
+<script>
+(() => {
+'use strict';
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N=s=>String(s||'').toUpperCase().replace(/\bAVENUE\b/g,'AVE').replace(/\bSTREET\b/g,'ST').replace(/\bWEST\b/g,'W').replace(/\bEAST\b/g,'E').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const R={
+nyc:{name:'432 Park Avenue',address:'432 Park Avenue',aliases:['432 Park Ave'],qualification:'https://www.cityrealty.com/buildings/top-ten/top-10-midtown-east-condo-buildings/78',source:'https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9',endpoint:'https://data.cityofnewyork.us/resource/3h2n-5cm9.json',where:"bin='1088817'",order:'issue_date DESC',identity:'BIN 1088817'},
+chi:{name:'One Bennett Park',address:'451 E Grand Ave',aliases:['451 East Grand Avenue'],qualification:'https://www.related.com/our-company/properties/one-bennett-park',source:'https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr',endpoint:'https://data.cityofchicago.org/resource/22u3-xenr.json',where:"address='451 E GRAND AVE'",order:'violation_date DESC'},
+van:{name:'Vancouver House',address:'1480 Howe St',aliases:['1480 Howe Street'],qualification:'https://dac.dk/en/magazine/places/vancouver-house-660',source:'https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/'},
+tor:{name:'FourFifty The Well',address:'450 Front St W',aliases:['450 Front Street West','FourFifty'],qualification:'https://thewelltoronto.com/live/rental-suites/',binding:'https://livingatfourfifty.com/',source:'https://open.toronto.ca/dataset/apartment-building-evaluation/'},
+cal:{name:'The Concord',address:'738 1 AV SW',aliases:['738 1 Avenue SW','738 1 Ave SW'],qualification:'https://www.concordpacific.com/project/the-concord/',binding:'https://yyccondos.com/compare/738-1-avenue-sw-vs-le-germain-residences',source:'https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w',endpoint:'https://data.calgary.ca/resource/4bsw-nn7w.json',where:"upper(address) like '% 738 1 AV SW'",order:'address ASC'},
+edm:{name:'Encore Tower',address:'10180 103 Street NW',aliases:['10180 103 St','10180 103 Street','10180 103 St NW','Encore'],qualification:'https://westrichpacific.com/project/encore-tower',source:'https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg',endpoint:'https://data.edmonton.ca/resource/q7d6-ambg.json',where:"house_number='10180' AND street_name='103 STREET NW'",order:'suite ASC'}
+};
+const lang=document.documentElement.lang.slice(0,2);
+const texts={
+en:['Selected luxury developments only. Coverage is limited, not a full inventory. City market figures describe the whole market, not luxury homes.','Not in the curated luxury directory','This address has not been qualified for this directory. This says nothing about statutory orders, safety or value.','General official-source research (external, not luxury-filtered)','Luxury qualification source','Checking official records...','Records unavailable','The source did not return verifiable records. This is not a no-match or a safety clearance.','No matching records returned','No record is not proof of safety or absence of orders.','Public records, not sale listings. Assessment values are for tax, not asking or sale prices. Historic orders may concern earlier works at the same address.','Records shown','Up to 100 records are retrieved; up to 8 shown. More may exist.','Choose the qualified building below or enter its exact address.'],
+de:['Nur ausgewählte Luxuswohnanlagen. Begrenzte Abdeckung, kein vollständiges Verzeichnis. Stadtmarktdaten betreffen den gesamten Markt.','Nicht im kuratierten Luxusverzeichnis','Diese Adresse wurde nicht für dieses Verzeichnis qualifiziert. Das sagt nichts über Anordnungen, Sicherheit oder Wert aus.','Allgemeine amtliche Recherche (extern, ohne Luxusfilter)','Quelle zur Luxusqualifikation','Amtliche Daten werden geprüft...','Daten nicht verfügbar','Die Quelle lieferte keine überprüfbaren Daten. Dies ist kein Sicherheitsnachweis.','Keine passenden Datensätze erhalten','Kein Datensatz ist kein Nachweis für Sicherheit oder fehlende Anordnungen.','Öffentliche Daten, keine Verkaufsangebote. Steuerwerte sind keine Verkaufspreise. Historische Anordnungen können frühere Arbeiten an derselben Adresse betreffen.','Angezeigte Datensätze','Bis zu 100 Datensätze abgerufen; bis zu 8 angezeigt. Weitere können existieren.','Wählen Sie das qualifizierte Gebäude oder geben Sie die genaue Adresse ein.'],
+fr:['Résidences de luxe sélectionnées uniquement. Couverture limitée, pas un inventaire complet. Les données du marché concernent toute la ville.','Hors du répertoire de luxe sélectionné','Cette adresse ne figure pas dans ce répertoire qualifié. Cela ne dit rien sur les arrêtés, la sécurité ou la valeur.','Recherche officielle générale (externe, sans filtre de luxe)','Source de qualification de luxe','Vérification des données officielles...','Données indisponibles','La source ne renvoie pas de données vérifiables. Ce n’est pas une garantie de sécurité.','Aucune donnée correspondante renvoyée','L’absence de données ne garantit ni sécurité ni absence d’arrêtés.','Données publiques, pas des annonces de vente. Les valeurs fiscales ne sont pas des prix de vente. Les anciens arrêtés peuvent concerner des travaux antérieurs à cette adresse.','Données affichées','100 données au maximum récupérées ; 8 affichées. Il peut en exister davantage.','Choisissez le bâtiment qualifié ou saisissez son adresse exacte.'],
+nl:['Alleen geselecteerde luxecomplexen. Beperkte dekking, geen volledige inventaris. Marktgegevens gelden voor de hele stad.','Niet in de samengestelde luxedirectory','Dit adres is niet voor deze directory gekwalificeerd. Dit zegt niets over bevelen, veiligheid of waarde.','Algemeen officieel onderzoek (extern, zonder luxefilter)','Bron voor luxekwalificatie','Officiële gegevens controleren...','Gegevens niet beschikbaar','De bron gaf geen controleerbare gegevens. Dit is geen veiligheidsverklaring.','Geen passende gegevens ontvangen','Geen gegevens is geen bewijs van veiligheid of ontbrekende bevelen.','Openbare gegevens, geen verkoopaanbod. Belastingwaarden zijn geen verkoopprijzen. Historische bevelen kunnen eerdere werkzaamheden op hetzelfde adres betreffen.','Getoonde gegevens','Maximaal100 opgehaald; maximaal8 getoond. Er kunnen meer bestaan.','Kies het gekwalificeerde gebouw of voer het exacte adres in.'],
+pl:['Tylko wybrane luksusowe inwestycje. Ograniczony zakres, nie pełny katalog. Dane rynkowe dotyczą całego miasta.','Poza wybranym katalogiem luksusowym','Ten adres nie został zakwalifikowany do katalogu. Nie oznacza to nic o nakazach, bezpieczeństwie ani wartości.','Ogólne badanie źródła urzędowego (zewnętrzne, bez filtra luksusowego)','Źródło kwalifikacji luksusowej','Sprawdzanie danych urzędowych...','Dane niedostępne','Źródło nie zwróciło weryfikowalnych danych. To nie jest potwierdzenie bezpieczeństwa.','Brak pasujących danych','Brak danych nie dowodzi bezpieczeństwa ani braku nakazów.','Dane publiczne, nie oferty sprzedaży. Wartości podatkowe nie są cenami sprzedaży. Historyczne nakazy mogą dotyczyć wcześniejszych prac pod tym adresem.','Wyświetlone dane','Pobrano do100 rekordów; pokazano do8. Może istnieć więcej.','Wybierz zakwalifikowany budynek lub wpisz dokładny adres.']};
+const T=texts[lang]||texts.en;
+const scope=document.querySelector('#luxuryScope');if(scope)scope.textContent=T[0];
+const labels={nyc:'New York City',chi:'Chicago',van:'Vancouver',tor:'Toronto',cal:'Calgary',edm:'Edmonton'};
+for(const [key,b] of Object.entries(R)){
+ const f=document.querySelector('#ask'+key),q=document.querySelector('#q'+key);if(!f||!q)continue;
+ q.placeholder=b.name+' / '+b.address;
+ const group=document.createElement('div');group.className='chips';
+ const local=document.createElement('button');local.type='button';local.textContent=b.name;local.addEventListener('click',()=>{q.value=b.address;f.requestSubmit()});group.append(local);f.prepend(group);
+ const link=document.createElement('p');link.innerHTML='<a target="_blank" rel="noopener noreferrer" href="'+b.source+'">'+E(T[3])+' ↗</a>';f.append(link);
+ f.addEventListener('submit',async e=>{
+  e.preventDefault();e.stopImmediatePropagation();
+  const out=document.querySelector('#report'),raw=N(q.value);const allowed=[b.name,b.address,...b.aliases].some(v=>N(v)===raw);
+  const links='<p><a target="_blank" rel="noopener noreferrer" href="'+b.qualification+'">'+E(T[4])+' ↗</a> · <a target="_blank" rel="noopener noreferrer" href="'+b.source+'">'+E(T[3])+' ↗</a></p>';
+  if(!allowed){out.innerHTML='<div class="finding warn"><h3>'+E(T[1])+'</h3><p>'+E(T[2])+'</p><p>'+E(b.name)+' · '+E(b.address)+'</p>'+links+'</div>';return}
+  q.value=b.address;out.innerHTML='<p>'+E(T[5])+'</p>';
+  try{
+   let rows=[],total=null;
+   if(key==='tor'){
+    const res=await fetch('toronto.json');if(!res.ok)throw Error('source');const data=await res.json();if(!Array.isArray(data))throw Error('format');rows=data.filter(x=>N(x.a)===N(b.address)).sort((a,c)=>Number(c.ev)-Number(a.ev));if(rows.length)rows=rows.slice(0,1);
+   }else if(key==='van'){
+    const params=new URLSearchParams({where:"report_year='2026' AND to_civic_number='1480' AND street_name='HOWE ST'",limit:'100'});
+    const res=await fetch('https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/property-tax-report/records?'+params);if(!res.ok)throw Error('source');const data=await res.json();if(!Array.isArray(data.results))throw Error('format');rows=data.results;total=data.total_count;
+    if(rows.some(x=>x.to_civic_number!=='1480'||x.street_name!=='HOWE ST'||x.report_year!=='2026'))throw Error('identity');
+   }else{
+    const params=new URLSearchParams({'$where':b.where,'$order':b.order,'$limit':'100'});const res=await fetch(b.endpoint+'?'+params);if(!res.ok)throw Error('source');rows=await res.json();if(!Array.isArray(rows))throw Error('format');
+    if(key==='nyc'&&rows.some(x=>x.bin!=='1088817'))throw Error('identity');
+    if(key==='chi'&&rows.some(x=>x.address!=='451 E GRAND AVE'))throw Error('identity');
+    if(key==='cal'&&rows.some(x=>!N(x.address).endsWith('738 1 AV SW')))throw Error('identity');
+    if(key==='edm'&&rows.some(x=>x.house_number!=='10180'||x.street_name!=='103 STREET NW'))throw Error('identity');
+   }
+   let h='<div class="finding"><h3>'+E(b.name)+' · '+E(b.address)+'</h3><p>'+E(T[10])+'</p>'+links;
+   if(!rows.length)h+='<h3>'+E(T[8])+'</h3><p>'+E(T[9])+'</p>';
+   else{
+    h+='<p>'+E(T[11])+': '+Math.min(rows.length,8)+(total!==null?' / '+total:'')+'. '+E(T[12])+'</p><div class="vrow">';
+    for(const x of rows.slice(0,8)){
+     let info='';
+     if(key==='nyc')info=[x.issue_date,x.violation_category,x.violation_type,x.description,x.disposition_comments].filter(Boolean).join(' · ');
+     if(key==='chi')info=[x.violation_date?.slice(0,10),x.violation_status,x.violation_description,x.violation_inspector_comments].filter(Boolean).join(' · ');
+     if(key==='van')info=[x.from_civic_number?'Unit '+x.from_civic_number:'',x.to_civic_number+' '+x.street_name,'Land C$'+Number(x.current_land_value||0).toLocaleString('en-CA'),'Building C$'+Number(x.current_improvement_value||0).toLocaleString('en-CA'),'2026'].join(' · ');
+     if(key==='tor')info=[x.a,'RentSafeTO '+x.score+'/100',x.ev,'Snapshot 2026-11-09'].join(' · ');
+     if(key==='cal')info=[x.address,'C$'+Number(x.assessed_value).toLocaleString('en-CA'),x.assessment_class_description,x.roll_year].join(' · ');
+     if(key==='edm')info=[x.suite?'Unit '+x.suite:'',x.house_number+' '+x.street_name,'C$'+Number(x.assessed_value).toLocaleString('en-CA'),x.tax_class].join(' · ');
+     h+='<div class="v">'+E(info)+'</div>';
+    }h+='</div>';
+   }out.innerHTML=h+'</div>';
+  }catch(err){out.innerHTML='<div class="finding warn"><h3>'+E(b.name)+' · '+E(T[6])+'</h3><p>'+E(T[7])+'</p>'+links+'</div>'}
+ },true);
+}
+})();
+
+</script></body></html>
