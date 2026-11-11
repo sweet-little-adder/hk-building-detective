@@ -374,4 +374,12 @@ const d = {
   }
 }
 
+
+function hashCmp(){return (location.hash||'').toLowerCase()==='#compare'}
+if(hashCmp())showCmp();
+window.addEventListener('hashchange',function(){if(hashCmp())showCmp()});
+window.addEventListener('message',function(e){
+  if(e.origin!=='https://sauletrust.com'&&e.origin!=='https://www.sauletrust.com')return;
+  if(e.data&&e.data.reagentTab==='compare')showCmp();
+});
 })();
