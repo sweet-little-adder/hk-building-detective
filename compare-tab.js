@@ -395,7 +395,7 @@ if(window.REAGENT_COMPARE_EXTRA&&window.REAGENT_COMPARE_EXTRA.render){
   var tw=v.querySelector('.tw'),tb=v.querySelector('#cmpView #t tbody');
   if(!tw||!tb)return;
   var cs=document.createElement('style');
-  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpsel .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
+  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpsel .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}@media (hover:none){#cmpView .cmpsel .chips button:hover{color:#dcc9ad;border-bottom-color:#7c6650}#cmpView .cmpsel .chips button.on:hover{color:#fdf6e9;border-bottom-color:#f1e3c6}}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
   document.head.appendChild(cs);
   var dataRows=[].slice.call(tb.querySelectorAll('tr'));
   var otherCities=['Hong Kong','Manchester','Vancouver','Toronto','Calgary','Edmonton'];
@@ -412,7 +412,7 @@ if(window.REAGENT_COMPARE_EXTRA&&window.REAGENT_COMPARE_EXTRA.render){
     var item={el:c,name:name,row:row,na:null,on:false};
     function render(){c.textContent=item.name;c.classList.toggle('on',item.on);c.setAttribute('aria-pressed',item.on?'true':'false')}
     function setOn(x){item.on=x;if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}render();sync()}
-    c.addEventListener('click',function(){setOn(!item.on)});
+    c.addEventListener('click',function(){setOn(!item.on);c.blur()});
     chips.push(item);box.appendChild(c);setOn(on);
     return item;
   }
