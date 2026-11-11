@@ -95,7 +95,7 @@ function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /
 const MARKET_LABELS=["Dane rynkowe", "Typowa wartość domu", "typowy czynsz", "Średnia cena sprzedaży", "Zmiana roczna", "Dane całego miasta, nie wycena nieruchomości. Indeksy dotyczą różnych zasobów mieszkaniowych; nie obliczono rentowności.", "Źródło"];
 function marketCard(c){const d=CITY_MARKET[c],l=MARKET_LABELS;return `<div class="finding"><h3>${esc(c)}, ${esc(d.st)} - ${l[0]}</h3><p>${l[1]} <b>${fmt(d.zhvi)}</b> · ${l[2]} <b>${fmt(d.zori)}/mo</b></p><p class="muted">Zillow Research: ZHVI / ZORI, ${CITY_MARKET._meta.zhvi_month.slice(0,7)}. ${l[5]} <a href="https://www.zillow.com/research/data/">${l[6]} ↗</a></p></div>`}
 function marketCardUK(slug){const d=UK_MARKET[slug],l=MARKET_LABELS;return `<div class="finding"><h3>${esc(d.label)} - ${l[0]}</h3><p>${l[3]} <b>£${Math.round(d.avg).toLocaleString('en-GB')}</b> · ${l[4]} ${(d.yoy>0?'+':'')+d.yoy}%</p><p class="muted">UK House Price Index (HM Land Registry / ONS), 2026-08. ${l[5]} <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">${l[6]} ↗</a></p></div>`}
-let CITIES=null;
+let CITIES=null;let WORLD=null;
 let photoSeq=0;const PHOTO_LABEL='Zdjęcie';
 function showCityPhoto(cand){const box=document.querySelector('#cityPhoto');if(!box)return;box.innerHTML='';if(!cand)return;const seq=++photoSeq;
 const tries=[cand.city+(cand.admin?', '+cand.admin:'')+(cand.country?', '+cand.country:''),cand.city+(cand.country?', '+cand.country:''),cand.city];
@@ -138,6 +138,7 @@ return false}
 function candName(c){return c.city+(c.admin?', '+c.admin:'')+', '+c.country}
 async function resolveInput(raw){
 try{if(!CITIES){CITIES=await(await fetch('cities.json')).json()}}catch(e){return {kind:'none'}}
+try{if(!WORLD){WORLD=await(await fetch('world.json')).json()}}catch(e){}
 const parts=raw.split(',').map(normS).filter(Boolean);if(!parts.length)return {kind:'none'};
 const cityKey=parts[0],quals=parts.slice(1);
 let cands=[];const seen={};
@@ -152,13 +153,14 @@ cands.sort((a,b)=>((b.cov?1:0)-(a.cov?1:0)));
 if(cands.length===1)return {kind:'one',cand:cands[0]};
 return {kind:'pick',cands:cands.slice(0,6),total:cands.length}}
 function chooserHTML(cands,total){return "<div class=\"finding\"><h3>Kilka miejsc ma tę nazwę</h3><p>Wybierz ten, który masz na myśli - nic nie zostanie wyświetlone, dopóki tego nie zrobisz:</p><div class=\"suggest\" style=\"display:block;margin-top:8px\">"+cands.map(function(c,i){return '<button type="button" class="cand" data-i="'+i+'">'+esc(candName(c))+(c.cov?" <span class=\"n\">· dostępne wpisy danych lub dane rynkowe</span>":'')+'</button>'}).join('')+'</div>'+(total>cands.length?"<p class=\"muted\" style=\"margin-top:8px\">Pokazywanie "+cands.length+" największy z "+total+" - dodaj stan, region lub kraj, aby zawęzić listę.</p>":'')+'</div>'}
+function countryCtx(c){const w=WORLD&&WORLD[c.country];if(!w)return "";let s="";if(w.yoy!==undefined){const y=(w.yoy>0?"+":"")+w.yoy+"%";s+="<p><b>"+esc(c.country)+" - rynek (krajowy)</b>: ceny nieruchomości mieszkaniowych "+y+" rok do roku w "+w.q+" (nominalny indeks BIS, wszystkie lokale). Trend krajowy, a nie dane miasta lub konkretnej nieruchomości. <a href=\"https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q."+w.cc+".N.628\" target=\"_blank\" rel=\"noopener\">Źródło ↗</a></p>"}if(w.cur){s+="<p class=\"muted\">Waluta lokalna: "+w.cur+".</p>"}return s}
 function worldPanelCand(c){let route='';
 if(c.country==='Hong Kong'){route=""}
 else if(c.country==='United States'){route="<p class=\"muted\" style=\"margin-top:10px\">W przypadku Stanów Zjednoczonych lista tras i dane rynkowe są dostępne dla 20 miast zawartych w tej aplikacji - wypróbuj jeden z żetonów.</p>"}
 else if(c.country==='United Kingdom'){route="<p class=\"muted\" style=\"margin-top:10px\">W Wielkiej Brytanii lista tras i dane rynkowe są dostępne dla 14 miast zawartych w tej aplikacji - wypróbuj jeden z żetonów.</p>"}
 else if(c.country==='Canada'){route="<p class=\"muted\" style=\"margin-top:10px\">W przypadku Kanady aktualne wpisy adresowe są dostępne dla Vancouver, Toronto, Calgary i Edmonton - wypróbuj te miasta.</p>"}
 else{route="<p class=\"muted\" style=\"margin-top:10px\">Trasa portalu z listami nie jest dostępna dla "+esc(c.country)+" jeszcze - żadnych wymyślonych linków.</p>"}
-return '<div class="finding"><h3>'+esc(candName(c))+"</h3><p>Rozwiązano na podstawie bazy danych miast GeoNames (ponad 34 000 miast). Wyszukiwanie wpisów danych budynków obejmuje Hongkong, Nowy Jork, Chicago, Vancouver, Toronto, Calgary i Edmonton (Toronto to przestarzała kopia danych); dane rynkowe zawarte w tej aplikacji obejmują 20 miast w USA i 14 Wielkiej Brytanii - "+esc(c.city)+" wykracza poza dzisiejsze, więc nie podaje się żadnych liczb, a nie je wymyśla.</p>"+route+'</div>'}
+return '<div class="finding"><h3>'+esc(candName(c))+"</h3>"+countryCtx(c)+"<p>Rozwiązano na podstawie bazy danych miast GeoNames (ponad 34 000 miast). Wyszukiwanie wpisów danych budynków obejmuje Hongkong, Nowy Jork, Chicago, Vancouver, Toronto, Calgary i Edmonton (Toronto to przestarzała kopia danych); dane rynkowe zawarte w tej aplikacji obejmują 20 miast w USA i 14 Wielkiej Brytanii - "+esc(c.city)+" wykracza poza dzisiejsze, więc nie podaje się żadnych liczb na poziomie miasta, zamiast je wymyślać.</p>"+route+'</div>'}
 function renderCoveredBuyRaw(c,cp,r){
 if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML="<div class=\"finding\"><h3>Hong Kong</h3><p>Wyszukiwanie wpisów danych budynków jest dostępne poniżej (zestawy danych zamówień Departamentu Budownictwa s.24 + s.26, kopia danych datowana na 15.10.2026 r.).</p></div>";r.innerHTML="Wyszukaj budynek, aby zobaczyć jego dane.";return}
 if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('New York');r.innerHTML="Powyższa kopia danych datowanych na rynek · podaj adres poniżej, aby uzyskać aktualne wpisy danych Departamentu Budynków Miasta Nowy Jork.";return}
@@ -295,7 +297,7 @@ if(c.indexOf("CA:")===0){const name=c.slice(3);return "<div class=\"finding\"><h
 if(c.indexOf("UK:")===0){const d=UK_MARKET[c.slice(3)];return "<div class=\"finding\"><h3>Sprzedaż: "+esc(d.label)+"</h3><p>"+"Kupujący może sprawdzić dane rynkowe dla miasta "+esc(d.label)+": średnią cenę sprzedaży według UK House Price Index (sierpień 2026 r.) i odnośniki do ofert Rightmove. Dane o budynkach nie są dostępne dla tego miasta."+"</p><p><button type=\"button\" class=\"gobuy\" data-g=\""+esc(d.label)+"\">Zobacz dane dla kupującego →</button></p></div>";}
 if(CITY_MARKET[c])return "<div class=\"finding\"><h3>Sprzedaż: "+esc(c)+"</h3><p>"+"Kupujący może sprawdzić dane rynkowe dla miasta "+esc(c)+": wskaźniki wartości i czynszów Zillow (wrzesień 2026 r.) i odnośniki do ofert. Dane o budynkach nie są dostępne dla tego miasta."+"</p><p><button type=\"button\" class=\"gobuy\" data-g=\""+esc(c)+"\">Zobacz dane dla kupującego →</button></p></div>";return null}
 function renderCandSell(c){if(c.cov)return renderCoveredSell(c.cov);
-return "<div class=\"finding\"><h3>Sprzedaję "+esc(candName(c))+"</h3><p>Rozwiązano na podstawie bazy danych miast GeoNames (ponad 34 000 miast). Wyszukiwanie rekordów i zawarte w tej aplikacji dane rynkowe nie obejmują jeszcze tego miasta - kupujący tutaj widzą zidentyfikowane miasto i jego trasę notowania, jeśli jest dostępna, nic nie zostało wymyślone.</p><p style=\"margin-top:10px\"><button type=\"button\" class=\"gobuy\" data-g=\""+esc(candName(c))+"\">Zobacz widok kupującego →</button></p></div>"}
+return "<div class=\"finding\"><h3>Sprzedaję "+esc(candName(c))+"</h3>"+countryCtx(c)+"<p>Rozwiązano na podstawie bazy danych miast GeoNames (ponad 34 000 miast). Wyszukiwanie rekordów i zawarte w tej aplikacji dane rynkowe nie obejmują jeszcze tego miasta - kupujący tutaj widzą zidentyfikowane miasto i jego trasę notowania, jeśli jest dostępna, nic nie zostało wymyślone.</p><p style=\"margin-top:10px\"><button type=\"button\" class=\"gobuy\" data-g=\""+esc(candName(c))+"\">Zobacz widok kupującego →</button></p></div>"}
 function bindSell(){sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
 async function sellPick(raw,pinned){
 if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCoveredSell(c);bindSell();return}}
