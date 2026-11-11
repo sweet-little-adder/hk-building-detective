@@ -377,26 +377,41 @@ const d = {
 }
 
 (function(){
-  var tw=v.querySelector('.tw'),rows=[].slice.call(v.querySelectorAll('#t tbody tr'));
-  if(!tw||!rows.length)return;
+  var tw=v.querySelector('.tw'),tb=v.querySelector('#cmpView #t tbody');
+  if(!tw||!tb)return;
   var cs=document.createElement('style');
-  cs.textContent='#cmpView .cmpsel{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 0}#cmpView .cmpsel .cl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#bda990;margin-right:4px}#cmpView .cmpchip{background:none;border:1px solid #6e5847;color:#bda990;font:inherit;font-size:12.5px;padding:6px 12px;cursor:pointer;letter-spacing:.02em}#cmpView .cmpchip.on{border-color:#f1e3c6;color:#fdf6e9;background:#4a3629}#cmpView .cmpchip:focus-visible{outline:2px solid #f1e3c6;outline-offset:2px}#cmpView .cmpall{background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;font:inherit;font-size:12px;cursor:pointer;padding:2px 0;margin-left:6px}#cmpView .cmpnone{display:none;margin:18px 0 0;color:#bda990;font-size:13px}';
+  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .chips{order:-1;flex-basis:100%;margin:0 0 10px}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}#cmpView .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .chips{order:0;margin:10px 0 0}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
   document.head.appendChild(cs);
-  var bar=document.createElement('div');bar.className='cmpsel';bar.setAttribute('role','group');bar.setAttribute('aria-label','Cities to compare');
-  var lab=document.createElement('span');lab.className='cl';lab.textContent='Cities';bar.appendChild(lab);
+  var dataRows=[].slice.call(tb.querySelectorAll('tr'));
+  var otherCities=['Hong Kong','New York City','San Francisco','Miami','Los Angeles','Chicago','Las Vegas','Manchester','London','Vancouver','Toronto','Calgary','Edmonton'];
+  var AL={'nyc':'New York City','new york':'New York City','sf':'San Francisco','la':'Los Angeles','hk':'Hong Kong','hongkong':'Hong Kong'};
+  var sel=document.createElement('div');sel.className='cmpsel';
+  sel.innerHTML='<p class="cl">Cities to compare</p><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="chips"></div><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
+  var chipBox=sel.querySelector('.chips'),input=sel.querySelector('input'),form=sel.querySelector('form');
   var none=document.createElement('p');none.className='cmpnone';none.textContent='Select at least one city to compare.';
   var chips=[];
-  function sync(){var n=0;chips.forEach(function(c,i){var on=c.classList.contains('on');rows[i].style.display=on?'':'none';if(on)n++});none.style.display=n?'none':'block';tw.style.display=n?'':'none'}
-  rows.forEach(function(tr,i){
-    var b=tr.querySelector('td b'),name=(b?b.textContent:'City '+(i+1)).split(' (')[0];
-    var c=document.createElement('button');c.type='button';c.className='cmpchip on';c.textContent=name;c.setAttribute('aria-pressed','true');
-    c.addEventListener('click',function(){var on=!c.classList.contains('on');c.classList.toggle('on',on);c.setAttribute('aria-pressed',on?'true':'false');sync()});
-    chips.push(c);bar.appendChild(c);
+  function sync(){var n=0;chips.forEach(function(c){if(c.el.classList.contains('on'))n++});none.style.display=n?'none':'block';tw.style.display=n?'':'none'}
+  function naRow(name){var tr=document.createElement('tr');var t1=document.createElement('td'),b=document.createElement('b');b.textContent=name;t1.appendChild(b);var t2=document.createElement('td');t2.colSpan=6;var s=document.createElement('span');s.className='missing';s.textContent='not available yet';t2.appendChild(s);tr.appendChild(t1);tr.appendChild(t2);return tr}
+  function addChip(name,row,on){
+    var c=document.createElement('button');c.type='button';c.textContent=name;c.setAttribute('data-c',name);
+    var item={el:c,name:name,row:row,na:null};
+    function setOn(x){c.classList.toggle('on',x);c.setAttribute('aria-pressed',x?'true':'false');if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}sync()}
+    c.addEventListener('click',function(){setOn(!c.classList.contains('on'))});
+    chips.push(item);chipBox.appendChild(c);setOn(on);
+    return item;
+  }
+  dataRows.forEach(function(tr){var b=tr.querySelector('td b');addChip((b?b.textContent:'City').split(' (')[0],tr,true)});
+  otherCities.forEach(function(n){addChip(n,null,false)});
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var s=(input.value||'').trim().replace(/\s+/g,' ');if(!s)return;
+    var k=s.toLowerCase();if(AL[k]){s=AL[k];k=s.toLowerCase()}
+    var hit=null;chips.forEach(function(c){if(c.name.toLowerCase()===k)hit=c});
+    if(hit){if(!hit.el.classList.contains('on'))hit.el.click()}
+    else{addChip(s,null,true)}
+    input.value='';
   });
-  var all=document.createElement('button');all.type='button';all.className='cmpall';all.textContent='All';
-  all.addEventListener('click',function(){chips.forEach(function(c){c.classList.add('on');c.setAttribute('aria-pressed','true')});sync()});
-  bar.appendChild(all);
-  tw.parentNode.insertBefore(bar,tw);tw.parentNode.insertBefore(none,tw);
+  tw.parentNode.insertBefore(sel,tw);tw.parentNode.insertBefore(none,tw);
 })();
 
 function hashCmp(){return (location.hash||'').toLowerCase()==='#compare'}
