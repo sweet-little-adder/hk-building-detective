@@ -15,8 +15,12 @@ Records lookup:
 
 Market snapshots: Zillow Research ZHVI/ZORI for 20 US cities; UK House Price Index
 sold prices for 14 UK cities. City search resolves 34,000+ cities worldwide from a
-bundled GeoNames extract (`cities.json`); places without wired data are named as
-gaps rather than given invented numbers.
+bundled GeoNames extract (`cities.json`). Every resolved city also shows its
+country context from the bundled `world.json` snapshot: local currency, and where
+the BIS publishes one, the country-wide residential property price index change
+(year on year, nominal, latest quarter - a country trend, never a city or property
+figure). Places without wired city-level data are named as gaps rather than given
+invented numbers.
 
 Static site: `index.html` + bundled JSON snapshots. No backend, no tracking, no AI.
 
