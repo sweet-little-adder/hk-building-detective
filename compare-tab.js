@@ -8,11 +8,14 @@ var NOTE={fr:'Page en anglais.',de:'Inhalt auf Englisch.',nl:'Inhoud in het Enge
 var st=document.createElement('style');st.textContent="#cmpView{display:none}#cmpView h2{font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:400;color:#f1e3c6}#cmpView .note{background:#4a3629;border:1px solid #6e5847;color:#e8d9b8;padding:12px 16px;font-size:12.5px;line-height:1.65;margin:18px 0 6px;max-width:760px}#cmpView .note b{color:#f8efdc}#cmpView table{border-collapse:collapse;width:100%;margin-top:26px;font-size:13.5px}#cmpView th,#cmpView td{text-align:left;padding:11px 12px;border-bottom:1px solid #6e5847;vertical-align:top}#cmpView th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#bda990;font-weight:400}#cmpView td{color:#e3d2b6}#cmpView td b{color:#f8efdc;font-weight:600}#cmpView .num{font-family:Georgia,serif;font-size:16px;color:#f8efdc}#cmpView .src,#cmpView .asm,#cmpView .excl{font-size:11.5px;color:#bda990;line-height:1.5}#cmpView .missing{color:#8f7c64;font-style:italic}#cmpView ul{margin:10px 0;padding-left:18px;max-width:760px}#cmpView li{margin:7px 0;color:#d3bfa2;font-size:12.5px;line-height:1.6}#cmpView li b{color:#f1e3c6}#cmpView details.meth{margin:26px 0 10px}#cmpView details summary{cursor:pointer;font-family:Georgia,serif;font-size:20px}#cmpView td.src summary{font-size:12px;font-family:inherit;opacity:.8}#cmpView details.meth[open] summary{margin-bottom:12px}#cmpView .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}#cmpView .tw table{min-width:820px}";document.head.appendChild(st);
 var cmp=document.createElement('button');cmp.id='tabCmp';cmp.type='button';cmp.textContent=L[lang]||L.en;tabs.appendChild(cmp);
 var v=document.createElement('div');v.id='cmpView';
-v.innerHTML="<div class=\"tw\"><table id=\"t\">\n  <thead><tr>\n    <th>City</th><th>Price period</th><th>Sales</th><th>Median /m&sup2;</th><th>Rent /m&sup2;/mo</th><th>Partial-cost yield<br>gross / partial-net</th><th>Source</th>\n  </tr></thead>\n  <tbody></tbody>\n</table></div>\n\n<details class=\"coverage\" style=\"margin-top:22px\"><summary>BETA &middot; city estimates, some costs excluded <span aria-hidden=\"true\">+</span></summary><p class=\"lead\">Compare estimated rental yields by city. These are city averages, not individual properties. Some ownership costs aren't included. Not investment advice.</p></details>";
+v.innerHTML="<div class=\"tw\"><table id=\"t\">\n  <thead><tr>\n    <th>City</th><th>Price period</th><th>Sales</th><th>Price</th><th>Rent</th><th>Yield / notes</th><th>Source</th>\n  </tr></thead>\n  <tbody></tbody>\n</table></div>\n\n<details class=\"coverage\" style=\"margin-top:22px\"><summary>BETA &middot; city estimates, some costs excluded <span aria-hidden=\"true\">+</span></summary><p class=\"lead\">Compare estimated rental yields by city. These are city averages, not individual properties. Some ownership costs aren't included. Not investment advice.</p></details>";
 var scf=document.querySelector('#sourcesCredits footer');
 if(scf&&!scf.querySelector('.cmpsrc')){var sp=document.createElement('p');sp.className='cmpsrc';
 sp.innerHTML='Compare (beta): Paris, Lyon, Marseille prices = DVF official transactions 2026 H1, median EUR/m&sup2;, apartments (<a href="https://www.data.gouv.fr/datasets/demandes-de-valeurs-foncieres">data.gouv.fr</a>, Licence Ouverte 2.0); rents = Carte des loyers 2025 (ANCT/DHUP), modelled commune-level listing indicators, EUR/m&sup2;/month (Licence Ouverte 2.0). Partial-net = gross minus 5% vacancy and 5% maintenance, with ~7.5% acquisition costs (varies by department and buyer). Excludes property tax, service charges, financing, furnishing, letting fees. Singapore Bishan: HDB resale prices only - buyer eligibility rules apply and no sourced rent is wired, so no yield shown. Illustrative city aggregates, not investment advice.';
-scf.appendChild(sp);}
+scf.appendChild(sp);
+  var sp2=document.createElement('p');sp2.className='cmpsrc cmpsrc2';
+  sp2.innerHTML='More cities: US typical values/rents = Zillow Research ZHVI/ZORI, Sep 2026, modelled - Data Provided by Zillow Group; London = UK House Price Index (Contains HM Land Registry data &copy; Crown copyright and database right 2026, OGL v3.0) + ONS Price Index of Private Rents (OGL v3.0), Aug 2026; Singapore Bishan = HDB resale prices and median rents via data.gov.sg (Singapore Open Data Licence). City or region averages for different homes, not individual properties or investment advice.';
+  scf.appendChild(sp2);}
 if(NOTE[lang]){var p=document.createElement('p');p.className='asm';p.style.marginTop='14px';p.textContent=NOTE[lang];v.insertBefore(p,v.firstChild)}
 sv.parentNode.insertBefore(v,sv.nextSibling);
 var bv=document.querySelector('#buyView');
@@ -361,7 +364,7 @@ const d = {
     const sales = r.estimatedUniqueSales
       ? `<span title="${(r.transactionRecords || r.transactions).toLocaleString()} records">${r.estimatedUniqueSales.toLocaleString()}</span><br><span class="asm">est. unique sales</span>`
       : `${(r.transactionRecords || r.transactions).toLocaleString()} records`;
-    const rentCell = r.rent ? `<span class="num">${r.rent.rentPerSqmMonth}</span> ${r.currency}<br><span class="asm">listing, 2025</span>` : '<span class="missing">no sourced rent</span>';
+    const rentCell = r.rent ? `<span class="num">${r.rent.rentPerSqmMonth}</span> ${r.currency}<br><span class="asm">per m&sup2;, listing, 2025</span>` : '<span class="missing">no sourced rent</span>';
     let yc;
     if (r.yield && r.yield.ok) {
       yc = `<span class="num">${r.yield.grossYieldPct}% / ${r.yield.netYieldPct}%</span><br>
@@ -374,7 +377,7 @@ const d = {
       <td><b>${r.city}</b></td>
       <td>${r.period.first} &rarr; ${r.period.last}</td>
       <td>${sales}</td>
-      <td><span class="num">${r.medianPricePerSqm.toLocaleString()}</span> ${r.currency}</td>
+      <td><span class="num">${r.medianPricePerSqm.toLocaleString()}</span> ${r.currency}<br><span class="asm">median /m&sup2;</span></td>
       <td>${rentCell}</td>
       <td>${yc}</td>
       <td class="src"><details><summary>Sources</summary>${r.source.name}${r.rent ? '<br>' + r.rent.source.name : ''}</details></td>`;
@@ -382,32 +385,38 @@ const d = {
   }
 }
 
+/* Extra verified cities (compare-data.js): rendered before chip wiring so
+   they get chips too. Live sources are fetched on demand inside the module. */
+if(window.REAGENT_COMPARE_EXTRA&&window.REAGENT_COMPARE_EXTRA.render){
+  window.REAGENT_COMPARE_EXTRA.render(document.querySelector('#cmpView #t tbody'));
+}
+
 (function(){
   var tw=v.querySelector('.tw'),tb=v.querySelector('#cmpView #t tbody');
   if(!tw||!tb)return;
   var cs=document.createElement('style');
-  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpgroup{margin:0 0 12px}#cmpView .cmpgroup .cgl{display:block;font-size:11px;color:#8f7c64;margin:0 0 6px}#cmpView .cmpgroup .chips{margin-top:0}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpon button{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpon button .x{color:#bda990;margin-left:5px}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
+  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpsel .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
   document.head.appendChild(cs);
   var dataRows=[].slice.call(tb.querySelectorAll('tr'));
-  var otherCities=['Hong Kong','New York City','San Francisco','Miami','Los Angeles','Chicago','Las Vegas','Manchester','London','Vancouver','Toronto','Calgary','Edmonton'];
+  var otherCities=['Hong Kong','Manchester','Vancouver','Toronto','Calgary','Edmonton'];
   var AL={'nyc':'New York City','new york':'New York City','sf':'San Francisco','la':'Los Angeles','hk':'Hong Kong','hongkong':'Hong Kong'};
   var sel=document.createElement('div');sel.className='cmpsel';
-  sel.innerHTML='<p class="cl">Cities to compare</p><div class="cmpgroup"><span class="cgl">Comparing - tap to remove</span><div class="chips cmpon"></div></div><div class="cmpgroup"><span class="cgl">Add a city</span><div class="chips cmpoff"></div></div><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
-  var onBox=sel.querySelector('.cmpon'),offBox=sel.querySelector('.cmpoff'),input=sel.querySelector('input'),form=sel.querySelector('form');
+  sel.innerHTML='<p class="cl">Cities to compare - tap to add or remove</p><div class="chips"></div><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
+  var box=sel.querySelector('.chips'),input=sel.querySelector('input'),form=sel.querySelector('form');
   var none=document.createElement('p');none.className='cmpnone';none.textContent='Select at least one city to compare.';
   var chips=[];
   function sync(){var n=0;chips.forEach(function(c){if(c.on)n++});none.style.display=n?'none':'block';tw.style.display=n?'':'none'}
-  function naRow(name){var tr=document.createElement('tr');var t1=document.createElement('td'),b=document.createElement('b');b.textContent=name;t1.appendChild(b);var t2=document.createElement('td');t2.colSpan=6;var s=document.createElement('span');s.className='missing';s.textContent='not available yet';t2.appendChild(s);tr.appendChild(t1);tr.appendChild(t2);return tr}
+  function naRow(name){var tr=document.createElement('tr');var t1=document.createElement('td'),b=document.createElement('b');b.textContent=name;t1.appendChild(b);var t2=document.createElement('td');t2.colSpan=6;var s=document.createElement('span');s.className='missing';s.textContent='not available in this comparison';t2.appendChild(s);tr.appendChild(t1);tr.appendChild(t2);return tr}
   function addChip(name,row,on){
     var c=document.createElement('button');c.type='button';c.setAttribute('data-c',name);
     var item={el:c,name:name,row:row,na:null,on:false};
-    function render(){c.textContent=item.name;if(item.on){var x=document.createElement('span');x.className='x';x.textContent='\u00d7';x.setAttribute('aria-hidden','true');c.appendChild(x);c.setAttribute('aria-label','Remove '+item.name)}else{c.setAttribute('aria-label','Add '+item.name)}}
-    function setOn(x){item.on=x;if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}render();(x?onBox:offBox).appendChild(c);sync()}
+    function render(){c.textContent=item.name;c.classList.toggle('on',item.on);c.setAttribute('aria-pressed',item.on?'true':'false')}
+    function setOn(x){item.on=x;if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}render();sync()}
     c.addEventListener('click',function(){setOn(!item.on)});
-    chips.push(item);setOn(on);
+    chips.push(item);box.appendChild(c);setOn(on);
     return item;
   }
-  dataRows.forEach(function(tr){var b=tr.querySelector('td b');addChip((b?b.textContent:'City').split(' (')[0],tr,true)});
+  dataRows.forEach(function(tr){var b=tr.querySelector('td b');addChip((b?b.textContent:'City').split(' (')[0],tr,!tr.hasAttribute('data-extra'))});
   otherCities.forEach(function(n){addChip(n,null,false)});
   form.addEventListener('submit',function(e){
     e.preventDefault();
