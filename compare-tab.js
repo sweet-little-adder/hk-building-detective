@@ -13,10 +13,12 @@ if(NOTE[lang]){var p=document.createElement('p');p.className='asm';p.style.margi
 sv.parentNode.insertBefore(v,sv.nextSibling);
 var bv=document.querySelector('#buyView');
 var h1=document.querySelector('h1'),h1o=h1?h1.innerHTML:'',HT={en:'Estimate Yield',fr:'Estimer le rendement',de:'Rendite sch\u00e4tzen',nl:'Rendement schatten',pl:'Oszacuj rentowno\u015b\u0107'};
+var ST={en:'Prepare your property listing',fr:'Pr\u00e9parez votre annonce',de:'Ihr Inserat vorbereiten',nl:'Bereid uw advertentie voor',pl:'Przygotuj og\u0142oszenie'};
 function showCmp(){if(h1)h1.textContent=HT[lang]||HT.en;cmp.classList.add('on');buy.classList.remove('on');sell.classList.remove('on');if(bv)bv.style.display='none';sv.style.display='none';v.style.display='block'}
 function hideCmp(){if(h1)h1.innerHTML=h1o;cmp.classList.remove('on');v.style.display='none'}
+function showSell(){hideCmp();if(h1)h1.textContent=ST[lang]||ST.en}
 cmp.addEventListener('click',showCmp);
-buy.addEventListener('click',hideCmp);sell.addEventListener('click',hideCmp);
+buy.addEventListener('click',hideCmp);sell.addEventListener('click',showSell);
 document.querySelectorAll('a[href="compare.html"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();showCmp()})});
 
 
