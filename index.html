@@ -105,7 +105,7 @@ function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /
 function marketCard(c){const d=CITY_MARKET[c];return '<div class="finding"><h3>'+c+', '+d.st+' - market snapshot</h3><p>Typical home value <b>'+fmt(d.zhvi)+'</b> · typical rent <b>'+fmt(d.zori)+'/mo</b></p><p class="muted">Zillow Research: ZHVI (typical value, all homes: single-family + condo) and ZORI (typical asking rent, all rentals incl. multifamily), '+CITY_MARKET._meta.zhvi_month.slice(0,7)+'. The two indices cover different housing stock - no yield is computed from them. <a href="https://www.zillow.com/research/data/">Source ↗</a></p></div>'}
 function marketCardUK(slug){const d=UK_MARKET[slug];const gbp='\u00a3'+Math.round(d.avg).toLocaleString('en-GB');const yoy=(d.yoy>0?'+':'')+d.yoy+'%';
 return '<div class="finding"><h3>'+d.label+' - market snapshot</h3><p>Average sold price <b>'+gbp+'</b> · '+yoy+' year on year</p><p class="muted">UK House Price Index (HM Land Registry / ONS), Aug 2026: average price of properties actually sold in the '+d.label+' local authority area. Area-level context, not a valuation of any home. <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">Source ↗</a></p></div>'}
-let CITIES=null;
+let CITIES=null;let WORLD=null;
 let photoSeq=0;const PHOTO_LABEL='Photo';
 function showCityPhoto(cand){const box=document.querySelector('#cityPhoto');if(!box)return;box.innerHTML='';if(!cand)return;const seq=++photoSeq;
 const tries=[cand.city+(cand.admin?', '+cand.admin:'')+(cand.country?', '+cand.country:''),cand.city+(cand.country?', '+cand.country:''),cand.city];
@@ -148,6 +148,7 @@ return false}
 function candName(c){return c.city+(c.admin?', '+c.admin:'')+', '+c.country}
 async function resolveInput(raw){
 try{if(!CITIES){CITIES=await(await fetch('cities.json')).json()}}catch(e){return {kind:'none'}}
+try{if(!WORLD){WORLD=await(await fetch('world.json')).json()}}catch(e){}
 const parts=raw.split(',').map(normS).filter(Boolean);if(!parts.length)return {kind:'none'};
 const cityKey=parts[0],quals=parts.slice(1);
 let cands=[];const seen={};
@@ -162,13 +163,14 @@ cands.sort((a,b)=>((b.cov?1:0)-(a.cov?1:0)));
 if(cands.length===1)return {kind:'one',cand:cands[0]};
 return {kind:'pick',cands:cands.slice(0,6),total:cands.length}}
 function chooserHTML(cands,total){return '<div class="finding"><h3>Several places share that name</h3><p>Pick the one you mean - nothing is shown until you do:</p><div class="suggest" style="display:block;margin-top:8px">'+cands.map(function(c,i){return '<button type="button" class="cand" data-i="'+i+'">'+esc(candName(c))+(c.cov?' <span class="n">· records or market data available</span>':'')+'</button>'}).join('')+'</div>'+(total>cands.length?'<p class="muted" style="margin-top:8px">Showing the '+cands.length+' largest of '+total+' - add a state, region or country to narrow it.</p>':'')+'</div>'}
+function countryCtx(c){const w=WORLD&&WORLD[c.country];if(!w)return '';let s='';if(w.yoy!==undefined){const y=(w.yoy>0?'+':'')+w.yoy+'%';s+='<p><b>'+esc(c.country)+' market (country-wide)</b>: residential property prices '+y+' year on year in '+w.q+' (BIS nominal index, all dwellings). A country-wide trend, not a city or property figure. <a href="https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q.'+w.cc+'.N.628" target="_blank" rel="noopener">Source ↗</a></p>'}if(w.cur){s+='<p class="muted">Local currency: '+w.cur+'.</p>'}return s}
 function worldPanelCand(c){let route='';
 if(c.country==='Hong Kong'){route=''}
 else if(c.country==='United States'){route='<p class="muted" style="margin-top:10px">For the US, listing routes and market data are wired for the 20 bundled cities - try one of the chips.</p>'}
 else if(c.country==='United Kingdom'){route='<p class="muted" style="margin-top:10px">For the UK, listing routes and market data are wired for the 14 bundled cities - try one of the chips.</p>'}
 else if(c.country==='Canada'){route='<p class="muted" style="margin-top:10px">For Canada, live address records are wired for Vancouver, Toronto, Calgary and Edmonton - try those cities.</p>'}
 else{route='<p class="muted" style="margin-top:10px">A listing-portal route is not wired for '+esc(c.country)+' yet - no invented links.</p>'}
-return '<div class="finding"><h3>'+esc(candName(c))+'</h3><p>Resolved from the GeoNames city database (34,000+ cities). Building-records lookup covers Hong Kong, New York City, Chicago, Vancouver, Toronto, Calgary and Edmonton (Toronto is a dated snapshot); bundled market data covers 20 US and 14 UK cities - '+esc(c.city)+' is outside those today, so no figures are shown rather than invented.</p>'+route+'</div>'}
+return '<div class="finding"><h3>'+esc(candName(c))+'</h3>'+countryCtx(c)+'<p>Resolved from the GeoNames city database (34,000+ cities). Building-records lookup covers Hong Kong, New York City, Chicago, Vancouver, Toronto, Calgary and Edmonton (Toronto is a dated snapshot); bundled market data covers 20 US and 14 UK cities - '+esc(c.city)+' is outside those today, so no city-level figures are shown rather than invented.</p>'+route+'</div>'}
 function renderCoveredBuyRaw(c,cp,r){
 if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Hong Kong</h3><p>Building-records lookup is live below (BD s.24 + s.26 order datasets, snapshot 2026-10-15).</p></div>';r.innerHTML='Search a building to see its record.';return}
 if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('New York');r.innerHTML='Market snapshot above · run an address below for its live DOB record.';return}
@@ -306,7 +308,7 @@ if(c.indexOf('UK:')===0){const d=UK_MARKET[c.slice(3)];return '<div class="findi
 if(CITY_MARKET[c]){return '<div class="finding"><h3>Selling in '+c+'</h3><p>Buyers here see the '+c+' market snapshot (Zillow value and rent indices, Sep 2026) and portal listings. Building-records lookup is not live for '+c+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+c+'">See the buyer view →</button></p></div>'}
 return null}
 function renderCandSell(c){if(c.cov)return renderCoveredSell(c.cov);
-return '<div class="finding"><h3>Selling in '+esc(candName(c))+'</h3><p>Resolved from the GeoNames city database (34,000+ cities). Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(candName(c))+'">See the buyer view →</button></p></div>'}
+return '<div class="finding"><h3>Selling in '+esc(candName(c))+'</h3>'+countryCtx(c)+'<p>Resolved from the GeoNames city database (34,000+ cities). Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(candName(c))+'">See the buyer view →</button></p></div>'}
 function bindSell(){sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
 async function sellPick(raw,pinned){
 if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCoveredSell(c);bindSell();return}}
