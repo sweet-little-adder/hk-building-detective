@@ -12,8 +12,9 @@ v.innerHTML="<p class=\"note\"><b>BETA</b> &middot; city aggregates, not propert
 if(NOTE[lang]){var p=document.createElement('p');p.className='asm';p.style.marginTop='14px';p.textContent=NOTE[lang];v.insertBefore(p,v.firstChild)}
 sv.parentNode.insertBefore(v,sv.nextSibling);
 var bv=document.querySelector('#buyView');
-function showCmp(){cmp.classList.add('on');buy.classList.remove('on');sell.classList.remove('on');if(bv)bv.style.display='none';sv.style.display='none';v.style.display='block'}
-function hideCmp(){cmp.classList.remove('on');v.style.display='none'}
+var h1=document.querySelector('h1'),h1o=h1?h1.innerHTML:'',HT={en:'Estimate Yield',fr:'Estimer le rendement',de:'Rendite sch\u00e4tzen',nl:'Rendement schatten',pl:'Oszacuj rentowno\u015b\u0107'};
+function showCmp(){if(h1)h1.textContent=HT[lang]||HT.en;cmp.classList.add('on');buy.classList.remove('on');sell.classList.remove('on');if(bv)bv.style.display='none';sv.style.display='none';v.style.display='block'}
+function hideCmp(){if(h1)h1.innerHTML=h1o;cmp.classList.remove('on');v.style.display='none'}
 cmp.addEventListener('click',showCmp);
 buy.addEventListener('click',hideCmp);sell.addEventListener('click',hideCmp);
 document.querySelectorAll('a[href="compare.html"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();showCmp()})});
