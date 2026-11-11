@@ -41,14 +41,16 @@
     if (pending) return;
     var q = currentQuery();
     pending = true; btn.disabled = true; btn.textContent = t[1];
-    var fullText = rep.innerText.trim();
-    var snap = {v:1,kind:'building-research',lang:lang,capturedAt:new Date().toISOString(),text:fullText.slice(0,2800),truncated:fullText.length>2800,links:[]};
-    [].slice.call(rep.querySelectorAll('a[href]')).forEach(function(a){
+    var cityPanel=document.getElementById('cityPanel');
+    var content=rep.querySelector('h3')?rep:(cityPanel&&cityPanel.innerText.trim()?cityPanel:rep);
+    var fullText = content.innerText.trim();
+    var snap = {v:1,kind:'research',lang:lang,capturedAt:new Date().toISOString(),text:fullText.slice(0,2800),truncated:fullText.length>2800,links:[]};
+    [].slice.call(content.querySelectorAll('a[href]')).forEach(function(a){
       try { var u=new URL(a.href); if (/^https?:$/.test(u.protocol) && snap.links.length<8) snap.links.push({label:a.innerText.trim().slice(0,100),url:u.href.slice(0,600)}); } catch(_){}
     });
     while(JSON.stringify(snap).length>3800 && snap.text.length>100){snap.text=snap.text.slice(0,-100);snap.truncated=true;}
     while(JSON.stringify(snap).length>3800 && snap.links.length){snap.links.pop();}
-    window.parent.postMessage({type: 'reagentSave' , url: parentOrigin + home + '#lookup', label: q ? t[5] + q : t[6], notes: JSON.stringify(snap)}, parentOrigin);
+    window.parent.postMessage({type: 'reagentSave' , url: parentOrigin + home + '#lookup', label: content.querySelector('h3') ? content.querySelector('h3').innerText.trim().slice(0,200) : (q ? t[5] + q : ((document.getElementById('qc')||{}).value || t[6])), notes: JSON.stringify(snap)}, parentOrigin);
     clearTimeout(timer);
     timer = setTimeout(function () { if (pending) { pending = false; reset(); } }, 8000);
   });
