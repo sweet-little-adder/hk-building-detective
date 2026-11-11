@@ -27,9 +27,9 @@ st.textContent='#sdRoot .sd-item{border-top:1px solid #6e5847;padding:12px 26px 
 +'#sdRoot .sd-x:hover{color:#f1e3c6;background:none}'
 +'#sdRoot .sd-item audio{max-width:100%;height:34px}'
 +'#sdRoot .sd-btnrow{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;align-items:center}'
-+'#sdRoot .sd-btnrow .sd-chip{font-size:13px;font-weight:400;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0;min-width:0}'
-+'#sdRoot .sd-btnrow .sd-chip:hover{color:#fdf6e9;border-bottom-color:#f1e3c6;background:none}'
-+'#sdRoot .sd-btnrow .sd-chip.sd-rec{color:#e8b9c4;border-bottom-color:#e8b9c4}'
++'#sdRoot .sd-chip{font-size:13px;font-weight:400;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0;min-width:0}'
++'#sdRoot .sd-chip:hover{color:#fdf6e9;border-bottom-color:#f1e3c6;background:none}'
++'#sdRoot .sd-chip.sd-rec{color:#e8b9c4;border-bottom-color:#e8b9c4}'
 +'#sdRoot .sd-note{font-size:11px;color:#bda990;margin-top:10px;line-height:1.6}'
 +'#sdRoot .sd-warn{color:#e8b9c4}'
 +'#sdDraft{margin-top:22px;border-top:1px solid #6e5847;padding-top:16px;display:none}'
@@ -38,8 +38,8 @@ st.textContent='#sdRoot .sd-item{border-top:1px solid #6e5847;padding:12px 26px 
 +'#sdDraft .sd-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}'
 +'#sdDraft .sd-thumbs img{width:96px;height:96px;object-fit:cover;border:1px solid #f1e3c6}'
 +'#sdDraft .sd-actions{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;align-items:center}'
-+'#sdDraft .sd-actions .sd-chip{font-size:13px;font-weight:400;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0;min-width:0}'
-+'#sdDraft .sd-actions .sd-chip:hover{color:#fdf6e9;border-bottom-color:#f1e3c6;background:none}'
++'#sdDraft .sd-chip{font-size:13px;font-weight:400;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0;min-width:0}'
++'#sdDraft .sd-chip:hover{color:#fdf6e9;border-bottom-color:#f1e3c6;background:none}'
 +'#sdRoot input#sdTitle{border-bottom:1px solid #836d55}'
 +'@media (max-width:600px){#sdRoot .sd-item img{width:88px;max-height:88px}#sdDraft .sd-thumbs img{width:72px;height:72px}}';
 document.head.appendChild(st);
