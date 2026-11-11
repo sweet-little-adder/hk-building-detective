@@ -95,7 +95,7 @@ function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /
 const MARKET_LABELS=["Marktoverzicht", "Typische woningwaarde", "typische huur", "Gemiddelde verkoopprijs", "Jaarverandering", "Stadsbrede marktgegevens, geen woningtaxatie. De indices betreffen verschillende woningen; geen rendement berekend.", "Bron"];
 function marketCard(c){const d=CITY_MARKET[c],l=MARKET_LABELS;return `<div class="finding"><h3>${esc(c)}, ${esc(d.st)} - ${l[0]}</h3><p>${l[1]} <b>${fmt(d.zhvi)}</b> · ${l[2]} <b>${fmt(d.zori)}/mo</b></p><p class="muted">Zillow Research: ZHVI / ZORI, ${CITY_MARKET._meta.zhvi_month.slice(0,7)}. ${l[5]} <a href="https://www.zillow.com/research/data/">${l[6]} ↗</a></p></div>`}
 function marketCardUK(slug){const d=UK_MARKET[slug],l=MARKET_LABELS;return `<div class="finding"><h3>${esc(d.label)} - ${l[0]}</h3><p>${l[3]} <b>£${Math.round(d.avg).toLocaleString('en-GB')}</b> · ${l[4]} ${(d.yoy>0?'+':'')+d.yoy}%</p><p class="muted">UK House Price Index (HM Land Registry / ONS), 2026-08. ${l[5]} <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">${l[6]} ↗</a></p></div>`}
-let CITIES=null;
+let CITIES=null;let WORLD=null;
 let photoSeq=0;const PHOTO_LABEL='Foto';
 function showCityPhoto(cand){const box=document.querySelector('#cityPhoto');if(!box)return;box.innerHTML='';if(!cand)return;const seq=++photoSeq;
 const tries=[cand.city+(cand.admin?', '+cand.admin:'')+(cand.country?', '+cand.country:''),cand.city+(cand.country?', '+cand.country:''),cand.city];
@@ -138,6 +138,7 @@ return false}
 function candName(c){return c.city+(c.admin?', '+c.admin:'')+', '+c.country}
 async function resolveInput(raw){
 try{if(!CITIES){CITIES=await(await fetch('cities.json')).json()}}catch(e){return {kind:'none'}}
+try{if(!WORLD){WORLD=await(await fetch('world.json')).json()}}catch(e){}
 const parts=raw.split(',').map(normS).filter(Boolean);if(!parts.length)return {kind:'none'};
 const cityKey=parts[0],quals=parts.slice(1);
 let cands=[];const seen={};
@@ -152,13 +153,14 @@ cands.sort((a,b)=>((b.cov?1:0)-(a.cov?1:0)));
 if(cands.length===1)return {kind:'one',cand:cands[0]};
 return {kind:'pick',cands:cands.slice(0,6),total:cands.length}}
 function chooserHTML(cands,total){return "<div class=\"finding\"><h3>Verschillende plaatsen delen die naam</h3><p>Kies degene die je bedoelt - er wordt niets weergegeven totdat je dat doet:</p><div class=\"suggest\" style=\"display:block;margin-top:8px\">"+cands.map(function(c,i){return '<button type="button" class="cand" data-i="'+i+'">'+esc(candName(c))+(c.cov?" <span class=\"n\">· vermelding of marktgegevens beschikbaar</span>":'')+'</button>'}).join('')+'</div>'+(total>cands.length?"<p class=\"muted\" style=\"margin-top:8px\">Het tonen van de "+cands.length+" grootste van "+total+" - voeg een staat, regio of land toe om het te verfijnen.</p>":'')+'</div>'}
+function countryCtx(c){const w=WORLD&&WORLD[c.country];if(!w)return "";let s="";if(w.yoy!==undefined){const y=(w.yoy>0?"+":"")+w.yoy+"%";s+="<p><b>"+esc(c.country)+" - markt (landelijk)</b>: woningprijzen "+y+" op jaarbasis in "+w.q+" (nominale BIS-index, alle woningen). Landelijke trend, geen stads- of objectcijfer. <a href=\"https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q."+w.cc+".N.628\" target=\"_blank\" rel=\"noopener\">Bron ↗</a></p>"}if(w.cur){s+="<p class=\"muted\">Lokale valuta: "+w.cur+".</p>"}return s}
 function worldPanelCand(c){let route='';
 if(c.country==='Hong Kong'){route=""}
 else if(c.country==='United States'){route="<p class=\"muted\" style=\"margin-top:10px\">Voor de VS zijn routes en marktgegevens beschikbaar voor de 20 steden in deze app - probeer een van de chips.</p>"}
 else if(c.country==='United Kingdom'){route="<p class=\"muted\" style=\"margin-top:10px\">Voor Groot-Brittannië zijn routes en marktgegevens beschikbaar voor de 14 steden in deze app - probeer een van de fiches.</p>"}
 else if(c.country==='Canada'){route="<p class=\"muted\" style=\"margin-top:10px\">Voor Canada zijn live adresgegevens beschikbaar voor Vancouver, Toronto, Calgary en Edmonton - probeer die steden eens.</p>"}
 else{route="<p class=\"muted\" style=\"margin-top:10px\">Er is geen vermeldingsportalroute beschikbaar voor "+esc(c.country)+" nog - geen verzonnen links.</p>"}
-return '<div class="finding"><h3>'+esc(candName(c))+"</h3><p>Opgelost vanuit de stadsdatabase GeoNames (meer dan 34.000 steden). Het opzoeken van gebouwgegevens omvat Hong Kong, New York City, Chicago, Vancouver, Toronto, Calgary en Edmonton (Toronto is een gedateerde gegevenskopie); opgenomen in deze app marktgegevens bestrijken 20 Amerikaanse en 14 Britse steden - "+esc(c.city)+" valt buiten die van vandaag, dus er worden geen cijfers getoond in plaats van uitgevonden.</p>"+route+'</div>'}
+return '<div class="finding"><h3>'+esc(candName(c))+"</h3>"+countryCtx(c)+"<p>Opgelost vanuit de stadsdatabase GeoNames (meer dan 34.000 steden). Het opzoeken van gebouwgegevens omvat Hong Kong, New York City, Chicago, Vancouver, Toronto, Calgary en Edmonton (Toronto is een gedateerde gegevenskopie); opgenomen in deze app marktgegevens bestrijken 20 Amerikaanse en 14 Britse steden - "+esc(c.city)+" valt buiten die van vandaag, dus er worden geen cijfers op stadsniveau getoond in plaats van uitgevonden.</p>"+route+'</div>'}
 function renderCoveredBuyRaw(c,cp,r){
 if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML="<div class=\"finding\"><h3>Hong Kong</h3><p>Het opzoeken van gebouwgegevens is hieronder live (Bouwafdeling s.24 + s.26 bestel datasets, gedateerde gegevenskopie 15-10-2026).</p></div>";r.innerHTML="Zoek een gebouw om de gegevens te bekijken.";return}
 if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('New York');r.innerHTML="Marktgedateerde gegevenskopie hierboven · Voer hieronder een adres in voor de live vermelding van de New York City Buildings Department.";return}
@@ -295,7 +297,7 @@ if(c.indexOf("CA:")===0){const name=c.slice(3);return "<div class=\"finding\"><h
 if(c.indexOf("UK:")===0){const d=UK_MARKET[c.slice(3)];return "<div class=\"finding\"><h3>Verkopen in "+esc(d.label)+"</h3><p>"+"Kopers zien marktgegevens voor "+esc(d.label)+": gemiddelde verkoopprijs volgens de UK House Price Index (augustus 2026) en links naar Rightmove-advertenties. Gebouwgegevens zijn voor deze stad niet beschikbaar."+"</p><p><button type=\"button\" class=\"gobuy\" data-g=\""+esc(d.label)+"\">Gegevens voor kopers bekijken →</button></p></div>";}
 if(CITY_MARKET[c])return "<div class=\"finding\"><h3>Verkopen in "+esc(c)+"</h3><p>"+"Kopers zien marktgegevens voor "+esc(c)+": Zillow-waarde- en huurindices (september 2026) en links naar advertenties. Gebouwgegevens zijn voor deze stad niet beschikbaar."+"</p><p><button type=\"button\" class=\"gobuy\" data-g=\""+esc(c)+"\">Gegevens voor kopers bekijken →</button></p></div>";return null}
 function renderCandSell(c){if(c.cov)return renderCoveredSell(c.cov);
-return "<div class=\"finding\"><h3>Binnen verkopen "+esc(candName(c))+"</h3><p>Opgelost vanuit de stadsdatabase GeoNames (meer dan 34.000 steden). Het opzoeken van records en de marktgegevens die in deze app zijn opgenomen, bestrijken deze stad nog niet - kopers zien hier de geïdentificeerde stad en de vermeldingsroute waar deze beschikbaar is, er is niets uitgevonden.</p><p style=\"margin-top:10px\"><button type=\"button\" class=\"gobuy\" data-g=\""+esc(candName(c))+"\">Zie het kopersoverzicht →</button></p></div>"}
+return "<div class=\"finding\"><h3>Binnen verkopen "+esc(candName(c))+"</h3>"+countryCtx(c)+"<p>Opgelost vanuit de stadsdatabase GeoNames (meer dan 34.000 steden). Het opzoeken van records en de marktgegevens die in deze app zijn opgenomen, bestrijken deze stad nog niet - kopers zien hier de geïdentificeerde stad en de vermeldingsroute waar deze beschikbaar is, er is niets uitgevonden.</p><p style=\"margin-top:10px\"><button type=\"button\" class=\"gobuy\" data-g=\""+esc(candName(c))+"\">Zie het kopersoverzicht →</button></p></div>"}
 function bindSell(){sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
 async function sellPick(raw,pinned){
 if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCoveredSell(c);bindSell();return}}
