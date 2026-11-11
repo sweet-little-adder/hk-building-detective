@@ -5,10 +5,10 @@
 <header><div class="mark">RE-AGENT</div><div class="tag"><a href="index.html">&larr; TERMINAL</a></div></header>
 <h1>Compare cities</h1>
 <p class="lead">Transaction evidence and illustrative rental yield across cities, from official open datasets. Beta research view.</p>
-<p class="note"><b>BETA</b> - city-level aggregates, not individual properties. Yields are <b>partial-cost illustrative</b>: they exclude property tax, service charges, financing and other owner costs, so they are not full net returns. Not investment advice. Details under "Method, sources and limitations" below.</p>
+<p class="note"><b>BETA</b> &middot; city aggregates, not properties &middot; <b>partial-cost yield</b>: excludes property tax, service charges, financing and other owner costs. Not investment advice.</p>
 <div class="tw"><table id="t">
   <thead><tr>
-    <th>City</th><th>Price period</th><th>Sales</th><th>Median /m&sup2;</th><th>Rent /m&sup2;/mo</th><th>Illustrative yield<br>gross / partial-net</th><th>Source</th>
+    <th>City</th><th>Price period</th><th>Sales</th><th>Median /m&sup2;</th><th>Rent /m&sup2;/mo</th><th>Partial-cost yield<br>gross / partial-net</th><th>Source</th>
   </tr></thead>
   <tbody></tbody>
 </table></div>
@@ -362,13 +362,13 @@ const d = {
   const tb = document.querySelector('#t tbody');
   for (const r of d.rows) {
     const sales = r.estimatedUniqueSales
-      ? `${r.estimatedUniqueSales.toLocaleString()} est. unique<br><span class="asm">${(r.transactionRecords || r.transactions).toLocaleString()} records</span>`
+      ? `<span title="${(r.transactionRecords || r.transactions).toLocaleString()} records">${r.estimatedUniqueSales.toLocaleString()}</span><br><span class="asm">est. unique sales</span>`
       : `${(r.transactionRecords || r.transactions).toLocaleString()} records`;
-    const rentCell = r.rent ? `<span class="num">${r.rent.rentPerSqmMonth}</span> ${r.currency}<br><span class="asm">listing indicator, 2025</span>` : '<span class="missing">no sourced rent</span>';
+    const rentCell = r.rent ? `<span class="num">${r.rent.rentPerSqmMonth}</span> ${r.currency}<br><span class="asm">listing, 2025</span>` : '<span class="missing">no sourced rent</span>';
     let yc;
     if (r.yield && r.yield.ok) {
       yc = `<span class="num">${r.yield.grossYieldPct}% / ${r.yield.netYieldPct}%</span><br>
-        <span class="excl">partial-cost: excludes property tax, charges, financing (assumptions in method below)</span>`;
+        <span class="excl">excl. tax, charges, financing</span>`;
     } else {
       yc = `<span class="missing">${(r.yield && r.yield.reason) || '-'}</span>`;
     }
