@@ -395,23 +395,21 @@ if(window.REAGENT_COMPARE_EXTRA&&window.REAGENT_COMPARE_EXTRA.render){
   var tw=v.querySelector('.tw'),tb=v.querySelector('#cmpView #t tbody');
   if(!tw||!tb)return;
   var cs=document.createElement('style');
-  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpdet summary{cursor:pointer;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 6px;list-style:none;line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}#cmpView .cmpdet summary::-webkit-details-marker{display:none}#cmpView .cmpdet[open] summary{margin-bottom:14px}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpsel .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}@media (hover:none){#cmpView .cmpsel .chips button:hover{color:#dcc9ad;border-bottom-color:#7c6650}#cmpView .cmpsel .chips button.on:hover{color:#fdf6e9;border-bottom-color:#f1e3c6}}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
+  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpdet summary{cursor:pointer;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 6px;list-style:none;line-height:1.7;display:flex;align-items:baseline;gap:8px}#cmpView .cmpdet summary .cmpsumtxt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#cmpView .cmpdet summary .cmpsign{flex:none;font-size:14px;font-weight:600;opacity:.8}#cmpView .cmpdet summary::-webkit-details-marker{display:none}#cmpView .cmpdet[open] summary{margin-bottom:14px}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}#cmpView .cmpsel input,#cmpView .cmpsel .controls button{touch-action:manipulation}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpsel .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}@media (hover:none){#cmpView .cmpsel .chips button:hover{color:#dcc9ad;border-bottom-color:#7c6650}#cmpView .cmpsel .chips button.on:hover{color:#fdf6e9;border-bottom-color:#f1e3c6}}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
   document.head.appendChild(cs);
   var dataRows=[].slice.call(tb.querySelectorAll('tr'));
   var otherCities=['Hong Kong','Manchester','Vancouver','Toronto','Calgary','Edmonton'];
   var AL={'nyc':'New York City','new york':'New York City','sf':'San Francisco','la':'Los Angeles','hk':'Hong Kong','hongkong':'Hong Kong'};
   var sel=document.createElement('div');sel.className='cmpsel';
-  sel.innerHTML='<details class="cmpdet"><summary></summary><div class="chips"></div><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
-  var box=sel.querySelector('.chips'),sum=sel.querySelector('summary'),input=sel.querySelector('input'),form=sel.querySelector('form');
+  sel.innerHTML='<details class="cmpdet"><summary><span class="cmpsumtxt">Select your favourite cities to compare</span><span class="cmpsign" aria-hidden="true">+</span></summary><div class="chips"></div><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
+  var det=sel.querySelector('details'),box=sel.querySelector('.chips'),sum=sel.querySelector('summary'),input=sel.querySelector('input'),form=sel.querySelector('form');
+  det.addEventListener('toggle',sync);
   var none=document.createElement('p');none.className='cmpnone';none.textContent='Select at least one city to compare.';
   var chips=[];
   function sync(){
-    var on=chips.filter(function(c){return c.on}).map(function(c){return c.name});
-    var n=on.length;
+    var n=0;chips.forEach(function(c){if(c.on)n++});
     none.style.display=n?'none':'block';tw.style.display=n?'':'none';
-    sum.textContent=n?('Cities to compare: '+on.slice(0,4).join(', ')+(n>4?' +'+(n-4)+' more':'')):'Cities to compare - tap to choose';
-    var plus=document.createElement('span');plus.setAttribute('aria-hidden','true');plus.style.opacity='.55';plus.textContent=' +';
-    sum.appendChild(plus);
+    sum.querySelector('.cmpsign').textContent=det.open?'\u2212':'+';
   }
   function naRow(name){var tr=document.createElement('tr');var t1=document.createElement('td'),b=document.createElement('b');b.textContent=name;t1.appendChild(b);var t2=document.createElement('td');t2.colSpan=6;var s=document.createElement('span');s.className='missing';s.textContent='not available in this comparison';t2.appendChild(s);tr.appendChild(t1);tr.appendChild(t2);return tr}
   function addChip(name,row,on){
