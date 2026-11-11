@@ -455,7 +455,7 @@ for(const [key,b] of Object.entries(R)){
   btn.style.cssText='display:none;margin-top:14px;background:none;border:1px solid #7c6650;color:#dcc9ad;font-size:12.5px;padding:8px 14px;letter-spacing:.08em;font-weight:400';
   btn.textContent='\u2606 Save to my shortlist';
   sec.appendChild(btn);
-  var pending=false;
+  var pending=false,authNeeded=false;
   function currentQuery(){
     var ins=[].slice.call(document.querySelectorAll('form input'));
     for(var i=0;i<ins.length;i++){var el=ins[i];if(el.offsetParent&&el.value.trim())return el.value.trim()}
@@ -464,9 +464,10 @@ for(const [key,b] of Object.entries(R)){
   new MutationObserver(function(){
     var has=rep.innerText.trim().length>20&&sec.style.display!=='none';
     btn.style.display=has?'':'none';
-    if(has&&!pending){btn.disabled=false;btn.textContent='\u2606 Save to my shortlist'}
+    if(has&&!pending){authNeeded=false;btn.disabled=false;btn.textContent='\u2606 Save to my shortlist'}
   }).observe(rep,{childList:true,subtree:true,characterData:true});
   btn.addEventListener('click',function(){
+    if(authNeeded){window.top.location.href=PARENT+'/account/';return;}
     var q=currentQuery();
     pending=true;btn.disabled=true;btn.textContent='Saving\u2026';
     window.top.postMessage({type:'reagentSave',url:'https://sauletrust.com/#lookup',label:q?('Building: '+q):'Building record',notes:rep.innerText.trim().slice(0,300)},PARENT);
@@ -477,10 +478,7 @@ for(const [key,b] of Object.entries(R)){
     pending=false;btn.disabled=false;
     if(e.data.ok){btn.textContent='Saved \u2713'}
     else if(e.data.authRequired){
-      btn.textContent='';
-      var a=document.createElement('a');a.href=PARENT+'/account/';a.target='_top';
-      a.textContent='Sign in to save';a.style.color='#f1e3c6';
-      btn.appendChild(a);
+      authNeeded=true;btn.textContent='Sign in to save';
     }
     else{btn.textContent='Save failed - try again'}
   });
