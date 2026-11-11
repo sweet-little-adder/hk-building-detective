@@ -380,24 +380,25 @@ const d = {
   var tw=v.querySelector('.tw'),tb=v.querySelector('#cmpView #t tbody');
   if(!tw||!tb)return;
   var cs=document.createElement('style');
-  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .chips{order:-1;flex-basis:100%;margin:0 0 10px}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}#cmpView .chips button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .chips{order:0;margin:10px 0 0}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
+  cs.textContent='#cmpView .cmpsel{margin:24px 0 0;max-width:760px}#cmpView .cmpsel .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 12px}#cmpView .cmpgroup{margin:0 0 12px}#cmpView .cmpgroup .cgl{display:block;font-size:11px;color:#8f7c64;margin:0 0 6px}#cmpView .cmpgroup .chips{margin-top:0}#cmpView .cmpsel .chips button{padding:10px 2px;font-size:14px}@media (max-width:600px){#cmpView .cmpsel .chips button{padding:13px 2px}}#cmpView .cmpon button{color:#fdf6e9;border-bottom-color:#f1e3c6}#cmpView .cmpon button .x{color:#bda990;margin-left:5px}#cmpView .cmpnone{display:none;margin:16px 0 0;color:#bda990;font-size:13px}#cmpView .cmpform{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px;padding:0;background:none;margin-top:16px}#cmpView .cmpform input{flex:1;min-width:0}#cmpView .cmpform .controls{padding-top:0;flex:none}#cmpView .cmpform .controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#cmpView .cmpform input{flex-basis:100%}#cmpView .cmpform .controls{flex-basis:100%;padding-top:14px}}';
   document.head.appendChild(cs);
   var dataRows=[].slice.call(tb.querySelectorAll('tr'));
   var otherCities=['Hong Kong','New York City','San Francisco','Miami','Los Angeles','Chicago','Las Vegas','Manchester','London','Vancouver','Toronto','Calgary','Edmonton'];
   var AL={'nyc':'New York City','new york':'New York City','sf':'San Francisco','la':'Los Angeles','hk':'Hong Kong','hongkong':'Hong Kong'};
   var sel=document.createElement('div');sel.className='cmpsel';
-  sel.innerHTML='<p class="cl">Cities to compare</p><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="chips"></div><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
-  var chipBox=sel.querySelector('.chips'),input=sel.querySelector('input'),form=sel.querySelector('form');
+  sel.innerHTML='<p class="cl">Cities to compare</p><div class="cmpgroup"><span class="cgl">Comparing - tap to remove</span><div class="chips cmpon"></div></div><div class="cmpgroup"><span class="cgl">Add a city</span><div class="chips cmpoff"></div></div><form class="cmpform" autocomplete="off"><input maxlength="80" aria-label="City to compare" placeholder="e.g. Hong Kong, London, Tokyo"><div class="controls"><button type="submit">Add city &rarr;</button></div></form>';
+  var onBox=sel.querySelector('.cmpon'),offBox=sel.querySelector('.cmpoff'),input=sel.querySelector('input'),form=sel.querySelector('form');
   var none=document.createElement('p');none.className='cmpnone';none.textContent='Select at least one city to compare.';
   var chips=[];
-  function sync(){var n=0;chips.forEach(function(c){if(c.el.classList.contains('on'))n++});none.style.display=n?'none':'block';tw.style.display=n?'':'none'}
+  function sync(){var n=0;chips.forEach(function(c){if(c.on)n++});none.style.display=n?'none':'block';tw.style.display=n?'':'none'}
   function naRow(name){var tr=document.createElement('tr');var t1=document.createElement('td'),b=document.createElement('b');b.textContent=name;t1.appendChild(b);var t2=document.createElement('td');t2.colSpan=6;var s=document.createElement('span');s.className='missing';s.textContent='not available yet';t2.appendChild(s);tr.appendChild(t1);tr.appendChild(t2);return tr}
   function addChip(name,row,on){
-    var c=document.createElement('button');c.type='button';c.textContent=name;c.setAttribute('data-c',name);
-    var item={el:c,name:name,row:row,na:null};
-    function setOn(x){c.classList.toggle('on',x);c.setAttribute('aria-pressed',x?'true':'false');if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}sync()}
-    c.addEventListener('click',function(){setOn(!c.classList.contains('on'))});
-    chips.push(item);chipBox.appendChild(c);setOn(on);
+    var c=document.createElement('button');c.type='button';c.setAttribute('data-c',name);
+    var item={el:c,name:name,row:row,na:null,on:false};
+    function render(){c.textContent=item.name;if(item.on){var x=document.createElement('span');x.className='x';x.textContent='\u00d7';x.setAttribute('aria-hidden','true');c.appendChild(x);c.setAttribute('aria-label','Remove '+item.name)}else{c.setAttribute('aria-label','Add '+item.name)}}
+    function setOn(x){item.on=x;if(item.row){item.row.style.display=x?'':'none'}else{if(x&&!item.na){item.na=naRow(name);tb.appendChild(item.na)}if(!x&&item.na){item.na.remove();item.na=null}}render();(x?onBox:offBox).appendChild(c);sync()}
+    c.addEventListener('click',function(){setOn(!item.on)});
+    chips.push(item);setOn(on);
     return item;
   }
   dataRows.forEach(function(tr){var b=tr.querySelector('td b');addChip((b?b.textContent:'City').split(' (')[0],tr,true)});
@@ -407,7 +408,7 @@ const d = {
     var s=(input.value||'').trim().replace(/\s+/g,' ');if(!s)return;
     var k=s.toLowerCase();if(AL[k]){s=AL[k];k=s.toLowerCase()}
     var hit=null;chips.forEach(function(c){if(c.name.toLowerCase()===k)hit=c});
-    if(hit){if(!hit.el.classList.contains('on'))hit.el.click()}
+    if(hit){if(!hit.on)hit.el.click()}
     else{addChip(s,null,true)}
     input.value='';
   });
