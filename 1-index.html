@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RE-agent · public building records</title>
+<style>:root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#57443e;color:#f6ead6}*{box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{width:0;height:0;display:none}body{margin:0;min-height:100vh;background:#57443e}main{max-width:1600px;margin:0 auto;padding:40px min(4vw,48px) 80px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #6b5546;padding-bottom:18px}.mark{font-size:15px;letter-spacing:.2em;color:#f1e3c6}.tag{font-size:11px;letter-spacing:.08em;color:#bda990}h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(40px,8vw,76px);font-weight:400;letter-spacing:-.045em;line-height:1;margin:56px 0 18px}.lead{font-size:15px;line-height:1.7;color:#d9c5a8;max-width:680px}section{margin-top:38px}.label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bda990;margin:0 0 14px}form{padding:0;background:none}input{display:block;width:100%;border:0;border-bottom:1px solid #836d55;outline:0;background:none;color:#faf2e2;font:inherit;font-size:17px;line-height:1.5;padding:10px 2px}input:focus{border-bottom-color:#f1e3c6}input::placeholder{color:#a08d72}.controls{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-top:14px}#buyView form,#sellView form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 14px}#buyView form input,#sellView form input{flex:1;min-width:0}#buyView form .chips,#sellView form .chips{order:-1;flex-basis:100%;margin:0 0 10px}#buyView form .controls,#sellView form .controls{padding-top:0;flex:none}.controls button{min-width:100px;white-space:nowrap}@media (max-width:600px){#buyView form input,#sellView form input{flex-basis:100%}#buyView form .chips,#sellView form .chips{order:0;margin:10px 0 0}#buyView form .controls,#sellView form .controls{flex-basis:100%;padding-top:14px}.controls button{width:100%}#buyView form .chips{position:relative}#buyView .srcinfo{position:static}#buyView .srcinfo .tip{max-width:100%}}button{cursor:pointer;border:0;border-radius:0;background:#f1e3c6;color:#4a3629;font:inherit;font-weight:700;padding:12px 18px}button:hover{background:#f8efdc}button:disabled{opacity:.6;cursor:wait}.coverage .srcs{margin:0;padding-left:18px;font-size:12px;line-height:1.6;color:#bda990}.cityphoto{margin:0 0 14px;padding-top:18px}.cityphoto img{display:block;max-width:100%;max-height:400px;width:auto;height:auto;border:1px solid #f1e3c6}.cityphoto figcaption{font-size:10px;color:#bda990;margin-top:4px;line-height:1.5}.cityphoto figcaption a{color:#bda990}.hint{font-size:11px;color:#bda990}.chips{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px}.chips button{font-size:13px;font-weight:400;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0}.chips button:hover{color:#fdf6e9;border-bottom-color:#f1e3c6;background:none}.suggest{margin-top:10px;display:none}.suggest button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #66503f;color:#eddfc4;font:inherit;font-weight:400;font-size:13px;padding:11px 2px;border-radius:0}.suggest button:hover{color:#fdf6e9}.suggest button:last-child{border-bottom:0}.suggest .n{color:#bda990;font-size:11px}.srcinfo{position:relative;display:inline-flex;align-items:center;gap:6px}.srcinfo a{font-size:13px;color:#dcc9ad;text-decoration:none;border-bottom:1px solid #7c6650;padding:2px 0}.srcinfo a:hover{color:#fdf6e9;border-bottom-color:#f1e3c6}.srcinfo .why{cursor:pointer;background:none;border:1px solid #7c6650;border-radius:50%;color:#bda990;font-size:10px;line-height:1;width:16px;height:16px;padding:0;font-weight:400}.srcinfo .why:hover{color:#f1e3c6;border-color:#f1e3c6}.srcinfo .tip{display:none;position:absolute;left:0;top:100%;margin-top:8px;background:#4a3629;border:1px solid #6e5847;color:#d9c5a8;font-size:11.5px;line-height:1.5;padding:9px 11px;width:max-content;max-width:250px;white-space:normal;z-index:6}.srcinfo:hover .tip,.srcinfo.open .tip{display:block}.panel{border-top:1px solid #6e5847;padding:18px 0 4px;font-size:13px;line-height:1.8;overflow-wrap:anywhere}.finding{border-top:1px solid #6e5847;padding:16px 0;margin:0}.finding h3{margin:0 0 6px;font-size:14px;font-weight:700}.finding.warn h3{color:#e8b9c4}.finding.clear h3{color:#9cd8ae}.finding p{margin:6px 0;color:#d3bfa2;font-size:12.5px}.finding .count{font-size:26px;font-family:Georgia,serif;color:#f8efdc}.muted{color:#bda990;font-size:12px}footer{margin-top:20px;border-top:1px solid #6b5546;padding-top:20px;font-size:11px;color:#bda990;line-height:1.8}a{color:#f1e3c6}ul{margin:8px 0;padding-left:18px}li{margin:5px 0;color:#d3bfa2;font-size:12.5px}
+.tabs{display:flex;gap:28px;margin-top:24px;border-bottom:1px solid #6b5546}.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:#bda990;font:inherit;font-size:13px;letter-spacing:.15em;padding:10px 0;cursor:pointer;font-weight:400;margin-bottom:-1px}.tabs button.on{color:#fdf6e9;border-bottom-color:#f1e3c6;font-weight:700;background:none}
+.cities{display:flex;gap:8px 18px;flex-wrap:wrap;margin-bottom:14px}.cities button{font-size:13px;background:none;color:#dcc9ad;border:0;border-bottom:1px solid #7c6650;padding:2px 0;cursor:pointer}.cities button:hover{color:#fdf6e9;border-bottom-color:#f1e3c6}.cities button.on{color:#fdf6e9;border-bottom-color:#f1e3c6}
+.vrow{margin-top:6px}.vrow .v{border-bottom:1px solid #66503f;padding:11px 2px;margin:0;font-size:12.5px}.vrow .v:last-child{border-bottom:0}.vrow .v b{color:#f1e3c6}button,.chips,.tabs,.label,.mark,.tag,.hint,.controls,.suggest{user-select:none;-webkit-user-select:none}
+.coverage{margin:20px 0 0;border-bottom:1px solid #6b5546;padding:0 0 14px}.coverage.lim{border-bottom:1px solid #6b5546;padding-bottom:14px}.coverage.lim[open]{padding-bottom:14px}.coverage summary{cursor:pointer;list-style:none;font-size:13px;color:#d9c5a8;padding:12px 0;min-height:44px}.coverage summary::-webkit-details-marker{display:none}.coverage summary span{float:right;font-size:20px;line-height:16px}.coverage[open] summary span{transform:rotate(45deg)}.coverage .lead{margin:6px 0 12px}.coverage .panel,.coverage .srcs{max-width:760px}.reveal-word{white-space:nowrap;display:inline-block}.reveal-char{opacity:1;display:inline-block;transition:opacity .28s ease,transform .45s cubic-bezier(.2,.7,.2,1)}.reveal-pending .reveal-char{opacity:0;transform:translateY(.24em)}.reveal-playing .reveal-char{opacity:1;transform:none;transition-delay:var(--char-delay,0ms)}.reveal-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(prefers-reduced-motion:reduce){.reveal-char{transition:none!important;opacity:1!important;transform:none!important}}
+button[type=submit]{position:relative;white-space:nowrap;flex-shrink:0;z-index:0;background:transparent;color:#f1e3c6;border:1px solid #f1e3c6;transition:color .3s ease,background-color .3s ease}
+button[type=submit]::before{content:none}
+button[type=submit]:focus-visible{color:#4a3629;background:#f1e3c6;outline:2px solid #f8efdc;outline-offset:2px}
+@media (hover:hover){button[type=submit]:hover:not(:disabled){background:#f1e3c6;color:#4a3629}}
+@media (prefers-reduced-motion:reduce){button[type=submit]{transition:none}}
+#sourcesCredits footer{margin:0;padding:0;border:0}
+</style></head><body><main>
+<header><div class="mark">RE-AGENT</div><div class="tag">RECORDS · MARKET DATA · WORLDWIDE CITY SEARCH &middot; <a href="compare.html">COMPARE CITIES (BETA)</a></div></header>
+<div class="tabs"><button id="tabBuy" class="on" type="button">BUY</button><button id="tabSell" type="button">SELL</button></div>
+<h1>Know the city.<br>Know the building.</h1>
+
+<div id="buyView"><section><p class="label">01 / The city</p>
+<form id="askcity" autocomplete="off"><input id="qc" maxlength="80" aria-label="City you want to buy in" placeholder="e.g. Manchester, New York City, Hong Kong, Tokyo"><div class="chips"><button type="button" data-c="Hong Kong">Hong Kong</button><button type="button" data-c="New York">New York City</button><button type="button" data-c="San Francisco">San Francisco</button><button type="button" data-c="Miami">Miami</button><button type="button" data-c="Los Angeles">Los Angeles</button><button type="button" data-c="Chicago">Chicago</button><button type="button" data-c="Las Vegas">Las Vegas</button><button type="button" data-c="Manchester">Manchester</button><button type="button" data-c="London">London</button><button type="button" data-c="Vancouver">Vancouver</button><button type="button" data-c="Toronto">Toronto</button><button type="button" data-c="Calgary">Calgary</button><button type="button" data-c="Edmonton">Edmonton</button></div>
+<div class="controls"><button type="submit">Explore →</button></div>
+</form>
+
+<div id="cityPhoto"></div><div id="cityPanel" style="margin-top:16px"></div>
+
+<p class="label" style="margin-top:26px" id="hkLabel">02 / The building</p>
+<div id="nycForm" style="display:none"><form id="asknyc" autocomplete="off"><input id="qnyc" maxlength="120" aria-label="NYC building address" placeholder="e.g. 452 Fifth Avenue"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="chiForm" style="display:none"><form id="askchi" autocomplete="off"><input id="qchi" maxlength="120" aria-label="Chicago building address" placeholder="e.g. 233 S Wacker Dr"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="vanForm" style="display:none"><form id="askvan" autocomplete="off"><input id="qvan" maxlength="120" aria-label="Vancouver street address" placeholder="e.g. 362 E 56th Ave"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="torForm" style="display:none"><form id="asktor" autocomplete="off"><input id="qtor" maxlength="120" aria-label="Toronto apartment building address" placeholder="e.g. 291 Avenue Rd"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="calForm" style="display:none"><form id="askcal" autocomplete="off"><input id="qcal" maxlength="120" aria-label="Calgary street address" placeholder="e.g. 3104 10 St NW"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="edmForm" style="display:none"><form id="askedm" autocomplete="off"><input id="qedm" maxlength="120" aria-label="Edmonton street address" placeholder="e.g. 11922 90 Street NW"><div class="controls"><button type="submit">Investigate →</button></div></form></div>
+<div id="hkForm"><form id="ask" autocomplete="off"><input id="q" maxlength="120" aria-label="Building name or street" placeholder="e.g. The Masterpiece, Residence Bel-Air">
+<div class="chips"><button type="button" data-q="THE MASTERPIECE">The Masterpiece</button><button type="button" data-q="RESIDENCE BEL-AIR">Residence Bel-Air</button><button type="button" data-q="INTERNATIONAL COMMERCE CENTRE">ICC (no-match demo)</button></div>
+<div class="controls"><button id="submit" type="submit">Investigate →</button></div>
+</form>
+<div class="suggest" id="suggest"></div>
+</div>
+</section>
+<section id="reportSec" style="display:none"><p class="label">Results</p><div class="panel" id="report" role="status" aria-live="polite">Search a building to see its record.</div></section>
+</div>
+<div id="sellView" style="display:none"><section><p class="label">01 / Sell</p><div class="panel"><p>No listing upload or valuation here yet - those need data we don't invent. What you can do today is see exactly what a buyer sees about your property before you list.</p></div>
+<p class="label" style="margin-top:26px">02 / Your city</p>
+<form id="asksellcity" autocomplete="off"><input id="qsc" maxlength="80" aria-label="City your property is in" placeholder="e.g. Manchester, New York City, Hong Kong"><div class="chips"><button type="button" data-sc="Hong Kong">Hong Kong</button><button type="button" data-sc="New York">New York City</button><button type="button" data-sc="Chicago">Chicago</button><button type="button" data-sc="Miami">Miami</button><button type="button" data-sc="Manchester">Manchester</button><button type="button" data-sc="London">London</button><button type="button" data-sc="Vancouver">Vancouver</button><button type="button" data-sc="Toronto">Toronto</button><button type="button" data-sc="Calgary">Calgary</button><button type="button" data-sc="Edmonton">Edmonton</button></div>
+<div class="controls"><button type="submit">Check →</button></div>
+</form>
+
+<div id="sellPanel" style="margin-top:16px"></div></section></div>
+<section><details class="coverage"><summary>Data sources &amp; coverage <span aria-hidden="true">+</span></summary><p class="lead">Type a city. RE-agent resolves 34,000+ cities worldwide (population 15k+) and shows what public data says: building-records lookup in Hong Kong, New York City, Chicago and four Canadian cities (Vancouver, Toronto, Calgary, Edmonton; Toronto is a dated snapshot), Zillow value and rent indices for 20 US cities, official sold-price indices for 14 UK cities, and real listing routes where they exist. Every figure names its source and date. Nothing here is invented or scored.</p><ul class="srcs"><li>Records: Hong Kong · NYC · Chicago · Vancouver · Toronto (snapshot) · Calgary · Edmonton · market data: 20 US + 14 UK cities · 34,000+ cities resolve</li><li>Live NYC DOB violations · NYC Open Data</li><li>Live Chicago building violations · data.cityofchicago.org</li><li>Live City of Vancouver property tax report · 2026 assessed values, not sale prices</li><li>RentSafeTO apartment-building evaluations · snapshot 2026-11-09, bundled</li><li>Live City of Calgary 2026 assessment roll</li><li>Live City of Edmonton current assessment dataset</li><li>English names as published by BD · snapshot 2026-10-15 · selected luxury buildings only</li></ul></details><details class="coverage lim"><summary>Data limitations <span aria-hidden="true">+</span></summary><div class="panel">
+<ul>
+<li><b>Hong Kong records: not listed ≠ no problems.</b> The s.24 and s.26 datasets only cover orders issued <b>after 1 May 2023</b>, refreshed monthly. Older orders, other order types, and every other kind of defect are outside this snapshot. Counts are cumulative orders issued, not outstanding - check per-order status in the <a href="https://www.bd.gov.hk/en/resources/online-tools/orders-search/ordersearch.html">BD order search</a>. Addresses are BD's published English names; confirm the address, not just the name.</li>
+<li><b>New York City records are live</b> from NYC Open Data's DOB Violations dataset. Dismissed violations are history, not current state; absence of records is not proof a building is clear.</li>
+<li><b>Chicago records are live</b> from the city's Building Violations dataset. Status (open/complied) is as published; absence of records is not proof a building is clear.</li>
+<li><b>Vancouver records are live</b> from the City of Vancouver property tax report (2026 roll): per-parcel assessed land and building values, zoning, year built and tax levy. Assessed values are taxable values set by BC Assessment the previous year - not sale prices or market listings. Covers the City of Vancouver itself, not the rest of Metro Vancouver (Burnaby, Surrey, Richmond are separate cities).</li>
+<li><b>Toronto records are a bundled snapshot</b> of the City's RentSafeTO apartment-building evaluations (fetched 2026-11-09): city inspector scores out of 100 for rental apartment buildings of 3 or more storeys and 10 or more units. Houses, condo buildings and smaller rentals are outside this dataset, so no record says nothing about condition.</li>
+<li><b>Calgary and Edmonton records are live</b> from each city's current assessment roll: the taxable value estimate plus the details each city publishes. Assessed values are set the previous year for tax purposes and are not sale prices. One record per parcel - individual condo units may not appear separately.</li>
+<li><b>Market figures are Zillow Research indices</b>, city-level, Sep 2026: ZHVI (typical value of all homes: single-family + condo) and ZORI (typical asking rent across all rentals incl. multifamily). They describe the city, not any specific home, and they cover different housing stock - so no yield or return is computed from them.</li>
+<li><b>UK market figures are official sold prices</b>: average price of properties actually sold and year-on-year change, from the UK House Price Index (HM Land Registry / ONS), Aug 2026, per local authority area. They describe the area, not any specific home.</li>
+<li><b>City search covers 34,000+ cities worldwide</b> (population 15k+) via the bundled GeoNames city database - resolved on your device, no lookup is sent anywhere. Smaller towns: search the nearest major city. Outside the bundled US/UK market cities and the records areas (Hong Kong, NYC, Chicago, Vancouver, Toronto, Calgary, Edmonton), RE-agent resolves the city and points to a listing route where one is wired (Hong Kong) - elsewhere it says so plainly instead of inventing data.</li>
+<li><b>Listings open on external portals</b> (Zillow, Rightmove, 28Hse). RE-agent does not verify them. No valuations, no investment scores, no recommendation to buy or avoid anything.</li>
+</ul>
+</div></details></section>
+<section style="margin-top:0"><details class="coverage" id="sourcesCredits"><summary>Sources & credits <span aria-hidden="true">+</span></summary><div class="panel"><footer>Records: Hong Kong <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1">s.24</a> and <a href="https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1">s.26</a> orders via data.gov.hk (snapshot 2026-10-15, bundled - no HK search is sent anywhere), New York City <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">DOB Violations</a> (live), Chicago <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Building Violations</a> (live), Vancouver <a href="https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/">Property Tax Report</a> (live, 2026 roll), Toronto <a href="https://open.toronto.ca/dataset/apartment-building-evaluation/">RentSafeTO Apartment Building Evaluation</a> (bundled snapshot 2026-11-09), Calgary <a href="https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w">Current Year Property Assessments</a> (live), Edmonton <a href="https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg">Property Assessment Data</a> (live). Market indices: <a href="https://www.zillow.com/research/data/">Zillow Research</a> ZHVI/ZORI, Sep 2026 (US); <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">UK House Price Index</a>, HM Land Registry / ONS, Aug 2026. Listings: Zillow, <a href="https://www.rightmove.co.uk/">Rightmove</a>, 28Hse. City data: <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0), bundled. More jurisdictions in progress. Not legal, surveying or investment advice.</footer></div></details></section>
+</main><script>
+let DATA=null;
+const norm=s=>s.toUpperCase().replace(/[^A-Z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+const q=document.querySelector('#q'),report=document.querySelector('#report'),suggest=document.querySelector('#suggest');const reportSec=document.getElementById('reportSec');new MutationObserver(()=>{reportSec.style.display=''}).observe(report,{childList:true});
+fetch('buildings.json').then(r=>r.json()).then(d=>{DATA=d.map(r=>({...r,n:norm(r.a)}))});
+function search(terms){if(!DATA)return[];const t=norm(terms).split(' ').filter(Boolean);if(!t.length)return[];
+return DATA.filter(r=>t.every(tok=>r.n.includes(tok))).sort((x,y)=>((y.s24||0)+(y.s26||0))-((x.s24||0)+(x.s26||0)));}
+q.addEventListener('input',()=>{const hits=search(q.value).slice(0,8);if(!hits.length||!q.value.trim()){suggest.style.display='none';return}
+suggest.innerHTML='';hits.forEach(h=>{const b=document.createElement('button');b.type='button';b.innerHTML=h.a+' <span class="n">'+((h.s24?('s.24 ×'+h.s24+' '):'')+(h.s26?('s.26 ×'+h.s26):'')||'listed')+'</span>';b.onclick=()=>{suggest.style.display='none';render(h)};suggest.appendChild(b)});suggest.style.display='block'});
+document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{q.value=b.dataset.q;run()}));
+document.querySelector('#ask').addEventListener('submit',e=>{e.preventDefault();run()});
+function run(){suggest.style.display='none';const hits=search(q.value);if(!q.value.trim())return;
+if(!hits.length){renderNone(q.value);return}render(hits[0],hits.length)}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function finding(kind,r){
+const is24=kind==='s24',n=r[kind];
+const title=is24?'Unauthorised building works · s.24 removal orders':'Dangerous building · s.26 repair orders';
+const src=is24?'https://data.gov.hk/en-data/dataset/hk-bd-opendata-s24-order-1':'https://data.gov.hk/en-data/dataset/hk-bd-opendata-s26-order-1';
+if(n>0){const what=is24
+?'The Buildings Department ordered removal of unauthorised building works at this address (for example illegal rooftop or external structures). The count covers orders issued since 1 May 2023.'
+:'The Buildings Department issued repair or investigation orders because the building was found dangerous or liable to become dangerous. The count covers orders issued since 1 May 2023.';
+return '<div class="finding warn"><h3>⚠ '+title+'</h3><div class="count">'+n+' order'+(n>1?'s':'')+'</div><p>'+what+'</p><p class="muted">Issued is not outstanding: any of these may already be complied with. <a href="'+src+'">Source dataset ↗</a> · <a href="https://www.bd.gov.hk/en/resources/online-tools/orders-search/ordersearch.html">Check per-order status at BD ↗</a></p></div>'}
+return '<div class="finding clear"><h3>✓ '+title+': not listed</h3><p>No matching entry in this dataset as of the 2026-10-15 snapshot. That only means no such orders issued after 1 May 2023 appear here - it is not proof the building is clear. <a href="'+src+'">Source dataset ↗</a></p></div>'}
+function render(r,total){report.innerHTML='<h3 style="margin:0 0 4px;font-size:18px">'+esc(r.a)+'</h3><p class="muted" style="margin:0 0 6px">Block type '+(r.bt||'—')+' · approx. '+Number(r.lat).toFixed(5)+', '+Number(r.lon).toFixed(5)+' · snapshot 2026-10-15'+(total>1?' · '+(total-1)+' other name/address match'+(total>2?'es':'')+' exist - confirm the address':'')+'</p>'+finding('s24',r)+finding('s26',r)+'<p class="muted" style="margin-bottom:0">Clues, not a verdict. Read Data limitations before treating this as reassurance or alarm.</p>'}
+function renderNone(term){report.innerHTML='<h3 style="margin:0 0 8px;font-size:16px">No match for “'+esc(term)+'” in these datasets</h3><p class="muted" style="margin:0">This directory lists selected luxury Hong Kong buildings only, so most buildings are not listed. This is a coverage gap, not a clean bill of health. The lookup only sees s.24 removal orders and s.26 repair orders issued after 1 May 2023, in BD\'s published English names. Try the exact name from the listing, or check the address directly in the <a href="https://www.bd.gov.hk/en/resources/online-tools/orders-search/ordersearch.html">BD order search</a>.</p>'}
+</script>
+<script>const CITY_MARKET={"New York": {"st": "NY", "zhvi": 825854, "zori": 4089}, "Los Angeles": {"st": "CA", "zhvi": 927891, "zori": 2772}, "San Francisco": {"st": "CA", "zhvi": 1441021, "zori": 4784}, "Miami": {"st": "FL", "zhvi": 583705, "zori": 2965}, "Boston": {"st": "MA", "zhvi": 761236, "zori": 3271}, "Seattle": {"st": "WA", "zhvi": 822572, "zori": 2227}, "Chicago": {"st": "IL", "zhvi": 334108, "zori": 2311}, "San Diego": {"st": "CA", "zhvi": 980490, "zori": 3004}, "Washington": {"st": "DC", "zhvi": 566961, "zori": 2484}, "Austin": {"st": "TX", "zhvi": 491960, "zori": 1571}, "Dallas": {"st": "TX", "zhvi": 303442, "zori": 1604}, "Houston": {"st": "TX", "zhvi": 259465, "zori": 1544}, "Atlanta": {"st": "GA", "zhvi": 380331, "zori": 1942}, "Denver": {"st": "CO", "zhvi": 520947, "zori": 1855}, "Las Vegas": {"st": "NV", "zhvi": 417475, "zori": 1700}, "Honolulu": {"st": "HI", "zhvi": 774710, "zori": 2715}, "Nashville": {"st": "TN", "zhvi": 425889, "zori": 1820}, "Phoenix": {"st": "AZ", "zhvi": 404067, "zori": 1571}, "Portland": {"st": "OR", "zhvi": 524318, "zori": 1719}, "Philadelphia": {"st": "PA", "zhvi": 231584, "zori": 1757}, "_meta": {"zhvi_month": "2026-09-30", "zori_month": "2026-09-30", "zhvi_universe": "all homes (single-family + condo/co-op)", "zori_universe": "all rentals + multifamily"}};</script>
+<script>
+(function(){
+const buy=document.querySelector('#tabBuy'),sell=document.querySelector('#tabSell');
+buy.onclick=()=>{buy.classList.add('on');sell.classList.remove('on');document.querySelector('#buyView').style.display='';document.querySelector('#sellView').style.display='none'};
+sell.onclick=()=>{sell.classList.add('on');buy.classList.remove('on');document.querySelector('#buyView').style.display='none';document.querySelector('#sellView').style.display=''};
+const hkF=document.querySelector('#hkForm'),nycF=document.querySelector('#nycForm'),chiF=document.querySelector('#chiForm'),hkL=document.querySelector('#hkLabel'),cp=document.querySelector('#cityPanel');
+const vanF=document.querySelector('#vanForm'),torF=document.querySelector('#torForm'),calF=document.querySelector('#calForm'),edmF=document.querySelector('#edmForm');
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+const UK_MARKET={"manchester":{"label":"Manchester","avg":256760,"yoy":2.1,"rm":"Manchester"},"london":{"label":"London","avg":554430,"yoy":-2.2,"rm":"London"},"birmingham":{"label":"Birmingham","avg":234867,"yoy":1.5,"rm":"Birmingham"},"leeds":{"label":"Leeds","avg":246385,"yoy":2.4,"rm":"Leeds"},"liverpool":{"label":"Liverpool","avg":188427,"yoy":4.7,"rm":"Liverpool"},"sheffield":{"label":"Sheffield","avg":217603,"yoy":0.6,"rm":"Sheffield"},"city-of-bristol":{"label":"Bristol","avg":353596,"yoy":0.9,"rm":"Bristol"},"city-of-edinburgh":{"label":"Edinburgh","avg":301313,"yoy":2.8,"rm":"Edinburgh"},"city-of-glasgow":{"label":"Glasgow","avg":194382,"yoy":1.8,"rm":"Glasgow"},"newcastle-upon-tyne":{"label":"Newcastle upon Tyne","avg":211255,"yoy":5.8,"rm":"Newcastle-upon-Tyne"},"city-of-nottingham":{"label":"Nottingham","avg":189547,"yoy":-1.8,"rm":"Nottingham"},"cardiff":{"label":"Cardiff","avg":272443,"yoy":2.1,"rm":"Cardiff"},"cambridge":{"label":"Cambridge","avg":470360,"yoy":-2.2,"rm":"Cambridge"},"oxford":{"label":"Oxford","avg":478080,"yoy":-2.9,"rm":"Oxford"}};
+const ALIAS={'hong kong':'HK','hk':'HK','hongkong':'HK','new york':'New York','nyc':'New York','new york city':'New York','chicago':'Chicago','chi':'Chicago','manchester':'UK:manchester','london':'UK:london','birmingham':'UK:birmingham','leeds':'UK:leeds','liverpool':'UK:liverpool','sheffield':'UK:sheffield','bristol':'UK:city-of-bristol','edinburgh':'UK:city-of-edinburgh','glasgow':'UK:city-of-glasgow','newcastle':'UK:newcastle-upon-tyne','newcastle upon tyne':'UK:newcastle-upon-tyne','nottingham':'UK:city-of-nottingham','cardiff':'UK:cardiff','cambridge':'UK:cambridge','oxford':'UK:oxford','vancouver':'CA:Vancouver','toronto':'CA:Toronto','calgary':'CA:Calgary','edmonton':'CA:Edmonton'};
+function resolveCity(s){s=(s||'').trim();if(!s)return null;const key=s.toLowerCase().split(',')[0].replace(/\s+/g,' ').trim();if(ALIAS[key])return ALIAS[key];for(const c in CITY_MARKET){if(c==='_meta')continue;if(c.toLowerCase()===key)return c}for(const k in UK_MARKET){if(UK_MARKET[k].label.toLowerCase()===key)return 'UK:'+k}return 'OTHER'}
+function zlink(c,st){return 'https://www.zillow.com/homes/'+c.replace(/ /g,'-')+',-'+st+'_rb/'}
+function zlux(c,st){return 'https://www.zillow.com/'+c.toLowerCase().replace(/ /g,'-')+'-'+st.toLowerCase()+'/luxury-homes/'}
+function marketCard(c){const d=CITY_MARKET[c];return '<div class="finding"><h3>'+c+', '+d.st+' - market snapshot</h3><p>Typical home value <b>'+fmt(d.zhvi)+'</b> · typical rent <b>'+fmt(d.zori)+'/mo</b></p><p class="muted">Zillow Research: ZHVI (typical value, all homes: single-family + condo) and ZORI (typical asking rent, all rentals incl. multifamily), '+CITY_MARKET._meta.zhvi_month.slice(0,7)+'. The two indices cover different housing stock - no yield is computed from them. <a href="https://www.zillow.com/research/data/">Source ↗</a></p></div>'}
+function marketCardUK(slug){const d=UK_MARKET[slug];const gbp='\u00a3'+Math.round(d.avg).toLocaleString('en-GB');const yoy=(d.yoy>0?'+':'')+d.yoy+'%';
+return '<div class="finding"><h3>'+d.label+' - market snapshot</h3><p>Average sold price <b>'+gbp+'</b> · '+yoy+' year on year</p><p class="muted">UK House Price Index (HM Land Registry / ONS), Aug 2026: average price of properties actually sold in the '+d.label+' local authority area. Area-level context, not a valuation of any home. <a href="https://www.gov.uk/government/collections/uk-house-price-index-reports">Source ↗</a></p></div>'}
+let CITIES=null;let WORLD=null;
+let photoSeq=0;const PHOTO_LABEL='Photo';
+function showCityPhoto(cand){const box=document.querySelector('#cityPhoto');if(!box)return;box.innerHTML='';if(!cand)return;const seq=++photoSeq;
+const tries=[cand.city+(cand.admin?', '+cand.admin:'')+(cand.country?', '+cand.country:''),cand.city+(cand.country?', '+cand.country:''),cand.city];
+(async()=>{const CURATED={'hong kong':'Hong Kong Skyline Restitch - Dec 2007.jpg'};const ck=(cand.city||'').toLowerCase();if(CURATED[ck]){try{const iq=await(await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=extmetadata%7Curl&iiextmetadatafilter=Artist%7CLicenseShortName%7CLicenseUrl&titles='+encodeURIComponent('File:'+CURATED[ck]))).json();const ip=Object.values(iq.query.pages)[0];const ii=ip&&ip.imageinfo&&ip.imageinfo[0];if(ii&&ii.url){const em=ii.extmetadata||{};let credit=em.Artist&&em.Artist.value?em.Artist.value.replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim():'';const lic=em.LicenseShortName&&em.LicenseShortName.value?em.LicenseShortName.value:'';const licurl=em.LicenseUrl&&em.LicenseUrl.value?em.LicenseUrl.value:'';if(!/^(cc0|public domain|cc by( \d|\.|$)|cc by-sa( \d|\.|$))/i.test(lic))throw new Error('license');if(seq===photoSeq){const ttl=CURATED[ck].replace(/\.[^.]+$/,'');const cap=PHOTO_LABEL+': '+(ttl?ttl+' · ':'')+(credit?credit+' · ':'')+'Wikimedia Commons';const lich=lic?(licurl?'<a href="'+licurl+'" target="_blank" rel="noopener">'+esc(lic)+'</a>':esc(lic)):'';box.innerHTML='<figure class="cityphoto"><img src="'+ii.url+'" alt="'+esc(cand.city)+'" loading="lazy"><figcaption>'+(ii.descriptionurl?'<a href="'+ii.descriptionurl+'" target="_blank" rel="noopener">'+esc(cap)+'</a>':esc(cap))+(lich?' · '+lich:'')+'</figcaption></figure>';return}}}catch(e){}}for(const t of tries){try{
+const q=await(await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=original%7Cname&titles='+encodeURIComponent(t))).json();
+const pages=q&&q.query&&q.query.pages?Object.values(q.query.pages):[];const p=pages[0];
+if(!p||!p.original||!p.original.source)continue;if(p.pageimage&&/flag|coat of arms|seal|locator|map of |_map\./i.test(p.pageimage))continue;
+let credit='',lic='',descurl='',licurl='';
+if(p.pageimage){try{
+const iq=await(await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=extmetadata%7Curl&iiextmetadatafilter=Artist%7CLicenseShortName%7CLicenseUrl&titles='+encodeURIComponent('File:'+p.pageimage))).json();
+const ip=Object.values(iq.query.pages)[0];const ii=ip&&ip.imageinfo&&ip.imageinfo[0];
+if(ii){descurl=ii.descriptionurl||'';const em=ii.extmetadata||{};credit=em.Artist&&em.Artist.value?em.Artist.value.replace(/<[^>]*>/g,'').replace(/File:[^,;]*?\.(jpe?g|png|svg|webp|tiff?)[,;]?/gi,'').split(/derivative work|SVG code|version copied/i)[0].replace(/\s+/g,' ').replace(/^[,;.\s·]+|[,;.\s·]+$/g,''):'';lic=em.LicenseShortName&&em.LicenseShortName.value?em.LicenseShortName.value:'';licurl=em.LicenseUrl&&em.LicenseUrl.value?em.LicenseUrl.value:''}
+}catch(e){}}
+if(!/^(cc0|public domain|cc by( \d|\.|$)|cc by-sa( \d|\.|$))/i.test(lic))continue;
+if(seq!==photoSeq)return;
+const ttl=(p.pageimage||'').replace(/\.[^.]+$/,'');const cap=PHOTO_LABEL+': '+(ttl?ttl+' · ':'')+(credit?credit+' · ':'')+'Wikimedia Commons';const lich=lic?(licurl?'<a href="'+licurl+'" target="_blank" rel="noopener">'+esc(lic)+'</a>':esc(lic)):'';
+box.innerHTML='<figure class="cityphoto"><img src="'+p.original.source+'" alt="'+esc(p.title||t)+'" loading="lazy"><figcaption>'+(descurl?'<a href="'+descurl+'" target="_blank" rel="noopener">'+esc(cap)+'</a>':esc(cap))+(lich?' · '+lich:'')+'</figcaption></figure>';
+return}catch(e){}}})()}
+const US_STATES={"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","District of Columbia":"DC","Washington, D.C.":"DC","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY"};
+const Q_ALIAS={"uk":"united kingdom","gb":"united kingdom","great britain":"united kingdom","us":"united states","usa":"united states","america":"united states","hk":"hong kong"};
+function normS(s){return (s||'').toLowerCase().replace(/\./g,'').replace(/\s+/g,' ').trim()}
+function coveredOf(city,admin,country){const ck=city.toLowerCase();
+if(country==='Hong Kong'&&ck==='hong kong')return 'HK';
+if(country==='United States'){
+if(ck==='new york city'&&admin==='New York')return 'New York';
+if(ck==='chicago'&&admin==='Illinois')return 'Chicago';
+for(const c in CITY_MARKET){if(c==='_meta')continue;if(c.toLowerCase()===ck&&US_STATES[admin]===CITY_MARKET[c].st)return c}}
+if(country==='United Kingdom'){for(const k in UK_MARKET){if(UK_MARKET[k].label.toLowerCase()===ck)return 'UK:'+k}}
+if(country==='Canada'){
+if(ck==='vancouver'&&admin==='British Columbia')return 'CA:Vancouver';
+if(ck==='toronto'&&admin==='Ontario')return 'CA:Toronto';
+if(ck==='calgary'&&admin==='Alberta')return 'CA:Calgary';
+if(ck==='edmonton'&&admin==='Alberta')return 'CA:Edmonton'}
+return null}
+function qualMatch(q,c){q=Q_ALIAS[q]||q;const a=normS(c.admin),co=normS(c.country);
+if(a&&a.indexOf(q)>-1)return true;
+if(co&&co.indexOf(q)>-1)return true;
+if(US_STATES[c.admin]&&US_STATES[c.admin].toLowerCase()===q)return true;
+return false}
+function candName(c){return c.city+(c.admin?', '+c.admin:'')+', '+c.country}
+async function resolveInput(raw){
+try{if(!CITIES){CITIES=await(await fetch('cities.json')).json()}}catch(e){return {kind:'none'}}
+try{if(!WORLD){WORLD=await(await fetch('world.json')).json()}}catch(e){}
+const parts=raw.split(',').map(normS).filter(Boolean);if(!parts.length)return {kind:'none'};
+const cityKey=parts[0],quals=parts.slice(1);
+let cands=[];const seen={};
+function addExact(key){if(!key)return;for(const c of CITIES){if(normS(c[0])===key){const id=c[0]+'|'+c[1]+'|'+c[2];if(!seen[id]){seen[id]=1;cands.push({city:c[0],admin:c[1],country:c[2]})}}}}
+addExact(cityKey);
+if(ALIAS[cityKey]){let ak=ALIAS[cityKey];ak=(ak==='HK')?'hong kong':(ak==='New York'?'new york city':(ak==='Chicago'?'chicago':(ak.indexOf('CA:')===0?ak.slice(3).toLowerCase():UK_MARKET[ak.slice(3)].label.toLowerCase())));addExact(ak)}
+if(!cands.length&&cityKey.length>3){for(const c of CITIES){if(normS(c[0]).indexOf(cityKey)===0){cands.push({city:c[0],admin:c[1],country:c[2]});break}}}
+cands.forEach(c=>{c.cov=coveredOf(c.city,c.admin,c.country)});
+if(quals.length){cands=cands.filter(c=>quals.every(q=>qualMatch(q,c)))}
+if(!cands.length)return {kind:'none'};
+cands.sort((a,b)=>((b.cov?1:0)-(a.cov?1:0)));
+if(cands.length===1)return {kind:'one',cand:cands[0]};
+return {kind:'pick',cands:cands.slice(0,6),total:cands.length}}
+function chooserHTML(cands,total){return '<div class="finding"><h3>Several places share that name</h3><p>Pick the one you mean - nothing is shown until you do:</p><div class="suggest" style="display:block;margin-top:8px">'+cands.map(function(c,i){return '<button type="button" class="cand" data-i="'+i+'">'+esc(candName(c))+(c.cov?' <span class="n">· records or market data available</span>':'')+'</button>'}).join('')+'</div>'+(total>cands.length?'<p class="muted" style="margin-top:8px">Showing the '+cands.length+' largest of '+total+' - add a state, region or country to narrow it.</p>':'')+'</div>'}
+function countryCtx(c){const w=WORLD&&WORLD[c.country];if(!w)return '';let s='';if(w.yoy!==undefined){const y=(w.yoy>0?'+':'')+w.yoy+'%';s+='<p><b>'+esc(c.country)+' market (country-wide)</b>: residential property prices '+y+' year on year in '+w.q+' (BIS nominal index, all dwellings). A country-wide trend, not a city or property figure. <a href="https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q.'+w.cc+'.N.628" target="_blank" rel="noopener">Source ↗</a></p>'}if(w.cur){s+='<p class="muted">Local currency: '+w.cur+'.</p>'}return s}
+function worldPanelCand(c){let route='';
+if(c.country==='Hong Kong'){route=''}
+else if(c.country==='United States'){route='<p class="muted" style="margin-top:10px">For the US, listing routes and market data are wired for the 20 bundled cities - try one of the chips.</p>'}
+else if(c.country==='United Kingdom'){route='<p class="muted" style="margin-top:10px">For the UK, listing routes and market data are wired for the 14 bundled cities - try one of the chips.</p>'}
+else if(c.country==='Canada'){route='<p class="muted" style="margin-top:10px">For Canada, live address records are wired for Vancouver, Toronto, Calgary and Edmonton - try those cities.</p>'}
+else{route='<p class="muted" style="margin-top:10px">A listing-portal route is not wired for '+esc(c.country)+' yet - no invented links.</p>'}
+return '<div class="finding"><h3>'+esc(candName(c))+'</h3>'+countryCtx(c)+'<p>Resolved from the GeoNames city database (34,000+ cities). Building-records lookup covers Hong Kong, New York City, Chicago, Vancouver, Toronto, Calgary and Edmonton (Toronto is a dated snapshot); bundled market data covers 20 US and 14 UK cities - '+esc(c.city)+' is outside those today, so no city-level figures are shown rather than invented.</p>'+route+'</div>'}
+function renderCoveredBuyRaw(c,cp,r){
+if(c==='HK'){hkF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Hong Kong</h3><p>Building-records lookup is live below (BD s.24 + s.26 order datasets, snapshot 2026-10-15).</p></div>';r.innerHTML='Search a building to see its record.';return}
+if(c==='New York'){nycF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('New York');r.innerHTML='Market snapshot above · run an address below for its live DOB record.';return}
+if(c==='Chicago'){chiF.style.display='';hkL.style.display='';cp.innerHTML=marketCard('Chicago');r.innerHTML='Market snapshot above · run an address below for its live violations record.';return}
+if(c==='CA:Vancouver'){vanF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Vancouver, BC</h3><p>Search any street address within the City of Vancouver below for its <b>assessed value</b>: land value, building value, year built, zoning and tax levy, live from the 2026 property tax roll.</p><p class="muted">City of Vancouver property tax report, 2026 roll. Assessed values are taxable values set the previous year - not sale prices. Covers the City of Vancouver itself; Burnaby, Surrey and the rest of Metro Vancouver are separate cities.</p></div>';r.innerHTML='Run a Vancouver address below.';return}
+if(c==='CA:Toronto'){torF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Toronto, ON</h3><p>Search a rental apartment building below for its <b>city inspection score out of 100</b> (RentSafeTO). Houses and condo buildings are outside this dataset.</p><p class="muted">City of Toronto RentSafeTO evaluations: inspector scores for rental apartment buildings (3+ storeys, 10+ units); bundled snapshot of 7,154 evaluation records fetched 2026-11-09.</p></div>';r.innerHTML='Run a Toronto apartment-building address below.';return}
+if(c==='CA:Calgary'){calF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Calgary, AB</h3><p>Search any street address within Calgary below for its <b>assessed value</b> - the City&rsquo;s market-value estimate for 2026 tax - plus year built, land use and community, live.</p><p class="muted">City of Calgary 2026 assessment roll. Assessed value is not a sale price.</p></div>';r.innerHTML='Run a Calgary address below.';return}
+if(c==='CA:Edmonton'){edmF.style.display='';hkL.style.display='';cp.innerHTML='<div class="finding"><h3>Edmonton, AB</h3><p>Search any street address within Edmonton below for its <b>assessed value</b>, tax class and neighbourhood, live from the current-year assessment roll.</p><p class="muted">City of Edmonton current-year assessment roll. Assessed value is set the previous year for tax - not a sale price.</p></div>';r.innerHTML='Run an Edmonton address below.';return}
+if(c&&c.indexOf('UK:')===0){cp.innerHTML=marketCardUK(c.slice(3));r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}
+if(CITY_MARKET[c]){cp.innerHTML=marketCard(c)+'<p class="muted" style="margin-top:8px">Building-records lookup for '+c+' is in progress - live today in Hong Kong, New York City and Chicago.</p>';r.innerHTML='Market snapshot above. Records lookup for this city is not live yet.';return}}
+const MS_V='<p><b>Market snapshot - Metro Vancouver, October 2026</b> (<a href="https://www.gvrealtors.ca/news/buyers-and-sellers-step-back-in-october" target="_blank" rel="noopener">Greater Vancouver Realtors</a>): apartment benchmark C$673,400 &middot; townhouse C$1,006,500 &middot; detached C$1,775,200. MLS benchmark prices in CAD for the metro region - not for any specific address.</p>';
+const MS_T='<p><b>Market snapshot - City of Toronto, October 2026</b> (<a href="https://trreb.ca/wp-content/files/market-stats/market-watch/mw2610.pdf" target="_blank" rel="noopener">TRREB Market Watch</a>): condo average C$659,214 &middot; townhouse C$927,804 &middot; detached C$1,603,886. Average sale prices in CAD, city-wide - not for any specific building.</p>';
+const MS_C='<p><b>Market snapshot - Calgary, October 2026</b> (<a href="https://www.creb.com/News/Media_Releases/2026/November/October_2026_Stats/" target="_blank" rel="noopener">CREB</a>): apartment condo benchmark C$288,800 &middot; row C$407,500 &middot; detached C$735,100. Benchmark prices in CAD, city-wide - not for any specific address.</p>';
+const MS_E='<p><b>Market snapshot - Edmonton, October 2026</b> (<a href="https://realtorsofedmonton.com/wp-content/uploads/2026/11/OCTOBER_2026_YEGMediaPackage_CORRECTED-2.pdf" target="_blank" rel="noopener">Realtors Association of Edmonton</a>): apartment condo average C$213,245 &middot; townhouse C$297,691 &middot; detached C$550,510. Average sale prices in CAD, city-wide - not for any specific address.</p>';
+const MS_H='<p><b>Market snapshot - Hong Kong, September 2026 (provisional)</b> (<a href="https://www.rvd.gov.hk/en/publications/property_market_statistics.html" target="_blank" rel="noopener">Rating &amp; Valuation Department</a>): a typical 40-70 m&sup2; flat averaged HK$157,538/m&sup2; on Hong Kong Island, HK$136,529/m&sup2; in Kowloon and HK$109,898/m&sup2; in the New Territories. HKD per m&sup2;, city-wide averages - not for any specific flat.</p>';
+function renderCoveredBuy(c,cp,r){renderCoveredBuyRaw(c,cp,r);const d=cp.querySelector(".finding");if(!d||d.dataset.snap)return;const h=d.querySelector("h3");if(!h)return;const t=h.textContent.toLowerCase();let s="";if(t.indexOf("vancouver")>=0)s=MS_V;else if(t.indexOf("toronto")>=0)s=MS_T;else if(t.indexOf("calgary")>=0)s=MS_C;else if(t.indexOf("edmonton")>=0)s=MS_E;else if(t.indexOf("hong kong")>=0)s=MS_H;if(s){d.dataset.snap="1";h.insertAdjacentHTML("afterend",s)}}
+function renderCandBuy(c,cp,r){if(c.cov){renderCoveredBuy(c.cov,cp,r);return}cp.innerHTML=worldPanelCand(c);r.innerHTML='City resolved above. Records and bundled market data do not cover it yet.'}
+async function pick(raw,pinned){const r=document.querySelector('#report');showCityPhoto(null);
+hkF.style.display='none';nycF.style.display='none';chiF.style.display='none';vanF.style.display='none';torF.style.display='none';calF.style.display='none';edmF.style.display='none';hkL.style.display='none';
+if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw});renderCoveredBuy(c,cp,r);return}}
+cp.innerHTML='<p class="muted">Resolving '+esc(raw)+'…</p>';
+const res=await resolveInput(raw);
+if(res.kind==='one'){showCityPhoto(res.cand);renderCandBuy(res.cand,cp,r);return}
+if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML='Choose the place you mean above.';cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
+cp.innerHTML='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (GeoNames database, 34,000+ cities over 15k population) found no match for what was typed - check the spelling or try the nearest major city. Live today: records in Hong Kong, NYC, Chicago, Vancouver, Toronto, Calgary and Edmonton; market data for 20 US + 14 UK cities.</p></div>';r.innerHTML='Pick a covered city to see its data.'}
+
+document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
+document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{document.querySelector('#qc').value=b.dataset.c;pick(b.dataset.c,true)});
+document.querySelector('#asknyc').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qnyc').value.trim();const r=document.querySelector('#report');if(!raw)return;
+r.innerHTML='Checking NYC Open Data…';
+const m=raw.match(/^(\d+[A-Z]?)\s+(.+)$/);if(!m){r.innerHTML='<div class="finding warn"><h3>Read that address wrong</h3><p>Use the form "452 Fifth Avenue" - number first, then street.</p></div>';return}
+const hn=m[1],st=m[2].toUpperCase().replace(/'/g,"''");
+try{
+const q="https://data.cityofnewyork.us/resource/3h2n-5cm9.json?$where=house_number='"+hn+"' AND upper(street) like '%25"+encodeURIComponent(st)+"%25'&$order=issue_date DESC&$limit=50";
+const rows=await(await fetch(q)).json();
+if(!Array.isArray(rows))throw new Error('bad');
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><div class="finding clear"><h3>✓ No DOB violations on record for this address</h3><p>Live query against NYC Open Data DOB Violations returned nothing. That is not proof the building is clear - check the dataset notes. <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">Source dataset ↗</a></p></div>';return}
+const act=rows.filter(x=>(x.violation_category||'').includes('ACTIVE')).length;
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><p class="muted" style="margin:0 0 6px">Live from NYC Open Data · DOB Violations · newest '+rows.length+' record'+(rows.length>1?'s':'')+' shown, '+act+' active among them'+(rows.length>=50?' - capped at 50; older records may exist':'')+'</p>';
+h+='<div class="finding '+(act?'warn':'clear')+'"><h3>'+(act?'⚠ ':'✓ ')+'DOB violations: '+act+' active of '+rows.length+' shown</h3><p>Newest records below. Categories and dispositions are as published by NYC DOB. <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9">Source dataset ↗</a></p></div><div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+(x.issue_date?x.issue_date.slice(0,4)+'-'+x.issue_date.slice(4,6)+'-'+x.issue_date.slice(6,8):'')+'</b> · '+(x.violation_category||'')+'<br>'+((x.violation_type||'').trim().slice(0,120))+(x.disposition_comments?('<br><span class="muted">'+x.disposition_comments.slice(0,140)+'</span>'):'')+'</div>'});
+h+='</div><p class="muted" style="margin-bottom:0">Clues, not a verdict. A records lookup, not a survey or legal advice.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>NYC Open Data did not answer. Try again in a moment.</p></div>'}});
+const CA_DIR={'avenue':'AVE','av':'AVE','street':'ST','road':'RD','drive':'DR','boulevard':'BLVD','place':'PL','court':'CT','crescent':'CRES','lane':'LANE','terrace':'TERR','parkway':'PKWY','highway':'HWY','east':'E','west':'W','north':'N','south':'S','e':'E','w':'W','n':'N','s':'S'};
+function stoks(s){return (s||'').toUpperCase().replace(/[^A-Z0-9 ]+/g,' ').split(' ').filter(Boolean).map(t=>{const l=t.toLowerCase();if(CA_DIR[l])return CA_DIR[l];return t.replace(/^(\d+)(ST|ND|RD|TH)$/,'$1')}).sort()}
+function sameStreet(a,b){const x=stoks(a).join(' '),y=stoks(b).join(' ');return x!==''&&x===y}
+function parseAddr(raw){const m=(raw||'').trim().match(/^(\d+[A-Za-z]?)\s+(.+)$/);return m?{num:m[1].toUpperCase(),street:m[2]}:null}
+function cfmt(n){n=+n;return isNaN(n)?'—':'C$'+Math.round(n).toLocaleString('en-CA')}
+function badAddr(r,ex){r.innerHTML='<div class="finding warn"><h3>Read that address wrong</h3><p>Use the form &ldquo;'+ex+'&rdquo; - number first, then street.</p></div>'}
+function firstTok(s){const ts=(s||'').toUpperCase().replace(/[^A-Z0-9 ]+/g,' ').trim().split(' ').filter(Boolean);for(const t of ts){const l=t.toLowerCase();if(CA_DIR[l]&&ts.length>1)continue;return t}return ''}
+function streetLike(f){if(!/^\d+$/.test(f))return 'street_name like "'+f+'%"';return '(street_name like "'+f+'TH%" OR street_name like "'+f+'ND%" OR street_name like "'+f+'RD%" OR street_name like "'+f+'ST%")'}
+document.querySelector('#askvan').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qvan').value.trim();const r=document.querySelector('#report');if(!raw)return;
+const p=parseAddr(raw);if(!p){badAddr(r,'362 E 56th Ave');return}
+r.innerHTML='Checking Vancouver open data…';
+const base='https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/property-tax-report/records';
+const sel='&select=pid,folio,from_civic_number,to_civic_number,street_name,legal_type,zoning_district,zoning_classification,current_land_value,current_improvement_value,year_built,tax_levy,tax_assessment_year&limit=100';
+const num=p.num.replace(/[^0-9A-Z]/g,'');const first=firstTok(p.street);
+if(!first){badAddr(r,'362 E 56th Ave');return}
+try{
+const d1=await(await fetch(base+'?where='+encodeURIComponent('report_year="2026" AND '+streetLike(first)+' AND to_civic_number = "'+num+'"')+sel)).json();
+if(!d1||!Array.isArray(d1.results))throw new Error('bad');
+const rows=d1.results.filter(x=>sameStreet(x.street_name,p.street));
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+esc(raw)+'</h3><div class="finding warn"><h3>No 2026 record at that address</h3><p>Live query against the City of Vancouver property tax report (2026 roll) returned nothing. That can mean the address is outside the City of Vancouver itself (Burnaby, Richmond, Surrey and the rest of Metro Vancouver are separate cities), a different street spelling, or a new or unusual parcel - not that anything is wrong with the property. <a href="https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/">Source dataset ↗</a></p></div>';return}
+function vaddr(x){return (x.to_civic_number||'')+' '+x.street_name+(x.from_civic_number?' (source secondary number '+x.from_civic_number+')':'')}
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+esc(raw)+'</h3><p class="muted" style="margin:0 0 6px">Live from City of Vancouver open data · property tax report, 2026 roll · '+rows.length+' record'+(rows.length>1?'s':'')+' at this address'+(d1.total_count>100?' · first 100 source records only':'')+'</p>';
+if(rows.length===1){const x=rows[0];h+='<div class="finding"><h3>Assessed value: '+cfmt((+x.current_land_value||0)+(+x.current_improvement_value||0))+'</h3><p>Land '+cfmt(x.current_land_value)+' + buildings '+cfmt(x.current_improvement_value)+' ('+(x.tax_assessment_year||'2026')+' assessment). A taxable value set by BC Assessment the previous year - not a sale price. <a href="https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/">Source dataset ↗</a></p></div>'}
+else{h+='<div class="finding"><h3>'+rows.length+' unit / parcel records at this address</h3><p>Each record below is one unit or parcel with its own assessed value ('+(rows[0].tax_assessment_year||'2026')+' assessment). Taxable values set by BC Assessment the previous year - not sale prices. <a href="https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/">Source dataset ↗</a></p></div>'}
+h+='<div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+esc(vaddr(x))+'</b> · '+(x.legal_type||'')+' · '+(x.zoning_district||'')+(x.zoning_classification?' ('+x.zoning_classification+')':'')+'<br><span class="muted">land '+cfmt(x.current_land_value)+' + building '+cfmt(x.current_improvement_value)+(x.year_built?' · built '+x.year_built:'')+(x.tax_levy?' · tax levy '+cfmt(x.tax_levy):'')+'</span></div>'});
+h+='</div>'+(rows.length>8?'<p class="muted">Showing 8 of '+rows.length+' records.</p>':'')+'<p class="muted" style="margin-bottom:0">Clues, not a verdict. Assessed values lag the market and say nothing about building condition.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>Vancouver open data did not answer. Try again in a moment.</p></div>'}});
+let TDATA=null;
+document.querySelector('#asktor').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qtor').value.trim();const r=document.querySelector('#report');if(!raw)return;
+const p=parseAddr(raw);if(!p){badAddr(r,'291 Avenue Rd');return}
+r.innerHTML='Loading Toronto RentSafeTO snapshot…';
+try{if(!TDATA){TDATA=await(await fetch('toronto.json')).json()}}catch(err){r.innerHTML='<div class="finding warn"><h3>Data failed to load</h3><p>The bundled Toronto evaluation snapshot did not load. Try again in a moment.</p></div>';return}
+const t=stoks(p.num+' '+p.street);
+const matches=TDATA.filter(x=>{const rt=stoks(x.a);return t.every(tok=>rt.indexOf(tok)>-1)}).sort((a,b)=>Number(b.ev)-Number(a.ev));
+const seen=new Set();const hits=matches.filter(x=>{if(seen.has(x.a))return false;seen.add(x.a);return true});
+if(!hits.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+esc(raw)+'</h3><div class="finding warn"><h3>Not in the RentSafeTO dataset</h3><p>RentSafeTO covers rental apartment buildings of 3+ storeys and 10+ units in Toronto. Houses, condo buildings and smaller rentals are outside its scope - so no record here says nothing about condition, good or bad. Snapshot fetched 2026-11-09. <a href="https://open.toronto.ca/dataset/apartment-building-evaluation/">Source dataset ↗</a></p></div>';return}
+const b=hits[0];
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+esc(b.a)+'</h3><p class="muted" style="margin:0 0 6px">City of Toronto RentSafeTO evaluation · bundled snapshot fetched 2026-11-09'+(hits.length>1?' · '+(hits.length-1)+' other matching building'+(hits.length>2?'s':''):'')+'</p>';
+h+='<div class="finding"><h3>Building evaluation score: '+(b.score||'—')+' / 100</h3><p>Latest city inspection ('+(b.ev||'')+' evaluation)'+(b.yb?' · built '+b.yb:'')+(b.st?' · '+b.st+' storeys · '+b.un+' units':'')+(b.ward?' · ward '+esc(b.ward):'')+'. Inspectors grade dozens of common-area items from exterior grounds to elevators; the score describes those common areas at inspection time, not any individual unit. <a href="https://open.toronto.ca/dataset/apartment-building-evaluation/">Source dataset ↗</a></p></div>';
+if(hits.length>1){h+='<div class="vrow">';hits.slice(1,8).forEach(x=>{h+='<div class="v"><b>'+esc(x.a)+'</b> · score '+(x.score||'—')+'/100 ('+(x.ev||'')+')</div>'});h+='</div>'}
+h+='<p class="muted" style="margin-bottom:0">Clues, not a verdict. RentSafeTO covers rental apartment buildings only.</p>';
+r.innerHTML=h});
+document.querySelector('#askcal').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qcal').value.trim();const r=document.querySelector('#report');if(!raw)return;
+const p=parseAddr(raw);if(!p){badAddr(r,'3104 10 St NW');return}
+r.innerHTML='Checking Calgary open data…';
+try{
+const rows0=await(await fetch('https://data.calgary.ca/resource/4bsw-nn7w.json?$where='+encodeURIComponent("upper(address) like '"+p.num.replace(/[^0-9A-Z]/g,'')+"%'")+'&$limit=100')).json();
+if(!Array.isArray(rows0))throw new Error('bad');
+const rows=rows0.filter(x=>{const toks=(x.address||'').split(/\s+/);return toks[0]===p.num&&sameStreet(toks.slice(1).join(' '),p.street)});
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+esc(raw)+'</h3><div class="finding warn"><h3>No 2026 assessment at that address</h3><p>Live query against the City of Calgary current-year assessment roll returned nothing. That can mean a different street spelling, a suite or unit number (this roll is one record per parcel), or a parcel outside Calgary - not that anything is wrong with the property. <a href="https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w">Source dataset ↗</a></p></div>';return}
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+esc(raw)+'</h3><p class="muted" style="margin:0 0 6px">Live from data.calgary.ca · current-year assessment roll · '+rows.length+' record'+(rows.length>1?'s':'')+'</p>';
+if(rows.length===1){const x=rows[0];h+='<div class="finding"><h3>Assessed value: '+cfmt(x.assessed_value)+'</h3><p>'+(x.assessment_class_description||'')+' · the City&rsquo;s market-value estimate for tax (roll year '+(x.roll_year||'2026')+') - not a sale price. <a href="https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w">Source dataset ↗</a></p></div>'}
+else{h+='<div class="finding"><h3>'+rows.length+' parcel records at this address</h3><p>Each record is one parcel with its own assessed value. <a href="https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w">Source dataset ↗</a></p></div>'}
+h+='<div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+esc(x.address||'')+'</b> · '+cfmt(x.assessed_value)+(x.assessment_class_description?' · '+x.assessment_class_description:'')+'<br><span class="muted">'+(x.year_of_construction?'built '+String(x.year_of_construction).replace(/\.0$/,'')+' · ':'')+(x.comm_name||'')+(x.land_use_designation?' · land use '+x.land_use_designation:'')+(x.land_size_sf?' · lot '+Math.round(+x.land_size_sf).toLocaleString('en-CA')+' sq ft':'')+'</span></div>'});
+h+='</div>'+(rows.length>8?'<p class="muted">Showing 8 of '+rows.length+' records.</p>':'')+'<p class="muted" style="margin-bottom:0">Clues, not a verdict. Assessed values lag the market and say nothing about building condition.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>Calgary open data did not answer. Try again in a moment.</p></div>'}});
+document.querySelector('#askedm').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qedm').value.trim();const r=document.querySelector('#report');if(!raw)return;
+const p=parseAddr(raw);if(!p){badAddr(r,'11922 90 Street NW');return}
+r.innerHTML='Checking Edmonton open data…';
+const first=firstTok(p.street);
+try{
+const rows0=await(await fetch('https://data.edmonton.ca/resource/q7d6-ambg.json?$where='+encodeURIComponent("house_number='"+p.num.replace(/[^0-9A-Z]/g,'')+"' AND upper(street_name) like '"+first+"%'")+'&$limit=100')).json();
+if(!Array.isArray(rows0))throw new Error('bad');
+const rows=rows0.filter(x=>sameStreet(x.street_name,p.street));
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+esc(raw)+'</h3><div class="finding warn"><h3>No current assessment at that address</h3><p>Live query against the City of Edmonton assessment data returned nothing. That can mean a different street spelling, a suite or unit number (one record per parcel), or a parcel outside Edmonton - not that anything is wrong with the property. <a href="https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg">Source dataset ↗</a></p></div>';return}
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+esc(raw)+'</h3><p class="muted" style="margin:0 0 6px">Live from data.edmonton.ca · current assessment data · '+rows.length+' record'+(rows.length>1?'s':'')+'</p>';
+if(rows.length===1){const x=rows[0];h+='<div class="finding"><h3>Assessed value: '+cfmt(x.assessed_value)+'</h3><p>'+(x.tax_class||'')+' · the City&rsquo;s taxable value estimate, set the previous year - not a sale price. <a href="https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg">Source dataset ↗</a></p></div>'}
+else{h+='<div class="finding"><h3>'+rows.length+' parcel records at this address</h3><p>Each record is one parcel with its own assessed value. <a href="https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg">Source dataset ↗</a></p></div>'}
+h+='<div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+esc((x.house_number||'')+' '+(x.street_name||''))+'</b> · '+cfmt(x.assessed_value)+(x.tax_class?' · '+x.tax_class:'')+'<br><span class="muted">'+(x.neighbourhood||'')+(x.garage==='Y'?' · garage':'')+'</span></div>'});
+h+='</div>'+(rows.length>8?'<p class="muted">Showing 8 of '+rows.length+' records.</p>':'')+'<p class="muted" style="margin-bottom:0">Clues, not a verdict. Assessed values lag the market and say nothing about building condition.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>Edmonton open data did not answer. Try again in a moment.</p></div>'}});
+const sp=document.querySelector('#sellPanel');
+function sellToBuy(c){document.querySelector('#tabBuy').click();document.querySelector('#qc').value=c;pick(c,c.indexOf(',')===-1)}
+function renderCoveredSell(c){
+if(c==='HK'){return '<div class="finding"><h3>Selling in Hong Kong</h3><p>A buyer using this app can pull your building\'s live s.24 and s.26 order record (Buildings Department datasets, orders issued since 1 May 2023). Run your own address first so nothing in it surprises you.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="Hong Kong">Check my building →</button></p></div>'}
+if(c==='New York'){return '<div class="finding"><h3>Selling in New York City</h3><p>A buyer using this app sees your building\'s live DOB violations record, plus the city market snapshot (Zillow indices, Sep 2026). Check your address the way they will.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="New York">Check my building →</button></p></div>'}
+if(c==='Chicago'){return '<div class="finding"><h3>Selling in Chicago</h3><p>A buyer using this app sees your building\'s live Building Violations record, plus the city market snapshot (Zillow indices, Sep 2026). Check your address the way they will.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="Chicago">Check my building →</button></p></div>'}
+if(c.indexOf('CA:')===0){const name=c.slice(3);return '<div class="finding"><h3>Selling in '+name+'</h3><p>Check the same public records a buyer sees: '+(name==='Toronto'?'RentSafeTO apartment-building evaluation snapshot.':'official property assessments, not sale prices.')+'</p><p><button type="button" class="gobuy" data-g="'+name+'">Check my building →</button></p></div>'}
+if(c.indexOf('UK:')===0){const d=UK_MARKET[c.slice(3)];return '<div class="finding"><h3>Selling in '+d.label+'</h3><p>Buyers here see the '+d.label+' market snapshot (UK House Price Index average sold price, Aug 2026) and Rightmove listings. Building-records lookup is not live for '+d.label+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+d.label+'">See the buyer view →</button></p></div>'}
+if(CITY_MARKET[c]){return '<div class="finding"><h3>Selling in '+c+'</h3><p>Buyers here see the '+c+' market snapshot (Zillow value and rent indices, Sep 2026) and portal listings. Building-records lookup is not live for '+c+' yet.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+c+'">See the buyer view →</button></p></div>'}
+return null}
+function renderCandSell(c){if(c.cov)return renderCoveredSell(c.cov);
+return '<div class="finding"><h3>Selling in '+esc(candName(c))+'</h3>'+countryCtx(c)+'<p>Resolved from the GeoNames city database (34,000+ cities). Records lookup and bundled market data do not cover this city yet - buyers here see the resolved city and its listing route where one is wired, nothing invented.</p><p style="margin-top:10px"><button type="button" class="gobuy" data-g="'+esc(candName(c))+'">See the buyer view →</button></p></div>'}
+function bindSell(){sp.querySelectorAll('.gobuy').forEach(b=>b.onclick=()=>sellToBuy(b.dataset.g))}
+async function sellPick(raw,pinned){
+if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCoveredSell(c);bindSell();return}}
+sp.innerHTML='<p class="muted">Resolving '+esc(raw)+'…</p>';
+const res=await resolveInput(raw);
+if(res.kind==='one'){sp.innerHTML=renderCandSell(res.cand);bindSell();return}
+if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
+sp.innerHTML='<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search found no match - check the spelling or try the nearest major city. Live coverage today: records in Hong Kong, New York City and Chicago; market data for 20 US + 14 UK cities.</p></div>'}
+
+document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});
+document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{document.querySelector('#qsc').value=b.dataset.sc;sellPick(b.dataset.sc,true)});
+document.querySelector('#askchi').addEventListener('submit',async e=>{e.preventDefault();
+const raw=document.querySelector('#qchi').value.trim();const r=document.querySelector('#report');if(!raw)return;
+r.innerHTML='Checking Chicago open data…';
+const addr=raw.toUpperCase().replace(/'/g,"''");
+try{
+const q="https://data.cityofchicago.org/resource/22u3-xenr.json?$where=upper(address) like '%25"+encodeURIComponent(addr)+"%25'&$order=violation_date DESC&$limit=50";
+const rows=await(await fetch(q)).json();
+if(!Array.isArray(rows))throw new Error('bad');
+if(!rows.length){r.innerHTML='<h3 style="margin:0 0 8px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><div class="finding clear"><h3>✓ No building violations on record for this address</h3><p>Live query against the Chicago Building Violations dataset returned nothing. That is not proof the building is clear - check the dataset notes. <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Source dataset ↗</a></p></div>';return}
+const open=rows.filter(x=>(x.violation_status||'').toUpperCase()==='OPEN').length;
+let h='<h3 style="margin:0 0 4px;font-size:18px">'+raw.replace(/[&<>"]/g,'')+'</h3><p class="muted" style="margin:0 0 6px">Live from data.cityofchicago.org · Building Violations · newest '+rows.length+' record'+(rows.length>1?'s':'')+' shown, '+open+' open among them'+(rows.length>=50?' - capped at 50; older records may exist':'')+'</p>';
+h+='<div class="finding '+(open?'warn':'clear')+'"><h3>'+(open?'⚠ ':'✓ ')+'Building violations: '+open+' open of '+rows.length+' shown</h3><p>Newest records below. Statuses and descriptions are as published by the City of Chicago. <a href="https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr">Source dataset ↗</a></p></div><div class="vrow">';
+rows.slice(0,8).forEach(x=>{h+='<div class="v"><b>'+((x.violation_date||'').slice(0,10))+'</b> · '+(x.violation_status||'')+' · '+(x.violation_code||'')+'<br>'+((x.violation_description||'').trim().slice(0,120))+(x.violation_inspector_comments?('<br><span class="muted">'+x.violation_inspector_comments.slice(0,140)+'</span>'):'')+'</div>'});
+h+='</div><p class="muted" style="margin-bottom:0">Clues, not a verdict. A records lookup, not a survey or legal advice.</p>';
+r.innerHTML=h;
+}catch(err){r.innerHTML='<div class="finding warn"><h3>Live query failed</h3><p>Chicago open data did not answer. Try again in a moment.</p></div>'}});
+})();
+</script>
+<script>
+(function(){if(window.parent!==window){document.body.style.minHeight='0'}var last=0;function tell(){var h=document.body.scrollHeight;if(h!==last){last=h;try{parent.postMessage({reagentHeight:h},'*')}catch(e){}}}
+if(typeof ResizeObserver!=='undefined'){new ResizeObserver(tell).observe(document.body)}window.addEventListener('load',tell);setInterval(tell,800);tell()})();
+</script>
+
+<script>
+/* One-time scroll-triggered type reveal. Full text remains accessible and selectable. */
+(function(){
+ const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+ if(motion.matches || !('IntersectionObserver' in window))return;
+ const items=Array.from(document.querySelectorAll('h1, .label, #sellView .panel > p'));
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  const el=entry.target;el.classList.remove('reveal-pending');el.classList.add('reveal-playing');observer.unobserve(el);
+  setTimeout(()=>el.classList.remove('reveal-playing'),1600);
+ }),{threshold:0.25});
+ items.forEach(el=>{
+  if(!el.textContent.trim())return;
+  const original=el.cloneNode(true);const visual=document.createElement('span');visual.setAttribute('aria-hidden','true');
+  let count=0;const duration=950;const length=Math.max(1,el.textContent.length);
+  function copy(node,parent){
+   if(node.nodeType===3){node.textContent.split(/(\s+)/).forEach(word=>{
+    if(!word)return;if(/^\s+$/.test(word)){parent.appendChild(document.createTextNode(word));count+=word.length;return;}
+    const group=document.createElement('span');group.className='reveal-word';
+    Array.from(word).forEach(char=>{const part=document.createElement('span');part.className='reveal-char';part.style.setProperty('--char-delay',Math.round(count++/length*duration)+'ms');part.textContent=char;group.appendChild(part)});parent.appendChild(group);
+   });}else if(node.nodeType===1){const child=node.cloneNode(false);parent.appendChild(child);node.childNodes.forEach(n=>copy(n,child));}
+  }
+  original.childNodes.forEach(n=>copy(n,visual));
+  const accessible=document.createElement('span');accessible.className='reveal-accessible';accessible.textContent=el.textContent;
+  el.replaceChildren(accessible,visual);el.classList.add('reveal-pending');observer.observe(el);
+ });
+ motion.addEventListener('change',e=>{if(e.matches){observer.disconnect();items.forEach(el=>el.classList.remove('reveal-pending','reveal-playing'));}});
+})();
+</script>
+<script>
+(() => {
+'use strict';
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N=s=>String(s||'').toUpperCase().replace(/\bAVENUE\b/g,'AVE').replace(/\bSTREET\b/g,'ST').replace(/\bWEST\b/g,'W').replace(/\bEAST\b/g,'E').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+const R={
+nyc:{name:'432 Park Avenue',address:'432 Park Avenue',aliases:['432 Park Ave'],qualification:'https://www.cityrealty.com/buildings/top-ten/top-10-midtown-east-condo-buildings/78',source:'https://data.cityofnewyork.us/Housing-Development/DOB-Violations/3h2n-5cm9',endpoint:'https://data.cityofnewyork.us/resource/3h2n-5cm9.json',where:"bin='1088817'",order:'issue_date DESC',identity:'BIN 1088817'},
+chi:{name:'One Bennett Park',address:'451 E Grand Ave',aliases:['451 East Grand Avenue'],qualification:'https://www.related.com/our-company/properties/one-bennett-park',source:'https://data.cityofchicago.org/Buildings/Building-Violations/22u3-xenr',endpoint:'https://data.cityofchicago.org/resource/22u3-xenr.json',where:"address='451 E GRAND AVE'",order:'violation_date DESC'},
+van:{name:'Vancouver House',address:'1480 Howe St',aliases:['1480 Howe Street'],qualification:'https://dac.dk/en/magazine/places/vancouver-house-660',source:'https://opendata.vancouver.ca/explore/dataset/property-tax-report/information/'},
+tor:{name:'FourFifty The Well',address:'450 Front St W',aliases:['450 Front Street West','FourFifty'],qualification:'https://thewelltoronto.com/live/rental-suites/',binding:'https://livingatfourfifty.com/',source:'https://open.toronto.ca/dataset/apartment-building-evaluation/'},
+cal:{name:'The Concord',address:'738 1 AV SW',aliases:['738 1 Avenue SW','738 1 Ave SW'],qualification:'https://www.concordpacific.com/project/the-concord/',binding:'https://yyccondos.com/compare/738-1-avenue-sw-vs-le-germain-residences',source:'https://data.calgary.ca/Assessments/Current-Year-Property-Assessments-Parcel-/4bsw-nn7w',endpoint:'https://data.calgary.ca/resource/4bsw-nn7w.json',where:"upper(address) like '% 738 1 AV SW'",order:'address ASC'},
+edm:{name:'Encore Tower',address:'10180 103 Street NW',aliases:['10180 103 St','10180 103 Street','10180 103 St NW','Encore'],qualification:'https://westrichpacific.com/project/encore-tower',source:'https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg',endpoint:'https://data.edmonton.ca/resource/q7d6-ambg.json',where:"house_number='10180' AND street_name='103 STREET NW'",order:'suite ASC'}
+};
+const lang=document.documentElement.lang.slice(0,2);
+const texts={
+en:['Selected luxury developments only. Coverage is limited, not a full inventory. City market figures describe the whole market, not luxury homes.','Not in the curated luxury directory','This address has not been qualified for this directory. This says nothing about statutory orders, safety or value.','General official-source research (external, not luxury-filtered)','Luxury qualification source','Checking official records...','Records unavailable','The source did not return verifiable records. This is not a no-match or a safety clearance.','No matching records returned','No record is not proof of safety or absence of orders.','Public records, not sale listings. Assessment values are for tax, not asking or sale prices. Historic orders may concern earlier works at the same address.','Records shown','Up to 100 records are retrieved; up to 8 shown. More may exist.','Choose the qualified building below or enter its exact address.','Other buildings: official source'],
+de:['Nur ausgewählte Luxuswohnanlagen. Begrenzte Abdeckung, kein vollständiges Verzeichnis. Stadtmarktdaten betreffen den gesamten Markt.','Nicht im kuratierten Luxusverzeichnis','Diese Adresse wurde nicht für dieses Verzeichnis qualifiziert. Das sagt nichts über Anordnungen, Sicherheit oder Wert aus.','Allgemeine amtliche Recherche (extern, ohne Luxusfilter)','Quelle zur Luxusqualifikation','Amtliche Daten werden geprüft...','Daten nicht verfügbar','Die Quelle lieferte keine überprüfbaren Daten. Dies ist kein Sicherheitsnachweis.','Keine passenden Datensätze erhalten','Kein Datensatz ist kein Nachweis für Sicherheit oder fehlende Anordnungen.','Öffentliche Daten, keine Verkaufsangebote. Steuerwerte sind keine Verkaufspreise. Historische Anordnungen können frühere Arbeiten an derselben Adresse betreffen.','Angezeigte Datensätze','Bis zu 100 Datensätze abgerufen; bis zu 8 angezeigt. Weitere können existieren.','Wählen Sie das qualifizierte Gebäude oder geben Sie die genaue Adresse ein.','Weitere Gebäude: amtliche Quelle'],
+fr:['Résidences de luxe sélectionnées uniquement. Couverture limitée, pas un inventaire complet. Les données du marché concernent toute la ville.','Hors du répertoire de luxe sélectionné','Cette adresse ne figure pas dans ce répertoire qualifié. Cela ne dit rien sur les arrêtés, la sécurité ou la valeur.','Recherche officielle générale (externe, sans filtre de luxe)','Source de qualification de luxe','Vérification des données officielles...','Données indisponibles','La source ne renvoie pas de données vérifiables. Ce n’est pas une garantie de sécurité.','Aucune donnée correspondante renvoyée','L’absence de données ne garantit ni sécurité ni absence d’arrêtés.','Données publiques, pas des annonces de vente. Les valeurs fiscales ne sont pas des prix de vente. Les anciens arrêtés peuvent concerner des travaux antérieurs à cette adresse.','Données affichées','100 données au maximum récupérées ; 8 affichées. Il peut en exister davantage.','Choisissez le bâtiment qualifié ou saisissez son adresse exacte.','Autres bâtiments : source officielle'],
+nl:['Alleen geselecteerde luxecomplexen. Beperkte dekking, geen volledige inventaris. Marktgegevens gelden voor de hele stad.','Niet in de samengestelde luxedirectory','Dit adres is niet voor deze directory gekwalificeerd. Dit zegt niets over bevelen, veiligheid of waarde.','Algemeen officieel onderzoek (extern, zonder luxefilter)','Bron voor luxekwalificatie','Officiële gegevens controleren...','Gegevens niet beschikbaar','De bron gaf geen controleerbare gegevens. Dit is geen veiligheidsverklaring.','Geen passende gegevens ontvangen','Geen gegevens is geen bewijs van veiligheid of ontbrekende bevelen.','Openbare gegevens, geen verkoopaanbod. Belastingwaarden zijn geen verkoopprijzen. Historische bevelen kunnen eerdere werkzaamheden op hetzelfde adres betreffen.','Getoonde gegevens','Maximaal100 opgehaald; maximaal8 getoond. Er kunnen meer bestaan.','Kies het gekwalificeerde gebouw of voer het exacte adres in.','Andere gebouwen: officiële bron'],
+pl:['Tylko wybrane luksusowe inwestycje. Ograniczony zakres, nie pełny katalog. Dane rynkowe dotyczą całego miasta.','Poza wybranym katalogiem luksusowym','Ten adres nie został zakwalifikowany do katalogu. Nie oznacza to nic o nakazach, bezpieczeństwie ani wartości.','Ogólne badanie źródła urzędowego (zewnętrzne, bez filtra luksusowego)','Źródło kwalifikacji luksusowej','Sprawdzanie danych urzędowych...','Dane niedostępne','Źródło nie zwróciło weryfikowalnych danych. To nie jest potwierdzenie bezpieczeństwa.','Brak pasujących danych','Brak danych nie dowodzi bezpieczeństwa ani braku nakazów.','Dane publiczne, nie oferty sprzedaży. Wartości podatkowe nie są cenami sprzedaży. Historyczne nakazy mogą dotyczyć wcześniejszych prac pod tym adresem.','Wyświetlone dane','Pobrano do100 rekordów; pokazano do8. Może istnieć więcej.','Wybierz zakwalifikowany budynek lub wpisz dokładny adres.','Inne budynki: oficjalne źródło']};
+const T=texts[lang]||texts.en;
+const scope=document.querySelector('#luxuryScope');if(scope)scope.textContent=T[0];
+const labels={nyc:'New York City',chi:'Chicago',van:'Vancouver',tor:'Toronto',cal:'Calgary',edm:'Edmonton'};
+for(const [key,b] of Object.entries(R)){
+ const f=document.querySelector('#ask'+key),q=document.querySelector('#q'+key);if(!f||!q)continue;
+ q.placeholder=b.name+' / '+b.address;
+ const group=document.createElement('div');group.className='chips';
+ const local=document.createElement('button');local.type='button';local.textContent=b.name;local.addEventListener('click',()=>{q.value=b.address;f.requestSubmit()});group.append(local);f.prepend(group);
+ const link=document.createElement('span');link.className='srcinfo';link.innerHTML='<a target="_blank" rel="noopener noreferrer" href="'+b.source+'">'+E(T[14])+' ↗</a><button type="button" class="why" aria-expanded="false" aria-label="'+E(T[3])+'">?</button><span class="tip" role="tooltip">'+E(T[3])+'</span>';group.append(link);link.querySelector('.why').addEventListener('click',e=>{e.preventDefault();const s=link.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',s)});
+ f.addEventListener('submit',async e=>{
+  e.preventDefault();e.stopImmediatePropagation();
+  const out=document.querySelector('#report'),raw=N(q.value);const allowed=[b.name,b.address,...b.aliases].some(v=>N(v)===raw);
+  const links='<p><a target="_blank" rel="noopener noreferrer" href="'+b.qualification+'">'+E(T[4])+' ↗</a> · <a target="_blank" rel="noopener noreferrer" href="'+b.source+'">'+E(T[3])+' ↗</a></p>';
+  if(!allowed){out.innerHTML='<div class="finding warn"><h3>'+E(T[1])+'</h3><p>'+E(T[2])+'</p><p>'+E(b.name)+' · '+E(b.address)+'</p>'+links+'</div>';return}
+  q.value=b.address;out.innerHTML='<p>'+E(T[5])+'</p>';
+  try{
+   let rows=[],total=null;
+   if(key==='tor'){
+    const res=await fetch('toronto.json');if(!res.ok)throw Error('source');const data=await res.json();if(!Array.isArray(data))throw Error('format');rows=data.filter(x=>N(x.a)===N(b.address)).sort((a,c)=>Number(c.ev)-Number(a.ev));if(rows.length)rows=rows.slice(0,1);
+   }else if(key==='van'){
+    const params=new URLSearchParams({where:"report_year='2026' AND to_civic_number='1480' AND street_name='HOWE ST'",limit:'100'});
+    const res=await fetch('https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/property-tax-report/records?'+params);if(!res.ok)throw Error('source');const data=await res.json();if(!Array.isArray(data.results))throw Error('format');rows=data.results;total=data.total_count;
+    if(rows.some(x=>x.to_civic_number!=='1480'||x.street_name!=='HOWE ST'||x.report_year!=='2026'))throw Error('identity');
+   }else{
+    const params=new URLSearchParams({'$where':b.where,'$order':b.order,'$limit':'100'});const res=await fetch(b.endpoint+'?'+params);if(!res.ok)throw Error('source');rows=await res.json();if(!Array.isArray(rows))throw Error('format');
+    if(key==='nyc'&&rows.some(x=>x.bin!=='1088817'))throw Error('identity');
+    if(key==='chi'&&rows.some(x=>x.address!=='451 E GRAND AVE'))throw Error('identity');
+    if(key==='cal'&&rows.some(x=>!N(x.address).endsWith('738 1 AV SW')))throw Error('identity');
+    if(key==='edm'&&rows.some(x=>x.house_number!=='10180'||x.street_name!=='103 STREET NW'))throw Error('identity');
+   }
+   let h='<div class="finding"><h3>'+E(b.name)+' · '+E(b.address)+'</h3><p>'+E(T[10])+'</p>'+links;
+   if(!rows.length)h+='<h3>'+E(T[8])+'</h3><p>'+E(T[9])+'</p>';
+   else{
+    h+='<p>'+E(T[11])+': '+Math.min(rows.length,8)+(total!==null?' / '+total:'')+'. '+E(T[12])+'</p><div class="vrow">';
+    for(const x of rows.slice(0,8)){
+     let info='';
+     if(key==='nyc')info=[x.issue_date,x.violation_category,x.violation_type,x.description,x.disposition_comments].filter(Boolean).join(' · ');
+     if(key==='chi')info=[x.violation_date?.slice(0,10),x.violation_status,x.violation_description,x.violation_inspector_comments].filter(Boolean).join(' · ');
+     if(key==='van')info=[x.from_civic_number?'Unit '+x.from_civic_number:'',x.to_civic_number+' '+x.street_name,'Land C$'+Number(x.current_land_value||0).toLocaleString('en-CA'),'Building C$'+Number(x.current_improvement_value||0).toLocaleString('en-CA'),'2026'].join(' · ');
+     if(key==='tor')info=[x.a,'RentSafeTO '+x.score+'/100',x.ev,'Snapshot 2026-11-09'].join(' · ');
+     if(key==='cal')info=[x.address,'C$'+Number(x.assessed_value).toLocaleString('en-CA'),x.assessment_class_description,x.roll_year].join(' · ');
+     if(key==='edm')info=[x.suite?'Unit '+x.suite:'',x.house_number+' '+x.street_name,'C$'+Number(x.assessed_value).toLocaleString('en-CA'),x.tax_class].join(' · ');
+     h+='<div class="v">'+E(info)+'</div>';
+    }h+='</div>';
+   }out.innerHTML=h+'</div>';
+  }catch(err){out.innerHTML='<div class="finding warn"><h3>'+E(b.name)+' · '+E(T[6])+'</h3><p>'+E(T[7])+'</p>'+links+'</div>'}
+ },true);
+}
+})();
+
+</script><script src="compare-data.js"></script><script src="compare-tab.js?v=20261113-responsive"></script>
+<script src="shortlist-bridge.js?v=20261111-i18n-save"></script><script src="sell-draft.js?v=20261112-sd2"></script></body></html>
