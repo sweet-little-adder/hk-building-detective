@@ -77,7 +77,22 @@
     '<div class="controls"><button type="submit">' + t.go + '</button></div></form>' +
     '<p class="label" style="margin-top:22px">' + t.sec2 + '</p>' +
     '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
-    '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>';
+    '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
+    '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
+    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Saved on this device only, for up to 7 days; nothing is uploaded or shared.</p></div>' +
+    '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
+    '<input id="rcName" maxlength="80" aria-label="Name or short label" placeholder="Name or short label, e.g. Flat A - Bishan">' +
+    '<input id="rcUrl" maxlength="300" aria-label="Listing link (optional)" placeholder="Listing link (optional)">' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap"><input id="rcRent" inputmode="decimal" maxlength="12" aria-label="Rent per month" placeholder="Rent per month" style="flex:1;min-width:140px">' +
+    '<select id="rcCur" aria-label="Currency" style="background:none;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0">' +
+    '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></div>' +
+    '<input id="rcExtra" inputmode="decimal" maxlength="12" aria-label="Extra monthly costs you know, total" placeholder="Extra monthly costs you know (total) - blank = unknown">' +
+    '<input id="rcIncl" maxlength="120" aria-label="What the rent includes" placeholder="What the rent includes (optional), e.g. management fee, internet">' +
+    '<input id="rcDep" inputmode="decimal" maxlength="12" aria-label="Deposit, one-off" placeholder="Deposit (one-off) - blank = unknown">' +
+    '<input id="rcFee" inputmode="decimal" maxlength="12" aria-label="Agency fee, one-off" placeholder="Agency fee (one-off) - blank = unknown">' +
+    '<input id="rcOnce" inputmode="decimal" maxlength="12" aria-label="Other one-off costs" placeholder="Other one-off costs - blank = unknown">' +
+    '<div class="controls" style="justify-content:flex-start"><button type="submit">Add rental →</button></div></form>' +
+    '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   var rp = v.querySelector('#rentPanel');
   if (NOTE[lang]) { var np = document.createElement('p'); np.className = 'asm'; np.style.marginTop = '10px'; np.textContent = NOTE[lang]; v.querySelector('section').appendChild(np); }
@@ -236,6 +251,72 @@
     return '<div class="finding"><h3>' + esc(candName(cand)) + '</h3>' + countryCtx(cand) +
       '<p>Resolved from the GeoNames city database (34,000+ cities). Rent figures and a listing route are not wired for ' + esc(cand.city) + ' yet - said plainly instead of invented.</p></div>';
   }
+
+  // --- Compare actual rentals: visitor-entered, on-device only (SAU-44) ---------
+  var CMP_KEY = 'stRentCmp:v1', CMP_AGE = 7 * 24 * 3600 * 1000;
+  var CURS = { HKD: 'HK$', USD: '$', GBP: '\u00a3', SGD: 'S$', EUR: '\u20ac', CAD: 'C$', Other: '' };
+  var rentals = [];
+  function cmpLoad() {
+    try {
+      var raw = localStorage.getItem(CMP_KEY); if (!raw) return;
+      var d = JSON.parse(raw);
+      if (d && d.ts && Date.now() - d.ts < CMP_AGE && Array.isArray(d.items)) rentals = d.items;
+      else localStorage.removeItem(CMP_KEY);
+    } catch (e) { }
+  }
+  function cmpSave() { try { localStorage.setItem(CMP_KEY, JSON.stringify({ ts: Date.now(), items: rentals })); } catch (e) { } }
+  function num(v) { if (v === undefined || v === null || String(v).trim() === '') return NaN; var n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isFinite(n) && n >= 0 ? n : NaN; }
+  function fm(cur, n) { var s = CURS[cur] || ''; return (s ? s : '') + Math.round(n).toLocaleString('en-US') + (s ? '' : (cur === 'Other' ? '' : '')); }
+  function unk(b) { return b ? '<span style="color:#e8b9c4">unknown</span>' : ''; }
+  function renderCmp() {
+    var el = v.querySelector('#rentCmp');
+    if (!rentals.length) { el.innerHTML = ''; return; }
+    var sameCur = rentals.every(function (r) { return r.cur === rentals[0].cur; });
+    var h = '';
+    rentals.forEach(function (r, i) {
+      var rentK = isFinite(r.rent), exK = isFinite(r.extra), depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once);
+      var monthly = rentK ? (exK ? r.rent + r.extra : r.rent) : NaN;
+      var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0);
+      var onceAny = depK || feeK || oncK, onceAll = depK && feeK && oncK;
+      h += '<div class="finding" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
+        (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing \u2197</a>' : '') + '</h3>';
+      h += '<p>' + (rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
+      h += '<br>Extra monthly costs: ' + (exK ? fm(r.cur, r.extra) + '/mo' : unk(1)) + (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
+      h += '<br><b>Known monthly total: ' + (rentK ? fm(r.cur, monthly) + '/mo' : 'unknown') + '</b>' + (rentK && !exK ? ' <span class="muted">(rent only - extra monthly costs unknown)</span>' : '') + '</p>';
+      h += '<p class="muted">One-off move-in: deposit ' + (depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (feeK ? fm(r.cur, r.fee) : unk(1)) + ' · other ' + (oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (onceAny ? fm(r.cur, onceSum) : 'unknown') + '</b>' + (onceAny && !onceAll ? ' (some one-off items unknown)' : '') + '</p>';
+      h += '<p style="margin-top:8px"><button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
+    });
+    if (rentals.length > 1) {
+      h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
+      if (!sameCur) h += 'Different currencies - totals are shown per rental, not compared across currencies.';
+      else {
+        var full = rentals.filter(function (r) { return isFinite(r.rent) && isFinite(r.extra); });
+        if (full.length === rentals.length) {
+          var minI = 0; full.forEach(function (r, i) { if (r.rent + r.extra < full[minI].rent + full[minI].extra) minI = i; });
+          h += 'Lowest known monthly total on the figures entered: <b>' + esc(full[minI].name || 'Rental ' + (minI + 1)) + '</b> at ' + fm(full[minI].cur, full[minI].rent + full[minI].extra) + '/mo. ';
+        } else h += 'A full monthly-cost comparison is not possible yet - extra monthly costs are unknown for ' + (rentals.length - full.length) + ' of ' + rentals.length + ' rentals. ';
+      }
+      h += 'Comparison uses only the figures you entered - check each listing for what is actually included.</p></div>';
+    }
+    el.innerHTML = h;
+    el.querySelectorAll('.rcdel').forEach(function (b) {
+      b.onclick = function () { rentals.splice(+b.dataset.i, 1); cmpSave(); renderCmp(); };
+    });
+  }
+  v.querySelector('#addrental').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var url = v.querySelector('#rcUrl').value.trim();
+    if (url && !/^https?:\/\//i.test(url)) url = '';
+    rentals.push({
+      name: v.querySelector('#rcName').value.trim(), url: url,
+      rent: num(v.querySelector('#rcRent').value), cur: v.querySelector('#rcCur').value,
+      extra: num(v.querySelector('#rcExtra').value), incl: v.querySelector('#rcIncl').value.trim(),
+      dep: num(v.querySelector('#rcDep').value), fee: num(v.querySelector('#rcFee').value), once: num(v.querySelector('#rcOnce').value)
+    });
+    if (rentals.length > 6) rentals = rentals.slice(-6);
+    cmpSave(); renderCmp(); e.target.reset();
+  });
+  cmpLoad(); renderCmp();
 
   function bindRent() {
     rp.querySelectorAll('.gobuy').forEach(function (b) {
