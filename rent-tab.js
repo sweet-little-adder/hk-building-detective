@@ -290,8 +290,8 @@
       else localStorage.removeItem(CMP_KEY);
       rentals = rentals.map(function (r) {
         if (!r.comps) {
-          r.comps = isFinite(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
-          r.exAll = isFinite(r.extra);
+          r.comps = fin(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
+          r.exAll = fin(r.extra);
           delete r.extra;
         }
         return r;
@@ -300,15 +300,16 @@
   }
   function cmpSave() { try { localStorage.setItem(CMP_KEY, JSON.stringify({ ts: Date.now(), items: rentals })); } catch (e) { } }
   function num(v) { if (v === undefined || v === null || String(v).trim() === '') return NaN; var n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isFinite(n) && n >= 0 ? n : NaN; }
+  function fin(x) { return typeof x === 'number' && isFinite(x); }
   function fm(cur, n) { var s = CURS[cur] || ''; return (s ? s : '') + Math.round(n).toLocaleString('en-US') + (s ? '' : (cur === 'Other' ? '' : '')); }
   function unk(b) { return b ? '<span style="color:#e8b9c4">unknown</span>' : ''; }
   function fmtOne(r) {
     var comps = r.comps || [], compSum = 0, compsFinite = true;
-    comps.forEach(function (c) { if (isFinite(c.amt)) compSum += c.amt; else compsFinite = false; });
-    var rentK = isFinite(r.rent);
+    comps.forEach(function (c) { if (fin(c.amt)) compSum += c.amt; else compsFinite = false; });
+    var rentK = fin(r.rent);
     var exK = comps.length > 0 && compsFinite && !!r.exAll;
     var monthly = rentK ? r.rent + compSum : NaN;
-    var depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once), stK = isFinite(r.stamp), fiK = isFinite(r.first);
+    var depK = fin(r.dep), feeK = fin(r.fee), oncK = fin(r.once), stK = fin(r.stamp), fiK = fin(r.first);
     var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0) + (stK ? r.stamp : 0) + (fiK ? r.first : 0);
     return { rentK: rentK, exK: exK, compsAny: comps.length > 0, compsFinite: compsFinite, compSum: compSum, monthly: monthly, depK: depK, feeK: feeK, oncK: oncK, stK: stK, fiK: fiK, onceSum: onceSum, onceAny: depK || feeK || oncK || stK || fiK, onceAll: depK && feeK && oncK && stK && fiK };
   }
@@ -323,7 +324,7 @@
       s += '   Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + r.cur : 'unknown') + '\n';
       if (!f.compsAny) s += '   Extra monthly costs: unknown' + '\n';
       else {
-        (r.comps || []).forEach(function (c) { s += '   - ' + (c.label || 'cost') + ': ' + (isFinite(c.amt) ? fm(r.cur, c.amt) + '/mo' : 'unknown') + '\n'; });
+        (r.comps || []).forEach(function (c) { s += '   - ' + (c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : 'unknown') + '\n'; });
         s += '   Listed extras total: ' + fm(r.cur, f.compSum) + '/mo' + (f.exK ? ' (all extra monthly costs)' : ' (other extras unknown - not estimated)') + '\n';
       }
       if (r.incl) s += '   Rent includes: ' + r.incl + '\n';
@@ -347,7 +348,7 @@
       h += '<p>' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
       if (!f.compsAny) h += '<br>Extra monthly costs: ' + unk(1);
       else {
-        (r.comps || []).forEach(function (c) { h += '<br>&nbsp;&nbsp;· ' + esc(c.label || 'cost') + ': ' + (isFinite(c.amt) ? fm(r.cur, c.amt) + '/mo' : unk(1)); });
+        (r.comps || []).forEach(function (c) { h += '<br>&nbsp;&nbsp;· ' + esc(c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : unk(1)); });
         h += '<br>&nbsp;&nbsp;Listed extras total: <b>' + fm(r.cur, f.compSum) + '/mo</b>' + (f.exK ? '' : ' <span class="muted">(other extras unknown - nothing estimated)</span>');
       }
       h += (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
@@ -377,16 +378,16 @@
         var r = rentals[+b.dataset.i]; EDIT_I = +b.dataset.i;
         v.querySelector('#rcName').value = r.name || '';
         v.querySelector('#rcUrl').value = r.url || '';
-        v.querySelector('#rcRent').value = isFinite(r.rent) ? r.rent : '';
+        v.querySelector('#rcRent').value = fin(r.rent) ? r.rent : '';
         v.querySelector('#rcCur').value = r.cur || 'HKD';
         resetComps(r.comps || []);
         v.querySelector('#rcExAll').checked = !!r.exAll;
         v.querySelector('#rcIncl').value = r.incl || '';
-        v.querySelector('#rcDep').value = isFinite(r.dep) ? r.dep : '';
-        v.querySelector('#rcFee').value = isFinite(r.fee) ? r.fee : '';
-        v.querySelector('#rcStamp').value = isFinite(r.stamp) ? r.stamp : '';
-        v.querySelector('#rcFirst').value = isFinite(r.first) ? r.first : '';
-        v.querySelector('#rcOnce').value = isFinite(r.once) ? r.once : '';
+        v.querySelector('#rcDep').value = fin(r.dep) ? r.dep : '';
+        v.querySelector('#rcFee').value = fin(r.fee) ? r.fee : '';
+        v.querySelector('#rcStamp').value = fin(r.stamp) ? r.stamp : '';
+        v.querySelector('#rcFirst').value = fin(r.first) ? r.first : '';
+        v.querySelector('#rcOnce').value = fin(r.once) ? r.once : '';
         v.querySelector('#rcDate').value = r.fdate || '';
         v.querySelector('#rcSubmit').textContent = 'Save changes →';
         v.querySelector('#rcCancel').style.display = '';
@@ -415,7 +416,7 @@
     var d = document.createElement('div');
     d.className = 'rccomp'; d.style.cssText = 'display:flex;gap:10px;margin-top:6px;align-items:center';
     d.innerHTML = '<input class="rcclab" maxlength="40" placeholder="e.g. utilities" style="flex:1;min-width:120px"><input class="rcamt" inputmode="decimal" maxlength="12" placeholder="amount" style="width:110px;flex:none"><button type="button" class="rccx" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;flex:none">remove</button>';
-    if (c) { d.querySelector('.rcclab').value = c.label || ''; d.querySelector('.rcamt').value = isFinite(c.amt) ? c.amt : ''; }
+    if (c) { d.querySelector('.rcclab').value = c.label || ''; d.querySelector('.rcamt').value = fin(c.amt) ? c.amt : ''; }
     d.querySelector('.rccx').onclick = function () { d.remove(); };
     return d;
   }
