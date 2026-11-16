@@ -59,7 +59,7 @@
 
   var st = document.createElement('style');
   st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}' +
-    '.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}';
+    '.rcmore{margin-top:14px;border-top:1px solid #6b5546;padding-top:4px}.rcmore summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;padding:12px 0;min-height:44px}.rcmore summary::-webkit-details-marker{display:none}.rcmore summary:before{content:"+ "}.rcmore[open] summary:before{content:"\\2212 "}.rcard .rcrent{font-size:24px;margin:6px 0 2px}.rcard .rcrent .muted{font-size:13px}.rcard .rctotal{margin:0 0 4px;font-size:15px}.rcard .rcact{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 0}.rcard .rcact button{background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:0 6px;font-size:14px;min-width:0;min-height:44px}.rcard .rcact .rcsave{border-bottom-color:#dcc9ad;margin-right:10px;padding-left:0}.rcdet{margin-top:2px;border-top:1px solid #6b5546}.rcdet summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;min-height:44px;display:flex;align-items:center}.rcdet summary::-webkit-details-marker{display:none}.rcdet summary:before{content:"+ ";margin-right:6px}.rcdet[open] summary:before{content:"\\2212 "}.rcbd p{margin:0 0 6px;font-size:13px;line-height:1.55}.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}';
   document.head.appendChild(st);
 
   // --- Tab button, between SELL and COMPARE ----------------------------------
@@ -80,13 +80,14 @@
     '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
     '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
     '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
-    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Figures you enter are yours: reported by you, not independently verified. Saved on this device until you remove them - nothing is uploaded or shared unless you choose "save to my account" on a rental.</p></div>' +
+    '<div class="finding"><p>Add a rental you are considering. Costs you leave blank stay marked unknown and totals say "known so far" - nothing is estimated. Entries stay on this device unless you save one to your account.</p></div>' +
     '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
     '<label class="rclab" for="rcName">Name or short label</label><input id="rcName" maxlength="80" placeholder="e.g. Flat A - Bishan">' +
     '<label class="rclab" for="rcUrl">Listing link (optional)</label><input id="rcUrl" maxlength="300" inputmode="url" placeholder="https://...">' +
     '<div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:1;min-width:150px"><label class="rclab" for="rcRent">Rent per month</label><input id="rcRent" inputmode="decimal" maxlength="12" placeholder="e.g. 3500"></span>' +
     '<span><label class="rclab" for="rcCur">Currency</label><select id="rcCur" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;width:100%">' +
     '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></span></div>' +
+    '<details id="rcMore" class="rcmore"><summary>Add costs <span class="muted">(optional - blanks stay unknown)</span></summary>' +
     '<label class="rclab">Extra monthly costs you know - one line per cost (e.g. utilities, management fee, parking); anything not listed stays unknown</label>' +
     '<div id="rcComps"></div>' +
     '<p style="margin-top:6px"><button type="button" id="rcCompAdd" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">+ add a known monthly cost</button></p>' +
@@ -98,8 +99,9 @@
     '<label class="rclab" for="rcFirst">First month paid upfront (one-off) - leave blank if unknown</label><input id="rcFirst" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcDate">Date of these figures (optional)</label><input id="rcDate" maxlength="40" placeholder="e.g. 2026-11-16, from the listing">' +
+    '</details>' +
     '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div></form>' +
-    '<p class="muted" style="margin-top:10px;font-size:12px">Rentals stay on this device. Account saves appear in your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library \u2197</a>.</p>' +
+    '<p class="muted" style="margin-top:10px;font-size:12px">Your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library \u2197</a> holds rentals you save.</p>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   var rp = v.querySelector('#rentPanel');
@@ -380,20 +382,25 @@
     var h = '';
     rentals.forEach(function (r, i) {
       var f = fmtOne(r);
-      h += '<div class="finding" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
+      h += '<div class="finding rcard" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
         (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing ↗</a>' : '') + '</h3>';
-      h += '<p class="muted">Figures as of ' + (r.fdate ? esc(r.fdate) : 'no date given') + ' - reported by you, not independently verified.</p>';
-      h += '<p>' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
-      if (!f.compsAny) h += '<br>Extra monthly costs: ' + unk(1);
+      var qual = f.rentK ? (f.exK ? '' : (f.compsAny ? 'rent + listed extras - more may apply' : 'rent only - extra monthly costs unknown')) : '';
+      h += '<p class="rcrent">' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '</b> <span class="muted">/ month rent</span>' : 'Rent: ' + unk(1)) + '</p>';
+      h += '<p class="rctotal"><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (qual ? ' <span class="muted">(' + qual + ')</span>' : '') + '</p>';
+      h += '<div class="rcact"><button type="button" class="rcacct rcsave" data-i="' + i + '">\u2606 save to my account</button><button type="button" class="rcedit" data-i="' + i + '">edit</button><button type="button" class="rcdel" data-i="' + i + '">remove</button></div>';
+      h += '<details class="rcdet"><summary>Full cost breakdown</summary><div class="rcbd">';
+      h += '<p>Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + esc(r.cur) : unk(1)) + '</p>';
+      if (!f.compsAny) h += '<p>Extra monthly costs: ' + unk(1) + '</p>';
       else {
-        (r.comps || []).forEach(function (c) { h += '<br>&nbsp;&nbsp;· ' + esc(c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : unk(1)); });
-        h += '<br>&nbsp;&nbsp;Listed extras total: <b>' + fm(r.cur, f.compSum) + '/mo</b>' + (f.exK ? '' : ' <span class="muted">(other extras unknown - nothing estimated)</span>');
+        (r.comps || []).forEach(function (c) { h += '<p>' + esc(c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : unk(1)) + '</p>'; });
+        h += '<p>Listed extras total: ' + fm(r.cur, f.compSum) + '/mo' + (f.exK ? ' (all extra monthly costs)' : ' <span class="muted">(other extras unknown - nothing estimated)</span>') + '</p>';
       }
-      h += (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
-      h += '<br><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(' + (f.compsAny ? 'rent + listed extras - more monthly costs may apply' : 'rent only - extra monthly costs unknown') + ')</span>' : '') + '</p>';
-      h += '<p class="muted">One-off move-in costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off costs total: ' + ((f.feeK || f.oncK || f.stK) ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + ((f.feeK || f.oncK || f.stK) && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
-      h += '<p class="muted">Deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' (potentially refundable, subject to tenancy terms and deductions - excluded from expense total) · First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' (rent paid early - not an extra cost)</p>';
-      h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:8px 4px;margin-right:14px;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:8px 4px;margin-right:14px;font-size:13px">remove</button> <button type="button" class="rcacct" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:8px 4px;margin-right:14px;font-size:13px">\u2606 save to my account</button></p></div>';
+      if (r.incl) h += '<p>Rent includes: ' + esc(r.incl) + '</p>';
+      h += '<p>Agency fee: ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + '</p><p>Stamp duty / tax: ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + '</p><p>Other one-off costs: ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '</p>';
+      h += '<p>Known one-off total: ' + ((f.feeK || f.oncK || f.stK) ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' <span class="muted">(some one-off items unknown)</span>') : unk(1)) + '</p>';
+      h += '<p>Deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' <span class="muted">(potentially refundable, subject to tenancy terms and deductions - excluded from expense total)</span></p>';
+      h += '<p>First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' <span class="muted">(rent paid early - not an extra cost)</span></p>';
+      h += '<p class="muted">Figures as of ' + (r.fdate ? esc(r.fdate) : 'no date given') + ' - reported by you, not independently verified.</p></div></details></div>';
     });
     if (rentals.length > 1) {
       h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
@@ -430,7 +437,7 @@
         v.querySelector('#rcDate').value = r.fdate || '';
         v.querySelector('#rcSubmit').textContent = 'Save changes →';
         v.querySelector('#rcCancel').style.display = '';
-        v.querySelector('#rcName').focus();
+        v.querySelector('#rcMore').open = true; v.querySelector('#rcName').focus();
       };
     });
     el.querySelectorAll('.rcacct').forEach(function (b) {
