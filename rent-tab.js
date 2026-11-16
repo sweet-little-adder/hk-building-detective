@@ -330,7 +330,7 @@
       if (r.incl) s += '   Rent includes: ' + r.incl + '\n';
       s += (f.exK ? '   Known monthly total: ' : '   Known so far: ') + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (more monthly costs may apply)') : 'unknown') + '\n';
       s += '   One-off costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
-      s += '   Refundable deposit (returned at move-out - not a cost): ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + '\n';
+      s += '   Deposit (potentially refundable, subject to tenancy terms and deductions - excluded from expense total): ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + '\n';
       s += '   First month paid upfront (rent paid early - not an extra cost): ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + '\n';
       s += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
     });
@@ -356,7 +356,7 @@
       h += (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
       h += '<br><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(' + (f.compsAny ? 'rent + listed extras - more monthly costs may apply' : 'rent only - extra monthly costs unknown') + ')</span>' : '') + '</p>';
       h += '<p class="muted">One-off move-in costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off costs total: ' + ((f.feeK || f.oncK || f.stK) ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + ((f.feeK || f.oncK || f.stK) && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
-      h += '<p class="muted">Refundable deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' (returned at move-out - not a cost) · First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' (rent paid early - not an extra cost)</p>';
+      h += '<p class="muted">Deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' (potentially refundable, subject to tenancy terms and deductions - excluded from expense total) · First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' (rent paid early - not an extra cost)</p>';
       h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
     });
     if (rentals.length > 1) {
