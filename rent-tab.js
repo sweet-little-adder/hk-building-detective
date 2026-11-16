@@ -40,14 +40,19 @@
   var NOTE = { fr: 'Page en anglais.', de: 'Inhalt auf Englisch.', nl: 'Inhoud in het Engels.', pl: 'Treść po angielsku.' };
   var T = {
     en: { sec: '01 / The city', aria: 'City you want to rent in', ph: 'e.g. London, New York City, Hong Kong, Singapore', go: 'Explore →',
+      sec2: '02 / Your budget (optional)', ariaBudget: 'Your monthly rent budget', budgetPh: 'e.g. 3500 - number only, matched to each city\'s currency',
       intro: 'No listings of our own and nothing invented. See what public data says about rents in a city, open real rental listings on the portals - where you contact the agent or landlord - and check the building\'s public record before you sign.' },
     fr: { sec: '01 / La ville', aria: 'Ville où vous voulez louer', ph: 'p. ex. London, New York City, Hong Kong, Singapore', go: 'Explorer →',
+      sec2: '02 / Votre budget (facultatif)', ariaBudget: 'Votre budget loyer mensuel', budgetPh: 'p. ex. 3500 - chiffre seul, dans la devise de la ville',
       intro: 'Pas d\'annonces à nous et rien d\'inventé. Voyez ce que les données publiques disent des loyers d\'une ville, ouvrez de vraies annonces de location sur les portails - où vous contactez l\'agent ou le propriétaire - et vérifiez le dossier public de l\'immeuble avant de signer.' },
     de: { sec: '01 / Die Stadt', aria: 'Stadt, in der Sie mieten möchten', ph: 'z. B. London, New York City, Hong Kong, Singapore', go: 'Entdecken →',
+      sec2: '02 / Ihr Budget (optional)', ariaBudget: 'Ihr monatliches Mietbudget', budgetPh: 'z. B. 3500 - nur Zahl, in der Währung der Stadt',
       intro: 'Keine eigenen Inserate und nichts Erfundenes. Sehen Sie, was öffentliche Daten über Mieten in einer Stadt sagen, öffnen Sie echte Mietinserate auf den Portalen - dort kontaktieren Sie den Makler oder Eigentümer - und prüfen Sie die öffentlichen Unterlagen des Gebäudes vor der Unterschrift.' },
     nl: { sec: '01 / De stad', aria: 'Stad waar u wilt huren', ph: 'bijv. London, New York City, Hong Kong, Singapore', go: 'Verkennen →',
+      sec2: '02 / Uw budget (optioneel)', ariaBudget: 'Uw maandelijkse huurbudget', budgetPh: 'bijv. 3500 - alleen cijfer, in de valuta van de stad',
       intro: 'Geen eigen advertenties en niets verzonnen. Bekijk wat openbare data over huren in een stad zeggen, open echte huuradvertenties op de portalen - waar u contact opneemt met de makelaar of verhuurder - en controleer de openbare gegevens van het gebouw vóór u tekent.' },
     pl: { sec: '01 / Miasto', aria: 'Miasto, w którym chcesz wynająć', ph: 'np. London, New York City, Hong Kong, Singapore', go: 'Odkryj →',
+      sec2: '02 / Twój budżet (opcjonalnie)', ariaBudget: 'Twój miesięczny budżet na czynsz', budgetPh: 'np. 3500 - sama liczba, w walucie miasta',
       intro: 'Żadnych własnych ogłoszeń i nic zmyślonego. Zobacz, co dane publiczne mówią o czynszach w mieście, otwórz prawdziwe oferty wynajmu w portalach - tam skontaktujesz się z agentem lub właścicielem - i sprawdź publiczne dane budynku przed podpisaniem.' }
   };
   var t = T[lang] || T.en;
@@ -70,6 +75,8 @@
     '<form id="askrentcity" autocomplete="off"><input id="qrc" maxlength="80" aria-label="' + t.aria + '" placeholder="' + t.ph + '">' +
     '<div class="chips">' + chips.map(function (c) { return '<button type="button" data-rc="' + c + '">' + c + '</button>' }).join('') + '</div>' +
     '<div class="controls"><button type="submit">' + t.go + '</button></div></form>' +
+    '<p class="label" style="margin-top:22px">' + t.sec2 + '</p>' +
+    '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
     '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   var rp = v.querySelector('#rentPanel');
@@ -89,6 +96,13 @@
   var GBP = function (n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
   var SGD = function (n) { return 'S$' + Math.round(n).toLocaleString('en-SG'); };
   var USD = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
+  var BUDGET = NaN, LAST_RAW = null, LAST_PINNED = false;
+  function fmtDiff(fmt, diff) { return diff > 0 ? fmt(diff) + ' over your budget' : (diff < 0 ? fmt(-diff) + ' under your budget' : 'matches your budget'); }
+  var BENCH = ' A budget benchmark against a market snapshot - not the total monthly cost of a specific home (deposit, fees and utilities not included).';
+  function budgetNote(fmt, typical, what) {
+    if (!(BUDGET > 0)) return '';
+    return '<p class="muted" style="margin-top:10px">Your budget ' + fmt(BUDGET) + '/mo vs ' + what + ' ' + fmt(typical) + '/mo: ' + fmtDiff(fmt, typical - BUDGET) + '.' + BENCH + '</p>';
+  }
   var zrent = function (c, stt) { return 'https://www.zillow.com/homes/for_rent/' + c.replace(/ /g, '-') + ',-' + stt + '_rb/'; };
   var rmrent = function (label) { return 'https://www.rightmove.co.uk/property-to-rent/find.html?searchLocation=' + encodeURIComponent(label); };
   var HSE_RENT = 'https://www.28hse.com/en/rent';
@@ -182,6 +196,7 @@
       return '<div class="finding"><h3>London - rent snapshot</h3>' +
         '<p><span class="count">' + GBP(LONDON_RENT.flat) + '/mo</span><br>average private rent, flat/maisonette · ' + GBP(LONDON_RENT.all) + '/mo across all property types</p>' +
         '<p class="muted">ONS Price Index of Private Rents, ' + LONDON_RENT.month + ': average monthly rent, private rental stock, London region. A region average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source ↗</a></p>' +
+        budgetNote(GBP, LONDON_RENT.flat, 'the average rent for a flat/maisonette') +
         act(extBtn(rmrent('London'), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
     }
     if (c && c.indexOf('UK:') === 0) {
@@ -194,7 +209,8 @@
       var m = CITY_MARKET[c];
       var h = '<div class="finding"><h3>' + c + ', ' + m.st + ' - rent snapshot</h3>' +
         '<p><span class="count">' + USD(m.zori) + '/mo</span><br>typical asking rent, all rentals incl. multifamily</p>' +
-        '<p class="muted">Zillow Research ZORI, ' + CITY_MARKET._meta.zori_month.slice(0, 7) + '. A city-level typical - neighbourhoods and flats vary widely, and it is not a quote for any specific home. <a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener">Source ↗</a></p>';
+        '<p class="muted">Zillow Research ZORI, ' + CITY_MARKET._meta.zori_month.slice(0, 7) + '. A city-level typical - neighbourhoods and flats vary widely, and it is not a quote for any specific home. <a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener">Source ↗</a></p>' +
+        budgetNote(USD, m.zori, 'the city-typical asking rent');
       var acts = extBtn(zrent(c, m.st), 'See rentals on Zillow') + ' · ' + CMP_BTN;
       if (c === 'New York') acts += ' · ' + goBuy('New York', 'Check a building\'s DOB record →');
       if (c === 'Chicago') acts += ' · ' + goBuy('Chicago', 'Check a building\'s violations record →');
@@ -210,6 +226,7 @@
     return '<div class="finding"><h3>Singapore - rent snapshot (' + SG_RENT.town + ')</h3>' +
       '<div class="vrow">' + rows + '</div>' +
       '<p class="muted" style="margin-top:10px">HDB median approved sublet rents by flat type, ' + SG_RENT.town + ' town, ' + SG_RENT.period + ' (data.gov.sg, Singapore Open Data Licence). Medians for one town, whole flats; HDB rental eligibility rules apply. Not a quote for any specific flat. <a href="https://data.gov.sg/datasets/d_23000a00c52996c55106084ed0339566/view" target="_blank" rel="noopener">Source ↗</a></p>' +
+      (BUDGET > 0 ? '<p class="muted" style="margin-top:10px">Your budget ' + SGD(BUDGET) + '/mo vs Bishan medians: ' + SG_RENT.rows.map(function (r) { return 'HDB ' + r[0] + ' ' + SGD(r[1]) + ' (' + fmtDiff(SGD, r[1] - BUDGET) + ')'; }).join(' · ') + '.' + BENCH + '</p>' : '') +
       act(CMP_BTN) + '</div>';
   }
 
@@ -234,6 +251,7 @@
   }
 
   async function rentPick(raw, pinned) {
+    LAST_RAW = raw; LAST_PINNED = !!pinned;
     if (pinned) {
       if (normS(raw) === 'singapore') { rp.innerHTML = renderSg(); bindRent(); return; }
       var c = resolveCity(raw);
@@ -254,6 +272,12 @@
   }
 
   v.querySelector('#askrentcity').addEventListener('submit', function (e) { e.preventDefault(); rentPick(v.querySelector('#qrc').value); });
+  v.querySelector('#askbudget').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var rawb = v.querySelector('#qbudget').value.replace(/[^0-9.]/g, '');
+    BUDGET = parseFloat(rawb) || NaN;
+    if (LAST_RAW) rentPick(LAST_RAW, LAST_PINNED);
+  });
   v.querySelectorAll('[data-rc]').forEach(function (b) { b.onclick = function () { v.querySelector('#qrc').value = b.dataset.rc; rentPick(b.dataset.rc, true); }; });
 
   // --- Tab switching ---------------------------------------------------------------
