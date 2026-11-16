@@ -466,7 +466,22 @@
   sell.addEventListener('click', hideRent);
   if (cmpBtn) cmpBtn.addEventListener('click', hideRent);
 
-  function hashRent() { return (location.hash || '').toLowerCase() === '#rent'; }
-  if (hashRent()) showRent();
-  window.addEventListener('hashchange', function () { if (hashRent()) showRent(); else hideRent(); });
+  // --- Deep links: #buy #sell #rent #compare select the matching tab -------------
+  function routeHash(h) {
+    h = (h === undefined ? location.hash : h) || ''; h = h.toLowerCase();
+    if (h === '#rent') { showRent(); return true; }
+    if (h === '#compare') { if (cmpBtn) { cmpBtn.click(); return true; } return false; }
+    if (h === '#sell') { sell.click(); return true; }
+    if (h === '#buy') { buy.click(); return true; }
+    return false;
+  }
+  routeHash();
+  window.addEventListener('hashchange', function () { routeHash(); });
+  // The sauletrust.com parent page cannot set this frame's hash without a reload,
+  // so it asks for tab switches by message instead.
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://sauletrust.com' && e.origin !== 'https://www.sauletrust.com') return;
+    var d = e.data || {};
+    if (d.type === 'st-tab' && typeof d.tab === 'string') routeHash('#' + d.tab);
+  });
 })();
