@@ -102,12 +102,30 @@
   var scf = document.querySelector('#sourcesCredits footer');
   if (scf && !scf.querySelector('.rentsrc')) {
     var sp = document.createElement('p'); sp.className = 'rentsrc';
-    sp.innerHTML = 'Rent: US typical asking rents = Zillow Research ZORI, Sep 2026, modelled - Data Provided by Zillow Group; London = ONS Price Index of Private Rents, Aug 2026 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0); Singapore Bishan = HDB median approved sublet rents by town and flat type, 2026-Q3 (data.gov.sg, Singapore Open Data Licence). Rental listings: Zillow, Rightmove, 28Hse (external portals, not verified by RE-agent; contacting the agent or landlord happens there). City averages, not quotes for any specific home. Not investment advice.';
+    sp.innerHTML = 'Rent: US typical asking rents = Zillow Research ZORI, Sep 2026, modelled - Data Provided by Zillow Group; UK city/area average rents = ONS Price Index of Private Rents, Sep 2026 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0); Singapore Bishan = HDB median approved sublet rents by town and flat type, 2026-Q3 (data.gov.sg, Singapore Open Data Licence). Rental listings: Zillow, Rightmove, 28Hse (external portals, not verified by RE-agent; contacting the agent or landlord happens there). City averages, not quotes for any specific home. Not investment advice.';
     scf.appendChild(sp);
   }
 
   // --- Rent data ------------------------------------------------------------------
-  var LONDON_RENT = { all: 2332, flat: 2056, month: '2026-08' }; // ONS PIPR, London region
+  // ONS Price Index of Private Rents, 2026-09 (21 Oct 2026 edition): average monthly rent, all property
+  // types, by local authority (England/Wales) or Broad Rental Market Area (Scotland).
+  var UK_RENT = {
+    'london': { v: 2338, area: 'London region' },
+    'manchester': { v: 1380, area: 'Manchester local authority' },
+    'birmingham': { v: 1106, area: 'Birmingham local authority' },
+    'leeds': { v: 1148, area: 'Leeds local authority' },
+    'liverpool': { v: 916, area: 'Liverpool local authority' },
+    'sheffield': { v: 936, area: 'Sheffield local authority' },
+    'city-of-bristol': { v: 1893, area: 'Bristol, City of local authority' },
+    'newcastle-upon-tyne': { v: 1220, area: 'Newcastle upon Tyne local authority' },
+    'nottingham': { v: 1015, area: 'Nottingham local authority' },
+    'cardiff': { v: 1179, area: 'Cardiff local authority' },
+    'cambridge': { v: 1805, area: 'Cambridge local authority' },
+    'oxford': { v: 1957, area: 'Oxford local authority' },
+    'city-of-glasgow': { v: 1266, area: 'Greater Glasgow Broad Rental Market Area (not the city alone)' },
+    'city-of-edinburgh': { v: 1411, area: 'Lothian Broad Rental Market Area - the BRMA containing Edinburgh, not the city alone' }
+  };
+  var UK_RENT_MONTH = '2026-09';
   var SG_RENT = { town: 'Bishan', period: '2026-Q3', rows: [['3 ROOM', 3000], ['4 ROOM', 3700], ['5 ROOM', 4100]] }; // HDB via data.gov.sg
   var GBP = function (n) { return '£' + Math.round(n).toLocaleString('en-GB'); };
   var SGD = function (n) { return 'S$' + Math.round(n).toLocaleString('en-SG'); };
@@ -208,15 +226,16 @@
         '<p>Rent figures are not wired for ' + name + ' yet - nothing invented. The public records live today are official property assessments (owner-side values, not rents).</p>' +
         act(goBuy(name, 'See the public records →')) + '</div>';
     }
-    if (c === 'UK:london') {
-      return '<div class="finding"><h3>London - rent snapshot</h3>' +
-        '<p><span class="count">' + GBP(LONDON_RENT.flat) + '/mo</span><br>average private rent, flat/maisonette · ' + GBP(LONDON_RENT.all) + '/mo across all property types</p>' +
-        '<p class="muted">ONS Price Index of Private Rents, ' + LONDON_RENT.month + ': average monthly rent, private rental stock, London region. A region average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source ↗</a></p>' +
-        budgetNote(GBP, LONDON_RENT.flat, 'the average rent for a flat/maisonette') +
-        act(extBtn(rmrent('London'), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
-    }
     if (c && c.indexOf('UK:') === 0) {
+      var uk = UK_RENT[c.slice(3)];
       var label = UK_LABELS[c.slice(3)];
+      if (uk) {
+        return '<div class="finding"><h3>' + label + ' - rent snapshot</h3>' +
+          '<p><span class="count">' + GBP(uk.v) + '/mo</span><br>average private rent, all property types</p>' +
+          '<p class="muted">ONS Price Index of Private Rents, ' + UK_RENT_MONTH + ': average monthly rent, private rental stock, ' + uk.area + '. An area average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source ↗</a></p>' +
+          budgetNote(GBP, uk.v, 'the area average rent') +
+          act(extBtn(rmrent(label), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
+      }
       return '<div class="finding"><h3>Renting in ' + label + '</h3>' +
         '<p>Official city-level rent figures are not wired for ' + label + ' yet - nothing invented. What you can do today: open real rental listings on Rightmove and compare typical rents across covered cities.</p>' +
         act(extBtn(rmrent(label), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
