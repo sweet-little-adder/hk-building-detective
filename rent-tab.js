@@ -340,7 +340,7 @@
     return s;
   }
   var ACCT_ORIGIN = null;
-  try { var _po = new URL(document.referrer).origin; if (window !== window.top && ['https://sauletrust.com', 'https://www.sauletrust.com'].indexOf(_po) >= 0) ACCT_ORIGIN = _po; } catch (e) { }
+  try { var _ao = (window.location.ancestorOrigins && window.location.ancestorOrigins.length) ? window.location.ancestorOrigins[0] : null; var _po = _ao || new URL(document.referrer).origin; if (window !== window.top && ['https://sauletrust.com', 'https://www.sauletrust.com'].indexOf(_po) >= 0) ACCT_ORIGIN = _po; } catch (e) { }
   var acctPending = false, acctBtn = null, acctTimer = 0, acctAuth = false;
   function openAccount() {
     var u = ACCT_ORIGIN + '/account/?lang=' + lang, w = null;
