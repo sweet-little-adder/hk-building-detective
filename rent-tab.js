@@ -310,8 +310,8 @@
     var exK = comps.length > 0 && compsFinite && !!r.exAll;
     var monthly = rentK ? r.rent + compSum : NaN;
     var depK = fin(r.dep), feeK = fin(r.fee), oncK = fin(r.once), stK = fin(r.stamp), fiK = fin(r.first);
-    var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0) + (stK ? r.stamp : 0) + (fiK ? r.first : 0);
-    return { rentK: rentK, exK: exK, compsAny: comps.length > 0, compsFinite: compsFinite, compSum: compSum, monthly: monthly, depK: depK, feeK: feeK, oncK: oncK, stK: stK, fiK: fiK, onceSum: onceSum, onceAny: depK || feeK || oncK || stK || fiK, onceAll: depK && feeK && oncK && stK && fiK };
+    var onceSum = (feeK ? r.fee : 0) + (oncK ? r.once : 0) + (stK ? r.stamp : 0);
+    return { rentK: rentK, exK: exK, compsAny: comps.length > 0, compsFinite: compsFinite, compSum: compSum, monthly: monthly, depK: depK, feeK: feeK, oncK: oncK, stK: stK, fiK: fiK, onceSum: onceSum, onceAny: depK || feeK || oncK || stK || fiK, onceAll: feeK && oncK && stK };
   }
   function exportText() {
     var d = new Date().toISOString().slice(0, 10);
@@ -329,7 +329,9 @@
       }
       if (r.incl) s += '   Rent includes: ' + r.incl + '\n';
       s += (f.exK ? '   Known monthly total: ' : '   Known so far: ') + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (more monthly costs may apply)') : 'unknown') + '\n';
-      s += '   One-off: deposit ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + ' - agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - first month upfront ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
+      s += '   One-off costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
+      s += '   Refundable deposit (returned at move-out - not a cost): ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + '\n';
+      s += '   First month paid upfront (rent paid early - not an extra cost): ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + '\n';
       s += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
     });
     s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
@@ -353,7 +355,8 @@
       }
       h += (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
       h += '<br><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(' + (f.compsAny ? 'rent + listed extras - more monthly costs may apply' : 'rent only - extra monthly costs unknown') + ')</span>' : '') + '</p>';
-      h += '<p class="muted">One-off move-in: deposit ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · first month upfront ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + (f.onceAny && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
+      h += '<p class="muted">One-off move-in costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off costs total: ' + ((f.feeK || f.oncK || f.stK) ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + ((f.feeK || f.oncK || f.stK) && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
+      h += '<p class="muted">Refundable deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' (returned at move-out - not a cost) · First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' (rent paid early - not an extra cost)</p>';
       h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
     });
     if (rentals.length > 1) {
