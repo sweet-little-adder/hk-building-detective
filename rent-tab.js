@@ -87,10 +87,15 @@
     '<div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:1;min-width:150px"><label class="rclab" for="rcRent">Rent per month</label><input id="rcRent" inputmode="decimal" maxlength="12" placeholder="e.g. 3500"></span>' +
     '<span><label class="rclab" for="rcCur">Currency</label><select id="rcCur" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;width:100%">' +
     '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></span></div>' +
-    '<label class="rclab" for="rcExtra">Extra monthly costs you know, total - leave blank if unknown</label><input id="rcExtra" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab">Extra monthly costs you know - one line per cost (e.g. utilities, management fee, parking); anything not listed stays unknown</label>' +
+    '<div id="rcComps"></div>' +
+    '<p style="margin-top:6px"><button type="button" id="rcCompAdd" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">+ add a known monthly cost</button></p>' +
+    '<label class="rclab" for="rcExAll" style="display:flex;gap:8px;align-items:center;font-size:13px;text-transform:none;letter-spacing:0"><input type="checkbox" id="rcExAll" style="width:auto">These are all the extra monthly costs - nothing else recurs monthly for this home</label>' +
     '<label class="rclab" for="rcIncl">What the rent includes (optional)</label><input id="rcIncl" maxlength="120" placeholder="e.g. management fee, internet">' +
     '<label class="rclab" for="rcDep">Deposit (one-off) - leave blank if unknown</label><input id="rcDep" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcFee">Agency fee (one-off) - leave blank if unknown</label><input id="rcFee" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab" for="rcStamp">Stamp duty / tax (one-off) - leave blank if unknown</label><input id="rcStamp" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab" for="rcFirst">First month paid upfront (one-off) - leave blank if unknown</label><input id="rcFirst" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcDate">Date of these figures (optional)</label><input id="rcDate" maxlength="40" placeholder="e.g. 2026-11-16, from the listing">' +
     '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div></form>' +
@@ -283,6 +288,14 @@
       var d = JSON.parse(raw);
       if (d && d.ts && Date.now() - d.ts < CMP_AGE && Array.isArray(d.items)) rentals = d.items;
       else localStorage.removeItem(CMP_KEY);
+      rentals = rentals.map(function (r) {
+        if (!r.comps) {
+          r.comps = isFinite(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
+          r.exAll = isFinite(r.extra);
+          delete r.extra;
+        }
+        return r;
+      });
     } catch (e) { }
   }
   function cmpSave() { try { localStorage.setItem(CMP_KEY, JSON.stringify({ ts: Date.now(), items: rentals })); } catch (e) { } }
@@ -290,10 +303,14 @@
   function fm(cur, n) { var s = CURS[cur] || ''; return (s ? s : '') + Math.round(n).toLocaleString('en-US') + (s ? '' : (cur === 'Other' ? '' : '')); }
   function unk(b) { return b ? '<span style="color:#e8b9c4">unknown</span>' : ''; }
   function fmtOne(r) {
-    var rentK = isFinite(r.rent), exK = isFinite(r.extra), depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once);
-    var monthly = rentK ? (exK ? r.rent + r.extra : r.rent) : NaN;
-    var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0);
-    return { rentK: rentK, exK: exK, depK: depK, feeK: feeK, oncK: oncK, monthly: monthly, onceSum: onceSum, onceAny: depK || feeK || oncK, onceAll: depK && feeK && oncK };
+    var comps = r.comps || [], compSum = 0, compsFinite = true;
+    comps.forEach(function (c) { if (isFinite(c.amt)) compSum += c.amt; else compsFinite = false; });
+    var rentK = isFinite(r.rent);
+    var exK = comps.length > 0 && compsFinite && !!r.exAll;
+    var monthly = rentK ? r.rent + compSum : NaN;
+    var depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once), stK = isFinite(r.stamp), fiK = isFinite(r.first);
+    var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0) + (stK ? r.stamp : 0) + (fiK ? r.first : 0);
+    return { rentK: rentK, exK: exK, compsAny: comps.length > 0, compsFinite: compsFinite, compSum: compSum, monthly: monthly, depK: depK, feeK: feeK, oncK: oncK, stK: stK, fiK: fiK, onceSum: onceSum, onceAny: depK || feeK || oncK || stK || fiK, onceAll: depK && feeK && oncK && stK && fiK };
   }
   function exportText() {
     var d = new Date().toISOString().slice(0, 10);
@@ -304,9 +321,14 @@
       s += '   Listing: ' + (r.url || '-') + '\n';
       s += '   Figures as of: ' + (r.fdate || '-') + ' (reported by me, not verified)\n';
       s += '   Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + r.cur : 'unknown') + '\n';
-      s += '   Extra monthly costs: ' + (f.exK ? fm(r.cur, r.extra) + '/mo' : 'unknown') + (r.incl ? ' - rent includes: ' + r.incl : '') + '\n';
-      s += '   Known monthly total: ' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (rent only - extras unknown)') : 'unknown') + '\n';
-      s += '   One-off: deposit ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + ' - agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
+      if (!f.compsAny) s += '   Extra monthly costs: unknown' + '\n';
+      else {
+        (r.comps || []).forEach(function (c) { s += '   - ' + (c.label || 'cost') + ': ' + (isFinite(c.amt) ? fm(r.cur, c.amt) + '/mo' : 'unknown') + '\n'; });
+        s += '   Listed extras total: ' + fm(r.cur, f.compSum) + '/mo' + (f.exK ? ' (all extra monthly costs)' : ' (other extras unknown - not estimated)') + '\n';
+      }
+      if (r.incl) s += '   Rent includes: ' + r.incl + '\n';
+      s += (f.exK ? '   Known monthly total: ' : '   Known so far: ') + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (more monthly costs may apply)') : 'unknown') + '\n';
+      s += '   One-off: deposit ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + ' - agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - first month upfront ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
       s += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
     });
     s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
@@ -323,20 +345,25 @@
         (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing ↗</a>' : '') + '</h3>';
       h += '<p class="muted">Figures as of ' + (r.fdate ? esc(r.fdate) : 'no date given') + ' - reported by you, not independently verified.</p>';
       h += '<p>' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
-      h += '<br>Extra monthly costs: ' + (f.exK ? fm(r.cur, r.extra) + '/mo' : unk(1)) + (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
-      h += '<br><b>Known monthly total: ' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' : 'unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(rent only - extra monthly costs unknown)</span>' : '') + '</p>';
-      h += '<p class="muted">One-off move-in: deposit ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + (f.onceAny && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
+      if (!f.compsAny) h += '<br>Extra monthly costs: ' + unk(1);
+      else {
+        (r.comps || []).forEach(function (c) { h += '<br>&nbsp;&nbsp;· ' + esc(c.label || 'cost') + ': ' + (isFinite(c.amt) ? fm(r.cur, c.amt) + '/mo' : unk(1)); });
+        h += '<br>&nbsp;&nbsp;Listed extras total: <b>' + fm(r.cur, f.compSum) + '/mo</b>' + (f.exK ? '' : ' <span class="muted">(other extras unknown - nothing estimated)</span>');
+      }
+      h += (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
+      h += '<br><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(' + (f.compsAny ? 'rent + listed extras - more monthly costs may apply' : 'rent only - extra monthly costs unknown') + ')</span>' : '') + '</p>';
+      h += '<p class="muted">One-off move-in: deposit ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · first month upfront ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + (f.onceAny && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
       h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
     });
     if (rentals.length > 1) {
       h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
       if (!sameCur) h += 'Different currencies - totals are shown per rental, not compared across currencies.';
       else {
-        var full = rentals.filter(function (r) { return isFinite(r.rent) && isFinite(r.extra); });
+        var full = rentals.filter(function (r) { var f = fmtOne(r); return f.rentK && f.exK; });
         if (full.length === rentals.length) {
-          var minI = 0; full.forEach(function (r, i) { if (r.rent + r.extra < full[minI].rent + full[minI].extra) minI = i; });
-          h += 'Lowest known monthly total on the figures entered: <b>' + esc(full[minI].name || 'Rental ' + (minI + 1)) + '</b> at ' + fm(full[minI].cur, full[minI].rent + full[minI].extra) + '/mo. ';
-        } else h += 'A full monthly-cost comparison is not possible yet - extra monthly costs are unknown for ' + (rentals.length - full.length) + ' of ' + rentals.length + ' rentals. ';
+          var minI = 0; full.forEach(function (r, i) { if (fmtOne(r).monthly < fmtOne(full[minI]).monthly) minI = i; });
+          h += 'Lowest known monthly total on the figures entered: <b>' + esc(full[minI].name || 'Rental ' + (minI + 1)) + '</b> at ' + fm(full[minI].cur, fmtOne(full[minI]).monthly) + '/mo. ';
+        } else h += 'A full monthly-cost comparison is not possible yet - not all recurring monthly costs are known for ' + (rentals.length - full.length) + ' of ' + rentals.length + ' rentals. ';
       }
       h += 'Comparison uses only the figures you entered - check each listing for what is actually included.</p></div>';
     }
@@ -352,10 +379,13 @@
         v.querySelector('#rcUrl').value = r.url || '';
         v.querySelector('#rcRent').value = isFinite(r.rent) ? r.rent : '';
         v.querySelector('#rcCur').value = r.cur || 'HKD';
-        v.querySelector('#rcExtra').value = isFinite(r.extra) ? r.extra : '';
+        resetComps(r.comps || []);
+        v.querySelector('#rcExAll').checked = !!r.exAll;
         v.querySelector('#rcIncl').value = r.incl || '';
         v.querySelector('#rcDep').value = isFinite(r.dep) ? r.dep : '';
         v.querySelector('#rcFee').value = isFinite(r.fee) ? r.fee : '';
+        v.querySelector('#rcStamp').value = isFinite(r.stamp) ? r.stamp : '';
+        v.querySelector('#rcFirst').value = isFinite(r.first) ? r.first : '';
         v.querySelector('#rcOnce').value = isFinite(r.once) ? r.once : '';
         v.querySelector('#rcDate').value = r.fdate || '';
         v.querySelector('#rcSubmit').textContent = 'Save changes →';
@@ -381,9 +411,24 @@
       } catch (e) { }
     };
   }
+  function compRow(c) {
+    var d = document.createElement('div');
+    d.className = 'rccomp'; d.style.cssText = 'display:flex;gap:10px;margin-top:6px;align-items:center';
+    d.innerHTML = '<input class="rcclab" maxlength="40" placeholder="e.g. utilities" style="flex:1;min-width:120px"><input class="rcamt" inputmode="decimal" maxlength="12" placeholder="amount" style="width:110px;flex:none"><button type="button" class="rccx" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;flex:none">remove</button>';
+    if (c) { d.querySelector('.rcclab').value = c.label || ''; d.querySelector('.rcamt').value = isFinite(c.amt) ? c.amt : ''; }
+    d.querySelector('.rccx').onclick = function () { d.remove(); };
+    return d;
+  }
+  function resetComps(list) {
+    var box = v.querySelector('#rcComps'); box.innerHTML = '';
+    (list && list.length ? list : [null]).forEach(function (c) { box.appendChild(compRow(c)); });
+  }
+  v.querySelector('#rcCompAdd').addEventListener('click', function () { v.querySelector('#rcComps').appendChild(compRow(null)); });
+  resetComps(null);
   v.querySelector('#rcCancel').addEventListener('click', function () {
     EDIT_I = -1;
     v.querySelector('#addrental').reset();
+    resetComps(null);
     v.querySelector('#rcSubmit').textContent = 'Add rental →';
     v.querySelector('#rcCancel').style.display = 'none';
   });
@@ -391,11 +436,17 @@
     e.preventDefault();
     var url = v.querySelector('#rcUrl').value.trim();
     if (url && !/^https?:\/\//i.test(url)) url = '';
+    var comps = [];
+    v.querySelectorAll('#rcComps .rccomp').forEach(function (d) {
+      var lab = d.querySelector('.rcclab').value.trim(), amt = num(d.querySelector('.rcamt').value);
+      if (lab || isFinite(amt)) comps.push({ label: lab, amt: amt });
+    });
     var item = {
       name: v.querySelector('#rcName').value.trim(), url: url,
       rent: num(v.querySelector('#rcRent').value), cur: v.querySelector('#rcCur').value,
-      extra: num(v.querySelector('#rcExtra').value), incl: v.querySelector('#rcIncl').value.trim(),
+      comps: comps, exAll: v.querySelector('#rcExAll').checked, incl: v.querySelector('#rcIncl').value.trim(),
       dep: num(v.querySelector('#rcDep').value), fee: num(v.querySelector('#rcFee').value), once: num(v.querySelector('#rcOnce').value),
+      stamp: num(v.querySelector('#rcStamp').value), first: num(v.querySelector('#rcFirst').value),
       fdate: v.querySelector('#rcDate').value.trim()
     };
     if (EDIT_I >= 0 && EDIT_I < rentals.length) rentals[EDIT_I] = item; else rentals.push(item);
@@ -403,7 +454,7 @@
     EDIT_I = -1;
     v.querySelector('#rcSubmit').textContent = 'Add rental →';
     v.querySelector('#rcCancel').style.display = 'none';
-    cmpSave(); renderCmp(); e.target.reset();
+    cmpSave(); renderCmp(); e.target.reset(); resetComps(null);
   });
   cmpLoad(); renderCmp();
 
