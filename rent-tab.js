@@ -58,7 +58,8 @@
   var t = T[lang] || T.en;
 
   var st = document.createElement('style');
-  st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}';
+  st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}' +
+    '.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}';
   document.head.appendChild(st);
 
   // --- Tab button, between SELL and COMPARE ----------------------------------
@@ -81,16 +82,16 @@
     '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
     '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Saved on this device only, for up to 7 days; nothing is uploaded or shared.</p></div>' +
     '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
-    '<input id="rcName" maxlength="80" aria-label="Name or short label" placeholder="Name or short label, e.g. Flat A - Bishan">' +
-    '<input id="rcUrl" maxlength="300" aria-label="Listing link (optional)" placeholder="Listing link (optional)">' +
-    '<div style="display:flex;gap:10px;flex-wrap:wrap"><input id="rcRent" inputmode="decimal" maxlength="12" aria-label="Rent per month" placeholder="Rent per month" style="flex:1;min-width:140px">' +
-    '<select id="rcCur" aria-label="Currency" style="background:none;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0">' +
-    '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></div>' +
-    '<input id="rcExtra" inputmode="decimal" maxlength="12" aria-label="Extra monthly costs you know, total" placeholder="Extra monthly costs you know (total) - blank = unknown">' +
-    '<input id="rcIncl" maxlength="120" aria-label="What the rent includes" placeholder="What the rent includes (optional), e.g. management fee, internet">' +
-    '<input id="rcDep" inputmode="decimal" maxlength="12" aria-label="Deposit, one-off" placeholder="Deposit (one-off) - blank = unknown">' +
-    '<input id="rcFee" inputmode="decimal" maxlength="12" aria-label="Agency fee, one-off" placeholder="Agency fee (one-off) - blank = unknown">' +
-    '<input id="rcOnce" inputmode="decimal" maxlength="12" aria-label="Other one-off costs" placeholder="Other one-off costs - blank = unknown">' +
+    '<label class="rclab" for="rcName">Name or short label</label><input id="rcName" maxlength="80" placeholder="e.g. Flat A - Bishan">' +
+    '<label class="rclab" for="rcUrl">Listing link (optional)</label><input id="rcUrl" maxlength="300" inputmode="url" placeholder="https://...">' +
+    '<div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:1;min-width:150px"><label class="rclab" for="rcRent">Rent per month</label><input id="rcRent" inputmode="decimal" maxlength="12" placeholder="e.g. 3500"></span>' +
+    '<span><label class="rclab" for="rcCur">Currency</label><select id="rcCur" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;width:100%">' +
+    '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></span></div>' +
+    '<label class="rclab" for="rcExtra">Extra monthly costs you know, total - leave blank if unknown</label><input id="rcExtra" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab" for="rcIncl">What the rent includes (optional)</label><input id="rcIncl" maxlength="120" placeholder="e.g. management fee, internet">' +
+    '<label class="rclab" for="rcDep">Deposit (one-off) - leave blank if unknown</label><input id="rcDep" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab" for="rcFee">Agency fee (one-off) - leave blank if unknown</label><input id="rcFee" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
+    '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<div class="controls" style="justify-content:flex-start"><button type="submit">Add rental →</button></div></form>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
