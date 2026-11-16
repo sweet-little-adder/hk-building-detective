@@ -80,7 +80,7 @@
     '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
     '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
     '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
-    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Figures you enter are yours: reported by you, not independently verified. Kept on this device only, and only for up to 7 days - nothing is uploaded or shared, and after 7 days they are gone from here, so copy or download your comparison if you want to keep it.</p></div>' +
+    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Figures you enter are yours: reported by you, not independently verified. Saved on this device until you remove them - nothing is uploaded or shared unless you choose "save to my account" on a rental.</p></div>' +
     '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
     '<label class="rclab" for="rcName">Name or short label</label><input id="rcName" maxlength="80" placeholder="e.g. Flat A - Bishan">' +
     '<label class="rclab" for="rcUrl">Listing link (optional)</label><input id="rcUrl" maxlength="300" inputmode="url" placeholder="https://...">' +
@@ -99,6 +99,7 @@
     '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcDate">Date of these figures (optional)</label><input id="rcDate" maxlength="40" placeholder="e.g. 2026-11-16, from the listing">' +
     '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div></form>' +
+    '<p class="muted" style="margin-top:10px;font-size:12px">Rentals stay on this device. Account saves appear in your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library \u2197</a>.</p>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   var rp = v.querySelector('#rentPanel');
@@ -279,15 +280,14 @@
   }
 
   // --- Compare actual rentals: visitor-entered, on-device only (SAU-44) ---------
-  var CMP_KEY = 'stRentCmp:v1', CMP_AGE = 7 * 24 * 3600 * 1000;
+  var CMP_KEY = 'stRentCmp:v1';
   var CURS = { HKD: 'HK$', USD: '$', GBP: '\u00a3', SGD: 'S$', EUR: '\u20ac', CAD: 'C$', Other: '' };
   var rentals = [], EDIT_I = -1;
   function cmpLoad() {
     try {
       var raw = localStorage.getItem(CMP_KEY); if (!raw) return;
       var d = JSON.parse(raw);
-      if (d && d.ts && Date.now() - d.ts < CMP_AGE && Array.isArray(d.items)) rentals = d.items;
-      else localStorage.removeItem(CMP_KEY);
+      if (d && Array.isArray(d.items)) rentals = d.items;
       rentals = rentals.map(function (r) {
         if (!r.comps) {
           r.comps = fin(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
@@ -313,27 +313,29 @@
     var onceSum = (feeK ? r.fee : 0) + (oncK ? r.once : 0) + (stK ? r.stamp : 0);
     return { rentK: rentK, exK: exK, compsAny: comps.length > 0, compsFinite: compsFinite, compSum: compSum, monthly: monthly, depK: depK, feeK: feeK, oncK: oncK, stK: stK, fiK: fiK, onceSum: onceSum, onceAny: depK || feeK || oncK || stK || fiK, onceAll: feeK && oncK && stK };
   }
+  function rentalText(r, i) {
+      var f = fmtOne(r), t = '';
+      t += (i + 1) + '. ' + (r.name || 'Rental ' + (i + 1)) + '\n';
+      t += '   Listing: ' + (r.url || '-') + '\n';
+      t += '   Figures as of: ' + (r.fdate || '-') + ' (reported by me, not verified)\n';
+      t += '   Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + r.cur : 'unknown') + '\n';
+      if (!f.compsAny) t += '   Extra monthly costs: unknown' + '\n';
+      else {
+        (r.comps || []).forEach(function (c) { t += '   - ' + (c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : 'unknown') + '\n'; });
+        t += '   Listed extras total: ' + fm(r.cur, f.compSum) + '/mo' + (f.exK ? ' (all extra monthly costs)' : ' (other extras unknown - not estimated)') + '\n';
+      }
+      if (r.incl) t += '   Rent includes: ' + r.incl + '\n';
+      t += (f.exK ? '   Known monthly total: ' : '   Known so far: ') + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (more monthly costs may apply)') : 'unknown') + '\n';
+      t += '   One-off costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
+      t += '   Deposit (potentially refundable, subject to tenancy terms and deductions - excluded from expense total): ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + '\n';
+      t += '   First month paid upfront (rent paid early - not an extra cost): ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + '\n';
+      t += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
+    return t;
+  }
   function exportText() {
     var d = new Date().toISOString().slice(0, 10);
-    var s = 'RENTAL COMPARISON - my figures\nExported ' + d + ' from RE-agent on sauletrust.com. All figures below were entered by me (reported by me, not independently verified). Entries are kept on my device for up to 7 days, then removed - keep this copy if I need them longer.\n\n';
-    rentals.forEach(function (r, i) {
-      var f = fmtOne(r);
-      s += (i + 1) + '. ' + (r.name || 'Rental ' + (i + 1)) + '\n';
-      s += '   Listing: ' + (r.url || '-') + '\n';
-      s += '   Figures as of: ' + (r.fdate || '-') + ' (reported by me, not verified)\n';
-      s += '   Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + r.cur : 'unknown') + '\n';
-      if (!f.compsAny) s += '   Extra monthly costs: unknown' + '\n';
-      else {
-        (r.comps || []).forEach(function (c) { s += '   - ' + (c.label || 'cost') + ': ' + (fin(c.amt) ? fm(r.cur, c.amt) + '/mo' : 'unknown') + '\n'; });
-        s += '   Listed extras total: ' + fm(r.cur, f.compSum) + '/mo' + (f.exK ? ' (all extra monthly costs)' : ' (other extras unknown - not estimated)') + '\n';
-      }
-      if (r.incl) s += '   Rent includes: ' + r.incl + '\n';
-      s += (f.exK ? '   Known monthly total: ' : '   Known so far: ') + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (more monthly costs may apply)') : 'unknown') + '\n';
-      s += '   One-off costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
-      s += '   Deposit (potentially refundable, subject to tenancy terms and deductions - excluded from expense total): ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + '\n';
-      s += '   First month paid upfront (rent paid early - not an extra cost): ' + (f.fiK ? fm(r.cur, r.first) : 'unknown') + '\n';
-      s += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
-    });
+    var s = 'RENTAL COMPARISON - my figures\nExported ' + d + ' from RE-agent on sauletrust.com. All figures below were entered by me (reported by me, not independently verified). Entries are saved on my device until I remove them; nothing is uploaded unless I choose "save to my account".\n\n';
+    rentals.forEach(function (r, i) { s += rentalText(r, i); });
     s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
     return s;
   }
