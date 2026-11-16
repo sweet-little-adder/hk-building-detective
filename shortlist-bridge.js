@@ -107,6 +107,7 @@
   if(e.data.type==='reagentStateReset'){location.reload();return}
   if(e.data.type==='reagentStateParentReady'){if(initialized)return;send({type:'reagentStateReady',lang:lang});return}
   if(e.data.type!=='reagentStateRestore')return;
+  if(/#(buy|sell|rent|compare)$/i.test(location.hash))return;/* explicit tab deep link wins over restored state */
   var state=e.data.state; initialized=true;
   if(!state||state.v!==1||state.lang!==lang)return;
   restoring=true;
