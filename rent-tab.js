@@ -80,7 +80,7 @@
     '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
     '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
     '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
-    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Saved on this device only, for up to 7 days; nothing is uploaded or shared.</p></div>' +
+    '<div class="finding"><p>Enter rentals you are actually considering, with the figures you know. Monthly recurring costs and one-off move-in costs stay separate. Anything you do not know is shown as unknown - nothing is estimated or invented. Figures you enter are yours: reported by you, not independently verified. Kept on this device only, and only for up to 7 days - nothing is uploaded or shared, and after 7 days they are gone from here, so copy or download your comparison if you want to keep it.</p></div>' +
     '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
     '<label class="rclab" for="rcName">Name or short label</label><input id="rcName" maxlength="80" placeholder="e.g. Flat A - Bishan">' +
     '<label class="rclab" for="rcUrl">Listing link (optional)</label><input id="rcUrl" maxlength="300" inputmode="url" placeholder="https://...">' +
@@ -92,7 +92,8 @@
     '<label class="rclab" for="rcDep">Deposit (one-off) - leave blank if unknown</label><input id="rcDep" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcFee">Agency fee (one-off) - leave blank if unknown</label><input id="rcFee" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
-    '<div class="controls" style="justify-content:flex-start"><button type="submit">Add rental →</button></div></form>' +
+    '<label class="rclab" for="rcDate">Date of these figures (optional)</label><input id="rcDate" maxlength="40" placeholder="e.g. 2026-11-16, from the listing">' +
+    '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div></form>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   var rp = v.querySelector('#rentPanel');
@@ -275,7 +276,7 @@
   // --- Compare actual rentals: visitor-entered, on-device only (SAU-44) ---------
   var CMP_KEY = 'stRentCmp:v1', CMP_AGE = 7 * 24 * 3600 * 1000;
   var CURS = { HKD: 'HK$', USD: '$', GBP: '\u00a3', SGD: 'S$', EUR: '\u20ac', CAD: 'C$', Other: '' };
-  var rentals = [];
+  var rentals = [], EDIT_I = -1;
   function cmpLoad() {
     try {
       var raw = localStorage.getItem(CMP_KEY); if (!raw) return;
@@ -288,23 +289,44 @@
   function num(v) { if (v === undefined || v === null || String(v).trim() === '') return NaN; var n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isFinite(n) && n >= 0 ? n : NaN; }
   function fm(cur, n) { var s = CURS[cur] || ''; return (s ? s : '') + Math.round(n).toLocaleString('en-US') + (s ? '' : (cur === 'Other' ? '' : '')); }
   function unk(b) { return b ? '<span style="color:#e8b9c4">unknown</span>' : ''; }
+  function fmtOne(r) {
+    var rentK = isFinite(r.rent), exK = isFinite(r.extra), depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once);
+    var monthly = rentK ? (exK ? r.rent + r.extra : r.rent) : NaN;
+    var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0);
+    return { rentK: rentK, exK: exK, depK: depK, feeK: feeK, oncK: oncK, monthly: monthly, onceSum: onceSum, onceAny: depK || feeK || oncK, onceAll: depK && feeK && oncK };
+  }
+  function exportText() {
+    var d = new Date().toISOString().slice(0, 10);
+    var s = 'RENTAL COMPARISON - my figures\nExported ' + d + ' from RE-agent on sauletrust.com. All figures below were entered by me (reported by me, not independently verified). Entries are kept on my device for up to 7 days, then removed - keep this copy if I need them longer.\n\n';
+    rentals.forEach(function (r, i) {
+      var f = fmtOne(r);
+      s += (i + 1) + '. ' + (r.name || 'Rental ' + (i + 1)) + '\n';
+      s += '   Listing: ' + (r.url || '-') + '\n';
+      s += '   Figures as of: ' + (r.fdate || '-') + ' (reported by me, not verified)\n';
+      s += '   Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + r.cur : 'unknown') + '\n';
+      s += '   Extra monthly costs: ' + (f.exK ? fm(r.cur, r.extra) + '/mo' : 'unknown') + (r.incl ? ' - rent includes: ' + r.incl : '') + '\n';
+      s += '   Known monthly total: ' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' + (f.exK ? '' : ' (rent only - extras unknown)') : 'unknown') + '\n';
+      s += '   One-off: deposit ' + (f.depK ? fm(r.cur, r.dep) : 'unknown') + ' - agency fee ' + (f.feeK ? fm(r.cur, r.fee) : 'unknown') + ' - other ' + (f.oncK ? fm(r.cur, r.once) : 'unknown') + '\n';
+      s += '   Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) + (f.onceAll ? '' : ' (some one-off items unknown)') : 'unknown') + '\n\n';
+    });
+    s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
+    return s;
+  }
   function renderCmp() {
     var el = v.querySelector('#rentCmp');
     if (!rentals.length) { el.innerHTML = ''; return; }
     var sameCur = rentals.every(function (r) { return r.cur === rentals[0].cur; });
     var h = '';
     rentals.forEach(function (r, i) {
-      var rentK = isFinite(r.rent), exK = isFinite(r.extra), depK = isFinite(r.dep), feeK = isFinite(r.fee), oncK = isFinite(r.once);
-      var monthly = rentK ? (exK ? r.rent + r.extra : r.rent) : NaN;
-      var onceSum = (depK ? r.dep : 0) + (feeK ? r.fee : 0) + (oncK ? r.once : 0);
-      var onceAny = depK || feeK || oncK, onceAll = depK && feeK && oncK;
+      var f = fmtOne(r);
       h += '<div class="finding" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
-        (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing \u2197</a>' : '') + '</h3>';
-      h += '<p>' + (rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
-      h += '<br>Extra monthly costs: ' + (exK ? fm(r.cur, r.extra) + '/mo' : unk(1)) + (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
-      h += '<br><b>Known monthly total: ' + (rentK ? fm(r.cur, monthly) + '/mo' : 'unknown') + '</b>' + (rentK && !exK ? ' <span class="muted">(rent only - extra monthly costs unknown)</span>' : '') + '</p>';
-      h += '<p class="muted">One-off move-in: deposit ' + (depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (feeK ? fm(r.cur, r.fee) : unk(1)) + ' · other ' + (oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (onceAny ? fm(r.cur, onceSum) : 'unknown') + '</b>' + (onceAny && !onceAll ? ' (some one-off items unknown)' : '') + '</p>';
-      h += '<p style="margin-top:8px"><button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
+        (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing ↗</a>' : '') + '</h3>';
+      h += '<p class="muted">Figures as of ' + (r.fdate ? esc(r.fdate) : 'no date given') + ' - reported by you, not independently verified.</p>';
+      h += '<p>' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '/mo</b> rent (' + esc(r.cur) + ')' : 'Rent: ' + unk(1));
+      h += '<br>Extra monthly costs: ' + (f.exK ? fm(r.cur, r.extra) + '/mo' : unk(1)) + (r.incl ? ' · rent includes: ' + esc(r.incl) : '');
+      h += '<br><b>Known monthly total: ' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' : 'unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(rent only - extra monthly costs unknown)</span>' : '') + '</p>';
+      h += '<p class="muted">One-off move-in: deposit ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' · agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off total: ' + (f.onceAny ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + (f.onceAny && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
+      h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
     });
     if (rentals.length > 1) {
       h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
@@ -318,22 +340,69 @@
       }
       h += 'Comparison uses only the figures you entered - check each listing for what is actually included.</p></div>';
     }
+    h += '<p style="margin-top:14px"><button type="button" id="rcCopy" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Copy text</button> <button type="button" id="rcDl" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Download .txt</button> <span class="muted" id="rcCopied" style="font-size:12px"></span></p>';
     el.innerHTML = h;
     el.querySelectorAll('.rcdel').forEach(function (b) {
       b.onclick = function () { rentals.splice(+b.dataset.i, 1); cmpSave(); renderCmp(); };
     });
+    el.querySelectorAll('.rcedit').forEach(function (b) {
+      b.onclick = function () {
+        var r = rentals[+b.dataset.i]; EDIT_I = +b.dataset.i;
+        v.querySelector('#rcName').value = r.name || '';
+        v.querySelector('#rcUrl').value = r.url || '';
+        v.querySelector('#rcRent').value = isFinite(r.rent) ? r.rent : '';
+        v.querySelector('#rcCur').value = r.cur || 'HKD';
+        v.querySelector('#rcExtra').value = isFinite(r.extra) ? r.extra : '';
+        v.querySelector('#rcIncl').value = r.incl || '';
+        v.querySelector('#rcDep').value = isFinite(r.dep) ? r.dep : '';
+        v.querySelector('#rcFee').value = isFinite(r.fee) ? r.fee : '';
+        v.querySelector('#rcOnce').value = isFinite(r.once) ? r.once : '';
+        v.querySelector('#rcDate').value = r.fdate || '';
+        v.querySelector('#rcSubmit').textContent = 'Save changes →';
+        v.querySelector('#rcCancel').style.display = '';
+        v.querySelector('#rcName').focus();
+      };
+    });
+    var cp = el.querySelector('#rcCopy');
+    if (cp) cp.onclick = function () {
+      var txt = exportText();
+      function done() { var m = el.querySelector('#rcCopied'); if (m) m.textContent = 'Copied'; }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, done); }
+      else { var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) { } ta.remove(); done(); }
+    };
+    var dl = el.querySelector('#rcDl');
+    if (dl) dl.onclick = function () {
+      try {
+        var blob = new Blob([exportText()], { type: 'text/plain' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'rental-comparison-' + new Date().toISOString().slice(0, 10) + '.txt';
+        document.body.appendChild(a); a.click(); a.remove();
+      } catch (e) { }
+    };
   }
+  v.querySelector('#rcCancel').addEventListener('click', function () {
+    EDIT_I = -1;
+    v.querySelector('#addrental').reset();
+    v.querySelector('#rcSubmit').textContent = 'Add rental →';
+    v.querySelector('#rcCancel').style.display = 'none';
+  });
   v.querySelector('#addrental').addEventListener('submit', function (e) {
     e.preventDefault();
     var url = v.querySelector('#rcUrl').value.trim();
     if (url && !/^https?:\/\//i.test(url)) url = '';
-    rentals.push({
+    var item = {
       name: v.querySelector('#rcName').value.trim(), url: url,
       rent: num(v.querySelector('#rcRent').value), cur: v.querySelector('#rcCur').value,
       extra: num(v.querySelector('#rcExtra').value), incl: v.querySelector('#rcIncl').value.trim(),
-      dep: num(v.querySelector('#rcDep').value), fee: num(v.querySelector('#rcFee').value), once: num(v.querySelector('#rcOnce').value)
-    });
+      dep: num(v.querySelector('#rcDep').value), fee: num(v.querySelector('#rcFee').value), once: num(v.querySelector('#rcOnce').value),
+      fdate: v.querySelector('#rcDate').value.trim()
+    };
+    if (EDIT_I >= 0 && EDIT_I < rentals.length) rentals[EDIT_I] = item; else rentals.push(item);
     if (rentals.length > 6) rentals = rentals.slice(-6);
+    EDIT_I = -1;
+    v.querySelector('#rcSubmit').textContent = 'Add rental →';
+    v.querySelector('#rcCancel').style.display = 'none';
     cmpSave(); renderCmp(); e.target.reset();
   });
   cmpLoad(); renderCmp();
