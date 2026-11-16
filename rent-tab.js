@@ -337,6 +337,40 @@
     s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
     return s;
   }
+  var ACCT_ORIGIN = null;
+  try { var _po = new URL(document.referrer).origin; if (window !== window.top && ['https://sauletrust.com', 'https://www.sauletrust.com'].indexOf(_po) >= 0) ACCT_ORIGIN = _po; } catch (e) { }
+  var acctPending = false, acctBtn = null, acctTimer = 0, acctAuth = false;
+  function openAccount() {
+    var u = ACCT_ORIGIN + '/account/?lang=' + lang, w = null;
+    try { w = window.open(u, '_blank', 'noopener'); } catch (e) { }
+    if (!w) { try { window.top.location.href = u; } catch (e) { } }
+  }
+  function saveToAccount(i, btn) {
+    if (!ACCT_ORIGIN) return;
+    if (acctAuth) { openAccount(); return; }
+    if (acctPending) return;
+    var r = rentals[i]; if (!r) return;
+    acctPending = true; acctBtn = btn; btn.disabled = true; btn.textContent = 'Saving...';
+    var text = rentalText(r, i);
+    var links = [];
+    if (/^https?:\/\/\S+$/i.test(r.url || '')) links.push({ label: 'Listing', url: r.url });
+    var snap = { v: 1, kind: 'research', researchKind: 'rental', lang: lang, capturedAt: new Date().toISOString(), text: text.slice(0, 2700), truncated: text.length > 2700, links: links };
+    var notes = JSON.stringify(snap);
+    while (notes.length > 3800 && snap.text.length > 200) { snap.text = snap.text.slice(0, -200); snap.truncated = true; notes = JSON.stringify(snap); }
+    var url = links.length ? r.url : (ACCT_ORIGIN + (lang === 'en' ? '/' : '/' + lang + '/') + '#rent');
+    window.parent.postMessage({ type: 'reagentSave', url: url, label: (r.name || 'Rental ' + (i + 1)).slice(0, 200), notes: notes }, ACCT_ORIGIN);
+    clearTimeout(acctTimer);
+    acctTimer = setTimeout(function () { if (acctPending) { acctPending = false; btn.disabled = false; btn.textContent = '\u2606 save to my account'; } }, 8000);
+  }
+  window.addEventListener('message', function (e) {
+    if (!ACCT_ORIGIN || e.origin !== ACCT_ORIGIN || !e.data || e.data.type !== 'reagentSaveResult') return;
+    clearTimeout(acctTimer);
+    var btn = acctBtn; acctPending = false;
+    if (!btn) return;
+    if (e.data.ok) { btn.disabled = true; btn.textContent = 'Saved \u2713 - in your account library'; acctAuth = false; }
+    else if (e.data.authRequired) { acctAuth = true; btn.disabled = false; btn.textContent = 'Sign in to save (opens your account page)'; }
+    else { btn.disabled = false; btn.textContent = 'Save failed - try again'; }
+  });
   function renderCmp() {
     var el = v.querySelector('#rentCmp');
     if (!rentals.length) { el.innerHTML = ''; return; }
@@ -357,7 +391,7 @@
       h += '<br><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (f.rentK && !f.exK ? ' <span class="muted">(' + (f.compsAny ? 'rent + listed extras - more monthly costs may apply' : 'rent only - extra monthly costs unknown') + ')</span>' : '') + '</p>';
       h += '<p class="muted">One-off move-in costs: agency fee ' + (f.feeK ? fm(r.cur, r.fee) : unk(1)) + ' · stamp duty/tax ' + (f.stK ? fm(r.cur, r.stamp) : unk(1)) + ' · other ' + (f.oncK ? fm(r.cur, r.once) : unk(1)) + '. <b>Known one-off costs total: ' + ((f.feeK || f.oncK || f.stK) ? fm(r.cur, f.onceSum) : 'unknown') + '</b>' + ((f.feeK || f.oncK || f.stK) && !f.onceAll ? ' (some one-off items unknown)' : '') + '</p>';
       h += '<p class="muted">Deposit: ' + (f.depK ? fm(r.cur, r.dep) : unk(1)) + ' (potentially refundable, subject to tenancy terms and deductions - excluded from expense total) · First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' (rent paid early - not an extra cost)</p>';
-      h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button></p></div>';
+      h += '<p style="margin-top:8px"><button type="button" class="rcedit" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">edit</button> <button type="button" class="rcdel" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">remove</button> <button type="button" class="rcacct" data-i="' + i + '" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">\u2606 save to my account</button></p></div>';
     });
     if (rentals.length > 1) {
       h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
@@ -396,6 +430,10 @@
         v.querySelector('#rcCancel').style.display = '';
         v.querySelector('#rcName').focus();
       };
+    });
+    el.querySelectorAll('.rcacct').forEach(function (b) {
+      if (!ACCT_ORIGIN) { b.style.display = 'none'; return; }
+      b.onclick = function () { saveToAccount(+b.dataset.i, b); };
     });
     var cp = el.querySelector('#rcCopy');
     if (cp) cp.onclick = function () {
