@@ -655,7 +655,7 @@
       window._rcands = res.cands;
       rp.innerHTML = chooserHTML(res.cands, res.total);
       rp.querySelectorAll('.cand').forEach(function (b) {
-        b.onclick = function () { rp.innerHTML = renderCandRent(window._rcands[+b.dataset.i]); bindRent(); };
+        b.onclick = function () { v.querySelector('#qrc').value = candName(window._rcands[+b.dataset.i]); rp.innerHTML = renderCandRent(window._rcands[+b.dataset.i]); bindRent(); };
       });
       return;
     }

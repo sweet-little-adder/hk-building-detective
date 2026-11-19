@@ -184,7 +184,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw})
 cp.innerHTML="<p class=\"muted\">Rozwiązywanie "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){showCityPhoto(res.cand);renderCandBuy(res.cand,cp,r);return}
-if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Wybierz miejsce, o którym mowa powyżej.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
+if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Wybierz miejsce, o którym mowa powyżej.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qc').value=candName(window._cands[+b.dataset.i]);showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
 cp.innerHTML="<div class=\"finding warn\"><h3>Nie udało się zidentyfikować tego miejsca</h3><p>Wyszukiwanie miast na całym świecie (baza danych GeoNames, ponad 34 000 miast powyżej 15 tys. mieszkańców) nie znalazło żadnego dopasowania do wpisanego hasła - sprawdź pisownię lub wyszukaj najbliższe większe miasto. Na żywo dzisiaj: wpisy danych w Hongkongu, Nowym Jorku, Chicago, Vancouver, Toronto, Calgary i Edmonton; dane rynkowe dla 20 miast w USA i 14 Wielkiej Brytanii.</p></div>";r.innerHTML="Wybierz objęte miasto, aby zobaczyć jego dane."}
 
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
@@ -304,7 +304,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCovere
 sp.innerHTML="<p class=\"muted\">Rozwiązywanie "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){sp.innerHTML=renderCandSell(res.cand);bindSell();return}
-if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
+if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qsc').value=candName(window._scands[+b.dataset.i]);sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
 sp.innerHTML="<div class=\"finding warn\"><h3>Nie udało się zidentyfikować tego miejsca</h3><p>Nie znaleziono żadnych wyników wyszukiwania miast na całym świecie - sprawdź pisownię lub wybierz najbliższe większe miasto. Dzisiejsza transmisja na żywo: wpisy danych w Hongkongu, Nowym Jorku i Chicago; dane rynkowe dla 20 miast w USA i 14 Wielkiej Brytanii.</p></div>"}
 
 document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});

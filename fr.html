@@ -184,7 +184,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw})
 cp.innerHTML="<p class=\"muted\">Résolution "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){showCityPhoto(res.cand);renderCandBuy(res.cand,cp,r);return}
-if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Choisissez l'endroit dont vous parlez ci-dessus.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
+if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Choisissez l'endroit dont vous parlez ci-dessus.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qc').value=candName(window._cands[+b.dataset.i]);showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
 cp.innerHTML="<div class=\"finding warn\"><h3>Impossible d'identifier cet endroit</h3><p>La recherche de villes dans le monde entier (base de données GeoNames, plus de 34 000 villes de plus de 15 000 habitants) n'a trouvé aucune correspondance pour ce qui a été saisi - vérifiez l'orthographe ou essayez la grande ville la plus proche. En direct aujourd'hui : entrées à Hong Kong, New York, Chicago, Vancouver, Toronto, Calgary et Edmonton ; données de marché pour 20 villes américaines et 14 villes britanniques.</p></div>";r.innerHTML="Choisissez une ville couverte pour voir ses données."}
 
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
@@ -304,7 +304,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCovere
 sp.innerHTML="<p class=\"muted\">Résolution "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){sp.innerHTML=renderCandSell(res.cand);bindSell();return}
-if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
+if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qsc').value=candName(window._scands[+b.dataset.i]);sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
 sp.innerHTML="<div class=\"finding warn\"><h3>Impossible d'identifier cet endroit</h3><p>La recherche de villes dans le monde n'a trouvé aucune correspondance - vérifiez l'orthographe ou essayez la grande ville la plus proche. Couverture en direct aujourd'hui : entrées de données à Hong Kong, New York et Chicago ; données de marché pour 20 villes américaines et 14 villes britanniques.</p></div>"}
 
 document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});

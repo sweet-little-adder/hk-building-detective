@@ -184,7 +184,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw})
 cp.innerHTML="<p class=\"muted\">Lösen "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){showCityPhoto(res.cand);renderCandBuy(res.cand,cp,r);return}
-if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Wählen Sie oben den Ort aus, den Sie meinen.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
+if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Wählen Sie oben den Ort aus, den Sie meinen.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qc').value=candName(window._cands[+b.dataset.i]);showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
 cp.innerHTML="<div class=\"finding warn\"><h3>Konnte diesen Ort nicht identifizieren</h3><p>Bei der weltweiten Städtesuche (GeoNames-Datenbank, mehr als 34.000 Städte mit mehr als 15.000 Einwohnern) wurde keine Übereinstimmung mit der eingegebenen Eingabe gefunden. Überprüfen Sie die Rechtschreibung oder versuchen Sie es mit der nächstgelegenen Großstadt. Heute live: Dateneinträge in Hongkong, NYC, Chicago, Vancouver, Toronto, Calgary und Edmonton; Marktdaten für 20 Städte in den USA und 14 im Vereinigten Königreich.</p></div>";r.innerHTML="Wählen Sie eine abgedeckte Stadt aus, um deren Daten anzuzeigen."}
 
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
@@ -304,7 +304,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCovere
 sp.innerHTML="<p class=\"muted\">Lösen "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){sp.innerHTML=renderCandSell(res.cand);bindSell();return}
-if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
+if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qsc').value=candName(window._scands[+b.dataset.i]);sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
 sp.innerHTML="<div class=\"finding warn\"><h3>Konnte diesen Ort nicht identifizieren</h3><p>Bei der weltweiten Städtesuche wurde kein Treffer gefunden. Überprüfen Sie die Rechtschreibung oder versuchen Sie es mit der nächstgelegenen Großstadt. Live-Berichterstattung heute: Datensätze in Hongkong, New York City und Chicago; Marktdaten für 20 Städte in den USA und 14 im Vereinigten Königreich.</p></div>"}
 
 document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});

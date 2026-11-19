@@ -184,7 +184,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw})
 cp.innerHTML="<p class=\"muted\">Oplossen "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){showCityPhoto(res.cand);renderCandBuy(res.cand,cp,r);return}
-if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Kies hierboven de plaats die je bedoelt.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
+if(res.kind==='pick'){window._cands=res.cands;cp.innerHTML=chooserHTML(res.cands,res.total);r.innerHTML="Kies hierboven de plaats die je bedoelt.";cp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qc').value=candName(window._cands[+b.dataset.i]);showCityPhoto(window._cands[+b.dataset.i]);renderCandBuy(window._cands[+b.dataset.i],cp,r)}});return}
 cp.innerHTML="<div class=\"finding warn\"><h3>Kon die plaats niet identificeren</h3><p>Wereldwijd zoeken naar steden (GeoNames-database, meer dan 34.000 steden met meer dan 15.000 inwoners) vond geen overeenkomst voor wat er was getypt - controleer de spelling of probeer de dichtstbijzijnde grote stad. Live vandaag: vermelding in Hong Kong, NYC, Chicago, Vancouver, Toronto, Calgary en Edmonton; marktgegevens voor 20 Amerikaanse en 14 Britse steden.</p></div>";r.innerHTML="Kies een overdekte stad om de gegevens ervan te bekijken."}
 
 document.querySelector('#askcity').addEventListener('submit',e=>{e.preventDefault();pick(document.querySelector('#qc').value)});
@@ -304,7 +304,7 @@ if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){sp.innerHTML=renderCovere
 sp.innerHTML="<p class=\"muted\">Oplossen "+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
 if(res.kind==='one'){sp.innerHTML=renderCandSell(res.cand);bindSell();return}
-if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
+if(res.kind==='pick'){window._scands=res.cands;sp.innerHTML=chooserHTML(res.cands,res.total);sp.querySelectorAll('.cand').forEach(b=>{b.onclick=()=>{document.querySelector('#qsc').value=candName(window._scands[+b.dataset.i]);sp.innerHTML=renderCandSell(window._scands[+b.dataset.i]);bindSell()}});return}
 sp.innerHTML="<div class=\"finding warn\"><h3>Kon die plaats niet identificeren</h3><p>Wereldwijd zoeken naar steden heeft geen overeenkomst gevonden - controleer de spelling of probeer de dichtstbijzijnde grote stad. Live verslaggeving vandaag: vermelding in Hong Kong, New York City en Chicago; marktgegevens voor 20 Amerikaanse en 14 Britse steden.</p></div>"}
 
 document.querySelector('#asksellcity').addEventListener('submit',e=>{e.preventDefault();sellPick(document.querySelector('#qsc').value)});
