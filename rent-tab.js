@@ -66,7 +66,9 @@
   // --- Rent view ---------------------------------------------------------------
   var v = document.createElement('div');
   v.id = 'rentView';
-  var chips = ['New York', 'San Francisco', 'Miami', 'Los Angeles', 'Chicago', 'London', 'Manchester', 'Toronto', 'Hong Kong', 'Singapore'];
+  // Keep the broader place roadmap; quick choices return only after real listing/photo coverage works.
+  var plannedCities = ['San Francisco','Miami','Los Angeles','Chicago','London','Manchester','Toronto','Hong Kong','Singapore'];
+  var chips = ['New York', 'Monaco', 'Vancouver'];
   v.innerHTML = '<section><p class="label">' + t.sec + '</p>' +
     '<form id="askrentcity" autocomplete="off"><input id="qrc" maxlength="80" aria-label="' + t.aria + '" placeholder="' + t.ph + '">' +
     '<div class="chips">' + chips.map(function (c) { return '<button type="button" data-rc="' + c + '">' + c + '</button>' }).join('') + '</div>' +
