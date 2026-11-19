@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/rental-search.mjs": {
+      "maxDuration": 30
+    }
+  }
+}

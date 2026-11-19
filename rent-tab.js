@@ -293,7 +293,7 @@
         '<p><span class="count">' + USD(m.zori) + '/mo</span><br>typical asking rent, all rentals incl. multifamily</p>' +
         '<p class="muted">Zillow Research ZORI, ' + CITY_MARKET._meta.zori_month.slice(0, 7) + '. A city-level typical - neighbourhoods and flats vary widely, and it is not a quote for any specific home. <a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener">Source ↗</a></p>' +
         budgetNote(USD, m.zori, 'the city-typical asking rent');
-      var acts = extBtn(zrent(c, m.st), 'See rentals on Zillow') + ' · ' + CMP_BTN;
+      var acts = CMP_BTN;
       if (c === 'New York') acts += ' · ' + goBuy('New York', 'Check a building\'s DOB record →');
       if (c === 'Chicago') acts += ' · ' + goBuy('Chicago', 'Check a building\'s violations record →');
       return h + act(acts) + '</div>';
@@ -640,6 +640,7 @@
 
   async function rentPick(raw, pinned) {
     LAST_RAW = raw; LAST_PINNED = !!pinned;
+    if (window.renderRentalResearch && await window.renderRentalResearch(raw, rp)) return;
     var bs = v.querySelector('#rcSec2Lab'), bf = v.querySelector('#askbudget');
     if (bs) bs.classList.remove('rcstep-off'); if (bf) bf.classList.remove('rcstep-off');
     if (pinned) {

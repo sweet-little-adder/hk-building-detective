@@ -1,0 +1,15 @@
+(function(){
+const text=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=value;if(cls)e.className=cls;return e};
+window.bindRentalDetail=function(gallery,r,urls,panel){
+ const rail=gallery.querySelector('.rental-photo-rail');let origin=null,moved=false;
+ rail.addEventListener('touchstart',e=>{origin={x:e.touches[0].clientX,y:e.touches[0].clientY};moved=false},{passive:true});
+ rail.addEventListener('touchmove',e=>{if(origin&&Math.hypot(e.touches[0].clientX-origin.x,e.touches[0].clientY-origin.y)>8)moved=true},{passive:true});
+ let pointer;rail.addEventListener('pointerdown',e=>pointer={x:e.clientX,y:e.clientY});rail.addEventListener('pointermove',e=>{if(pointer&&Math.hypot(e.clientX-pointer.x,e.clientY-pointer.y)>8)moved=true});
+ rail.setAttribute('aria-label','Property photos. Swipe to browse; tap to open listing details.');rail.addEventListener('click',()=>{if(moved){moved=false;return}open()});rail.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();open()}});
+ function open(){
+  const scroll=window.scrollY,container=document.createElement('section');container.className='rental-detail';const back=text('button','← Back to results');back.type='button';const title=text('h2',r.title);title.tabIndex=-1;container.append(back,text('p',r.source+' / '+r.location,'listing-caption'),title,createRentalGallery(urls,r.title),text('p',r.priceText,'listing-price'),text('p',r.specs.join(' · ')),text('h3','Costs and availability'),text('p','Advertised rent shown above. Service charges, deposit, agency fees and full monthly total have not been confirmed. Listing is source-advertised; current vacancy and tenancy conditions are not independently verified.'),text('h3','Contact the advertiser'),text('p',r.source+(r.advertiserRole==='property manager'?' is the advertised property manager.':' is an agency.')+' This is not an owner-direct contact.'));
+  if(r.freshnessWarning)container.append(text('p',r.freshnessWarning));container.append(createRentalFavourite(r));if(window.createRentalInterestDemo)container.append(createRentalInterestDemo(r));const phone=text('a','Call '+r.source+' '+r.agencyPhone);phone.href='tel:'+r.agencyPhone;phone.style='display:inline-flex;min-height:44px;align-items:center';container.append(phone,text('h3','Source and photo provenance'),text('p','Listing facts and corresponding property photos were fetched from the original source on this city search. Images remain hosted by the original source, not a permanent SauleTrust photo cache. Checked '+r.checkedAt));const source=text('a','Original source listing');source.href=r.url;source.target='_blank';source.rel='noopener noreferrer';container.append(source);
+  panel.hidden=true;panel.after(container);const restore=()=>{container.remove();panel.hidden=false;window.scrollTo({top:scroll,behavior:'instant'});rail.focus({preventScroll:true})};back.onclick=restore;container.addEventListener('keydown',e=>{if(e.key==='Escape')restore()});container.scrollIntoView({block:'start',behavior:'instant'});title.focus({preventScroll:true});
+ }
+};
+})();
