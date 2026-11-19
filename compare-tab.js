@@ -8,7 +8,7 @@ var NOTE={fr:'Page en anglais.',de:'Inhalt auf Englisch.',nl:'Inhoud in het Enge
 var st=document.createElement('style');st.textContent="#cmpView{display:none}#cmpView h2{font-family:Georgia,'Times New Roman',serif;font-size:19px;font-weight:400;color:#f1e3c6}#cmpView .note{background:#4a3629;border:1px solid #6e5847;color:#e8d9b8;padding:12px 16px;font-size:12.5px;line-height:1.65;margin:18px 0 6px;max-width:760px}#cmpView .note b{color:#f8efdc}#cmpView table{border-collapse:collapse;width:100%;margin-top:26px;font-size:13.5px}#cmpView th,#cmpView td{text-align:left;padding:11px 12px;border-bottom:1px solid #6e5847;vertical-align:top}#cmpView th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#bda990;font-weight:400}#cmpView td{color:#e3d2b6}#cmpView td b{color:#f8efdc;font-weight:600}#cmpView .num{font-family:Georgia,serif;font-size:16px;color:#f8efdc}#cmpView .src,#cmpView .asm,#cmpView .excl{font-size:11.5px;color:#bda990;line-height:1.5}#cmpView .missing{color:#8f7c64;font-style:italic}#cmpView ul{margin:10px 0;padding-left:18px;max-width:760px}#cmpView li{margin:7px 0;color:#d3bfa2;font-size:12.5px;line-height:1.6}#cmpView li b{color:#f1e3c6}#cmpView details.meth{margin:26px 0 10px}#cmpView details summary{cursor:pointer;font-family:Georgia,serif;font-size:20px}#cmpView td.src summary{font-size:12px;font-family:inherit;opacity:.8}#cmpView details.meth[open] summary{margin-bottom:12px}#cmpView .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}#cmpView .tw table{min-width:820px}";document.head.appendChild(st);
 var cmp=document.createElement('button');cmp.id='tabCmp';cmp.type='button';cmp.textContent=L[lang]||L.en;tabs.appendChild(cmp);
 var v=document.createElement('div');v.id='cmpView';
-v.innerHTML="<div class=\"tw\" tabindex=\"0\" role=\"region\" aria-label=\"City comparison table, scroll horizontally for more columns\"><table id=\"t\">\n  <thead><tr>\n    <th>City</th><th>Price period</th><th>Sales</th><th>Price</th><th>Rent</th><th>Yield / notes</th><th>Source</th>\n  </tr></thead>\n  <tbody></tbody>\n</table></div>\n\n<details class=\"coverage\" style=\"margin-top:22px\"><summary>BETA &middot; city estimates, some costs excluded <span aria-hidden=\"true\">+</span></summary><p class=\"lead\">Compare estimated rental yields by city. These are city averages, not individual properties. Some ownership costs aren't included. Not investment advice.</p></details>";
+v.innerHTML="<div id=\"cmpHomes\"></div><p style=\"margin-top:40px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#bda990\">Market context - city rent and price estimates, not individual homes</p><div class=\"tw\" tabindex=\"0\" role=\"region\" aria-label=\"City comparison table, scroll horizontally for more columns\" style=\"margin-top:6px\"><table id=\"t\">\n  <thead><tr>\n    <th>City</th><th>Price period</th><th>Sales</th><th>Price</th><th>Rent</th><th>Yield / notes</th><th>Source</th>\n  </tr></thead>\n  <tbody></tbody>\n</table></div>\n\n<details class=\"coverage\" style=\"margin-top:22px\"><summary>BETA &middot; city estimates, some costs excluded <span aria-hidden=\"true\">+</span></summary><p class=\"lead\">Compare estimated rental yields by city. These are city averages, not individual properties. Some ownership costs aren't included. Not investment advice.</p></details>";
 var scf=document.querySelector('#sourcesCredits footer');
 if(scf&&!scf.querySelector('.cmpsrc')){var sp=document.createElement('p');sp.className='cmpsrc';
 sp.innerHTML='Compare (beta): Paris, Lyon, Marseille prices = DVF official transactions 2026 H1, median EUR/m&sup2;, apartments (<a href="https://www.data.gouv.fr/datasets/demandes-de-valeurs-foncieres">data.gouv.fr</a>, Licence Ouverte 2.0); rents = Carte des loyers 2025 (ANCT/DHUP), modelled commune-level listing indicators, EUR/m&sup2;/month (Licence Ouverte 2.0). Partial-net = gross minus 5% vacancy and 5% maintenance, with ~7.5% acquisition costs (varies by department and buyer). Excludes property tax, service charges, financing, furnishing, letting fees. Singapore Bishan: HDB resale prices only - buyer eligibility rules apply and no sourced rent is wired, so no yield shown. Illustrative city aggregates, not investment advice.';
@@ -19,11 +19,52 @@ scf.appendChild(sp);
 if(NOTE[lang]){var p=document.createElement('p');p.className='asm';p.style.marginTop='14px';p.textContent=NOTE[lang];v.insertBefore(p,v.firstChild)}
 sv.parentNode.insertBefore(v,sv.nextSibling);
 var bv=document.querySelector('#buyView');
-var h1=document.querySelector('h1'),h1o=h1?h1.innerHTML:'',HT={en:'Estimate Yield',fr:'Estimer le rendement',de:'Rendite sch\u00e4tzen',nl:'Rendement schatten',pl:'Oszacuj rentowno\u015b\u0107'};
+var h1=document.querySelector('h1'),h1o=h1?h1.innerHTML:'',HT={en:'Compare',fr:'Comparer',de:'Vergleichen',nl:'Vergelijken',pl:'Por\u00f3wnaj'};
 var ST={en:'Prepare your property listing',fr:'Pr\u00e9parez votre annonce',de:'Ihr Inserat vorbereiten',nl:'Bereid uw advertentie voor',pl:'Przygotuj og\u0142oszenie'};
-function showCmp(){if(h1)h1.textContent=HT[lang]||HT.en;cmp.classList.add('on');buy.classList.remove('on');sell.classList.remove('on');if(bv)bv.style.display='none';sv.style.display='none';v.style.display='block'}
+function showCmp(){if(h1)h1.textContent=HT[lang]||HT.en;cmp.classList.add('on');buy.classList.remove('on');sell.classList.remove('on');if(bv)bv.style.display='none';sv.style.display='none';v.style.display='block';renderHomes()}
 function hideCmp(){if(h1)h1.innerHTML=h1o;cmp.classList.remove('on');v.style.display='none'}
 function showSell(){hideCmp();if(h1)h1.textContent=ST[lang]||ST.en}
+function escH(s){return String(s).replace(/[&<>"]/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]});}
+function mny(cur,n){var S={HKD:'HK$',USD:'$',GBP:'\u00a3',SGD:'S$',EUR:'\u20ac',CAD:'C$'};return (S[cur]||(cur==='Other'?'':cur+' '))+Math.round(n).toLocaleString('en-US');}
+function finH(x){return typeof x==='number'&&isFinite(x);}
+function renderHomes(){
+  var host=document.getElementById('cmpHomes');if(!host)return;
+  var items=[],plan='',more=0;
+  try{
+    var raw=localStorage.getItem('stRentPlans:v1');
+    if(raw){var d=JSON.parse(raw);if(d&&Array.isArray(d.plans)&&d.plans.length){var ai=typeof d.active==='number'&&d.active>=0&&d.active<d.plans.length?d.active:0;var pp=d.plans[ai];items=Array.isArray(pp.items)?pp.items:[];plan=typeof pp.name==='string'?pp.name:'';more=d.plans.length-1;}}
+    if(!items.length&&!plan){var old2=localStorage.getItem('stRentCmp:v1');if(old2){var o=JSON.parse(old2);if(o&&Array.isArray(o.items))items=o.items;if(o&&typeof o.plan==='string')plan=o.plan;}}
+  }catch(e){}
+  var h='<h2>Candidate homes'+(plan?' - '+escH(plan):'')+'</h2>';
+  if(more>0)h+='<p class="src">One of '+(more+1)+' employee plans on this device - switch plans on the Rent tab.</p>';
+  if(!items.length){
+    h+='<p class="src">No candidate homes in this plan yet. Add rentals on the Rent tab - plans and entries stay on this device unless saved to an account.</p><p style="margin-top:10px"><button type="button" id="cmpGoRent" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Add homes on the Rent tab \u2192</button></p>';
+  } else {
+    h+='<div class="tw"><table id="ht"><thead><tr><th>Home</th><th>Monthly (known so far)</th><th>Upfront cash (known)</th><th>Still unknown</th><th>Listing</th></tr></thead><tbody>';
+    items.forEach(function(r,i){
+      var comps=r.comps||[],compSum=0,compFin=true;
+      comps.forEach(function(cc){if(finH(cc.amt))compSum+=cc.amt;else compFin=false;});
+      var rentK=finH(r.rent),exK=rentK&&comps.length>0&&compFin&&!!r.exAll;
+      var monthly=rentK?r.rent+compSum:NaN;
+      var depK=finH(r.dep),feeK=finH(r.fee),oncK=finH(r.once),stK=finH(r.stamp),fiK=finH(r.first);
+      var up=(depK?r.dep:0)+(feeK?r.fee:0)+(oncK?r.once:0)+(stK?r.stamp:0)+(fiK?r.first:0);
+      var upAny=depK||feeK||oncK||stK||fiK,upAll=depK&&feeK&&oncK&&stK&&fiK;
+      var un=[];
+      if(!rentK)un.push('rent');
+      if(!exK)un.push('extra monthly');
+      if(!depK)un.push('deposit');
+      if(!feeK)un.push('agency fee');
+      if(!stK)un.push('tax/stamp');
+      if(!fiK)un.push('first month');
+      if(!oncK)un.push('other one-off');
+      h+='<tr><td><b>'+escH(r.name||'Rental '+(i+1))+'</b></td><td class="num">'+(rentK?mny(r.cur,monthly)+'/mo':'unknown')+(rentK&&!exK?'*':'')+'</td><td class="num">'+(upAny?mny(r.cur,up)+(upAll?'':'*'):'unknown')+'</td><td>'+(un.length?escH(un.join(', ')):'none')+'</td><td>'+(r.url?'<a href="'+escH(r.url)+'" target="_blank" rel="noopener" style="color:#dcc9ad">listing \u2197</a>':'-')+'</td></tr>';
+    });
+    h+='</tbody></table></div><p class="src" style="margin-top:8px">From the Rent tab shortlist on this device. Monthly = rent + listed extra monthly costs. Upfront cash = deposit + agency fee + tax/stamp duty + other one-offs + first month paid upfront (includes the refundable deposit). * some items still unknown - nothing is estimated. Figures entered by the user, not independently verified.</p>';
+  }
+  host.innerHTML=h;
+  var gr=document.getElementById('cmpGoRent');
+  if(gr)gr.onclick=function(){var rt=document.getElementById('tabRent');if(rt)rt.click();};
+}
 cmp.addEventListener('click',showCmp);
 buy.addEventListener('click',hideCmp);sell.addEventListener('click',showSell);
 document.querySelectorAll('a[href="compare.html"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();showCmp()})});

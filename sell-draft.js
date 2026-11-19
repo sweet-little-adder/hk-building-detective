@@ -71,6 +71,7 @@ root.innerHTML='<p class="label" style="margin-top:26px">'+t.sec+'</p>'
 +'<input type="file" id="sdPhotoInput" accept="image/*" multiple style="display:none">'
 +'<input type="file" id="sdAudioInput" accept="audio/*" style="display:none">';
 sv.querySelector('section').appendChild(root);
+root.style.display='none';
 
 var thread=root.querySelector('#sdThread'),textIn=root.querySelector('#sdText'),note=root.querySelector('#sdNote'),
 createBtn=root.querySelector('#sdCreate'),draft=root.querySelector('#sdDraft'),titleIn=root.querySelector('#sdTitle'),

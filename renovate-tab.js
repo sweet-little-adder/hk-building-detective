@@ -46,13 +46,17 @@
     '#renoView .rnrow .rnamt{font-family:Georgia,serif;font-size:16px;color:#f8efdc;white-space:nowrap}' +
     '#renoView .rnrow .rnsub{display:block;font-size:11px;color:#bda990;margin-top:2px}' +
     '#renoView .rnrow button{background:none;border:0;color:#bda990;font-size:15px;padding:0 2px;min-width:0;min-height:0}' +
-    '#renoView .rnrow button:hover{color:#f8efdc}';
+    '#renoView .rnrow button:hover{color:#f8efdc}' +
+    '#renoView .rnstep-off{display:none}' +
+    '#renoView .rnstep{animation:rnfade .22s ease}' +
+    '@keyframes rnfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}';
   document.head.appendChild(st);
 
   // --- Tab button, after COMPARE ---------------------------------------------
   var reno = document.createElement('button');
   reno.id = 'tabReno'; reno.type = 'button'; reno.textContent = L[lang] || L.en;
-  tabs.appendChild(reno);
+  var rentTab = tabs.querySelector('#tabRent');
+  if (rentTab) tabs.insertBefore(reno, rentTab); else tabs.appendChild(reno);
 
   // --- Renovate view -----------------------------------------------------------
   var v = document.createElement('div');
@@ -61,23 +65,24 @@
     '<section><p class="label">01 / Your renovation brief</p>' +
     '<div class="finding"><p>SauleTrust doesn\'t refer, vet or endorse any firm. This brief is a private planning note: it stays on this device and is never sent anywhere by us. You can copy it into a firm\'s own contact form yourself (section 03).</p></div>' +
     '<form id="addbrief" autocomplete="off" style="margin-top:8px">' +
-    '<label class="rnlab" for="brLoc">Where is the property?</label><input id="brLoc" maxlength="80" placeholder="e.g. Paris 16e, London, Hong Kong">' +
+    '<div class="rnstep"><label class="rnlab" for="brLoc">Where is the property?</label><input id="brLoc" maxlength="80" placeholder="e.g. Paris 16e, London, Hong Kong"></div><div class="rnstep rnstep-off" id="brs2">' +
     '<label class="rnlab">What do you need?</label><div class="chips" id="brNeed">' +
     '<button type="button" data-need="Construction">Construction</button>' +
     '<button type="button" data-need="Interior design">Interior design</button>' +
-    '<button type="button" data-need="Both">Both</button></div>' +
+    '<button type="button" data-need="Both">Both</button></div><button type="button" id="brSkip" style="background:none;border:0;border-bottom:1px solid #836d55;color:#bda990;font:inherit;font-size:12px;padding:0 0 1px;margin:8px 0 0;cursor:pointer;min-height:0">no preference - continue \u2192</button></div><div class="rnstep rnstep-off" id="brs3">' +
     '<label class="rnlab" for="brNote">Scope (optional)</label><input id="brNote" maxlength="160" placeholder="e.g. 900 sq ft flat, two bathrooms and kitchen, keep flooring">' +
-    '<div class="controls" style="justify-content:flex-start"><button type="submit">Save brief →</button></div></form>' +
+    '<div class="controls" style="justify-content:flex-start"><button type="submit">Save brief →</button></div></div></form>' +
     '<div id="briefList" style="margin-top:6px"></div></section>' +
     '<section><p class="label" style="margin-top:26px">02 / Quotations - your figures</p>' +
     '<div class="finding"><p>Comparing quotations only works when the scope matches. Add each firm\'s figure as you receive it; what you leave blank stays unknown. Entries stay on this device.</p></div>' +
     '<form id="addquote" autocomplete="off" style="margin-top:8px">' +
-    '<div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:2;min-width:160px"><label class="rnlab" for="qFirm">Firm</label><input id="qFirm" maxlength="80" placeholder="e.g. the contractor who visited Tuesday"></span>' +
-    '<span style="flex:1;min-width:120px"><label class="rnlab" for="qPrice">Price - blank if unknown</label><input id="qPrice" inputmode="decimal" maxlength="14" placeholder="e.g. 420000"></span>' +
+    '<div class="rnstep"><label class="rnlab" for="qFirm">Firm</label><input id="qFirm" maxlength="80" placeholder="e.g. the contractor who visited Tuesday"></div>' +
+    '<div class="rnstep rnstep-off" id="qtsPrice"><div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:1;min-width:120px"><label class="rnlab" for="qPrice">Price - blank if unknown</label><input id="qPrice" inputmode="decimal" maxlength="14" placeholder="e.g. 420000"></span>' +
     '<span><label class="rnlab" for="qCur">Currency</label><select id="qCur" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;width:100%">' +
     '<option>HKD</option><option>EUR</option><option>GBP</option><option>USD</option><option>Other</option></select></span></div>' +
-    '<label class="rnlab" for="qScope">What the price includes (optional)</label><input id="qScope" maxlength="160" placeholder="e.g. demolition, plumbing, tiling; excludes appliances">' +
-    '<div class="controls" style="justify-content:flex-start"><button type="submit">Add quotation →</button></div></form>' +
+    '<button type="button" id="qtSkip" style="background:none;border:0;border-bottom:1px solid #836d55;color:#bda990;font:inherit;font-size:12px;padding:0 0 1px;margin:8px 0 0;cursor:pointer;min-height:0">price unknown - continue \u2192</button></div>' +
+    '<div class="rnstep rnstep-off" id="qts2"><label class="rnlab" for="qScope">What the price includes (optional)</label><input id="qScope" maxlength="160" placeholder="e.g. demolition, plumbing, tiling; excludes appliances">' +
+    '<div class="controls" style="justify-content:flex-start"><button type="submit">Add quotation →</button></div></div></form>' +
     '<div id="quoteList" style="margin-top:6px"></div></section>' +
     '<section><p class="label" style="margin-top:26px">03 / Firms to contact yourself - Europe</p>' +
     '<div class="finding"><p>A reference list of 21 firms and the websites they publish themselves. Not partners, not vetted, not recommendations: SauleTrust does not contact them or pass your brief on. Open a firm\'s own site to reach them. Facts checked 17 Nov 2026.</p></div>' +
@@ -178,6 +183,7 @@
     save(BK, briefs);
     v.querySelector('#brLoc').value = ''; v.querySelector('#brNote').value = '';
     needBox.querySelectorAll('button').forEach(function (x) { x.style.color = ''; x.style.borderBottomColor = ''; }); need = '';
+    brs2.classList.add('rnstep-off'); brs3.classList.add('rnstep-off');
     renderBriefs();
   });
 
@@ -208,8 +214,18 @@
     quotes.push({ firm: firm, price: price > 0 ? price : null, cur: v.querySelector('#qCur').value, scope: v.querySelector('#qScope').value.trim() });
     save(QK, quotes);
     v.querySelector('#qFirm').value = ''; v.querySelector('#qPrice').value = ''; v.querySelector('#qScope').value = '';
+    qtsPrice.classList.add('rnstep-off'); qts2.classList.add('rnstep-off');
     renderQuotes();
   });
+  var brLocEl = v.querySelector('#brLoc'), brs2 = v.querySelector('#brs2'), brs3 = v.querySelector('#brs3');
+  var qFirmEl = v.querySelector('#qFirm'), qts2 = v.querySelector('#qts2');
+  brLocEl.addEventListener('input', function () { if (brLocEl.value.trim()) brs2.classList.remove('rnstep-off'); });
+  v.querySelector('#brNeed').addEventListener('click', function (e) { if (e.target.dataset && e.target.dataset.need) brs3.classList.remove('rnstep-off'); });
+  v.querySelector('#brSkip').onclick = function () { brs3.classList.remove('rnstep-off'); v.querySelector('#brNote').focus(); };
+  var qtsPrice = v.querySelector('#qtsPrice'), qPriceEl = v.querySelector('#qPrice');
+  qFirmEl.addEventListener('input', function () { if (qFirmEl.value.trim()) qtsPrice.classList.remove('rnstep-off'); });
+  qPriceEl.addEventListener('input', function () { if (qPriceEl.value.trim()) qts2.classList.remove('rnstep-off'); });
+  v.querySelector('#qtSkip').onclick = function () { qts2.classList.remove('rnstep-off'); v.querySelector('#qScope').focus(); };
   renderBriefs(); renderQuotes();
 
   // --- Tab switching --------------------------------------------------------------

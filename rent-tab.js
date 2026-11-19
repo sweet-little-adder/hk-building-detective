@@ -59,7 +59,7 @@
 
   var st = document.createElement('style');
   st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}' +
-    '.rcmore{margin-top:14px;border-top:1px solid #6b5546;padding-top:4px}.rcmore summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;padding:12px 0;min-height:44px}.rcmore summary::-webkit-details-marker{display:none}.rcmore summary:before{content:"+ "}.rcmore[open] summary:before{content:"\\2212 "}.rcard .rcrent{font-size:24px;margin:6px 0 2px}.rcard .rcrent .muted{font-size:13px}.rcard .rctotal{margin:0 0 4px;font-size:15px}.rcard .rcact{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 0}.rcard .rcact button{background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:0 6px;font-size:14px;min-width:0;min-height:44px}.rcard .rcact .rcsave{border-bottom-color:#dcc9ad;margin-right:10px;padding-left:0}.rcdet{margin-top:2px;border-top:1px solid #6b5546}.rcdet summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;min-height:44px;display:flex;align-items:center}.rcdet summary::-webkit-details-marker{display:none}.rcdet summary:before{content:"+ ";margin-right:6px}.rcdet[open] summary:before{content:"\\2212 "}.rcbd p{margin:0 0 6px;font-size:13px;line-height:1.55}.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}';
+    '.rcmore{margin-top:14px;border-top:1px solid #6b5546;padding-top:4px}.rcmore summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;padding:12px 0;min-height:44px}.rcmore summary::-webkit-details-marker{display:none}.rcmore summary:before{content:"+ "}.rcmore[open] summary:before{content:"\\2212 "}.rcard .rcrent{font-size:24px;margin:6px 0 2px}.rcard .rcrent .muted{font-size:13px}.rcard .rctotal{margin:0 0 4px;font-size:15px}.rcard .rcact{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 0}.rcard .rcact button{background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:0 6px;font-size:14px;min-width:0;min-height:44px}.rcard .rcact .rcsave{border-bottom-color:#dcc9ad;margin-right:10px;padding-left:0}.rcdet{margin-top:2px;border-top:1px solid #6b5546}.rcdet summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;min-height:44px;display:flex;align-items:center}.rcdet summary::-webkit-details-marker{display:none}.rcdet summary:before{content:"+ ";margin-right:6px}.rcdet[open] summary:before{content:"\\2212 "}.rcbd p{margin:0 0 6px;font-size:13px;line-height:1.55}.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}.rcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}.rctable{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px;min-width:680px}.rctable th,.rctable td{text-align:left;padding:9px 10px;border-bottom:1px solid #6e5847;vertical-align:top}.rctable th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#bda990;font-weight:400}.rctable td{color:#e3d2b6}.rctable td b{color:#f8efdc;font-weight:600}.rctable .num{font-family:Georgia,serif;font-size:15px;color:#f8efdc;white-space:nowrap}.rcard .rcact a.rcopen{color:#dcc9ad;border-bottom:1px solid #dcc9ad;padding:0 6px;font-size:14px;min-height:44px;display:inline-flex;align-items:center}.rcstep-off{display:none}.rcstep{animation:rcfade .32s ease}@keyframes rcfade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}.rcskip{background:none;border:0;border-bottom:1px solid #7c6650;color:#bda990;padding:2px 0;font-size:12px;cursor:pointer;min-height:44px}';
   document.head.appendChild(st);
 
   // --- Tab button, between SELL and COMPARE ----------------------------------
@@ -76,17 +76,33 @@
     '<form id="askrentcity" autocomplete="off"><input id="qrc" maxlength="80" aria-label="' + t.aria + '" placeholder="' + t.ph + '">' +
     '<div class="chips">' + chips.map(function (c) { return '<button type="button" data-rc="' + c + '">' + c + '</button>' }).join('') + '</div>' +
     '<div class="controls"><button type="submit">' + t.go + '</button></div></form>' +
-    '<p class="label" style="margin-top:22px">' + t.sec2 + '</p>' +
-    '<form id="askbudget" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
+    '<p class="label rcstep rcstep-off" id="rcSec2Lab" style="margin-top:22px">' + t.sec2 + '</p>' +
+    '<form id="askbudget" class="rcstep rcstep-off" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
     '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
-    '<section><p class="label" style="margin-top:26px">03 / Compare actual rentals - your figures</p>' +
-    '<div class="finding"><p>Add a rental you are considering. Costs you leave blank stay marked unknown and totals say "known so far" - nothing is estimated. Entries stay on this device unless you save one to your account.</p></div>' +
+    '<section><p class="label" style="margin-top:26px">03 / Your shortlist - compare candidate homes</p>' +
+    '<div class="finding"><p>Add rentals to the employee plan selected below - switch plans or start a new one any time. Costs you leave blank stay marked unknown and totals say "known so far" - nothing is estimated. Plans and entries stay on this device only; signed in on sauletrust.com you can save a rental to your own account library. A shared company workspace (colleagues seeing the same plans) is not available yet - to share a plan, copy or download its text below.</p></div>' +
+    '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:16px 0 2px">' +
+    '<label class="rclab" for="rcPlanSel" style="margin:0">Employee plan</label>' +
+    '<select id="rcPlanSel" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;max-width:280px"></select>' +
+    '<button type="button" id="rcPlanNew" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-height:44px">+ new plan</button>' +
+    '<button type="button" id="rcPlanDel" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-height:44px">remove this plan</button>' +
+    '</div>' +
+    '<label class="rclab" for="rcPlan">Name of this plan (employee or reference)</label><input id="rcPlan" maxlength="80" placeholder="e.g. R. Silva - Lisbon move, spring 2027">' +
     '<form id="addrental" autocomplete="off" style="margin-top:12px">' +
+    '<div class="rcstep" id="rcStep1">' +
     '<label class="rclab" for="rcName">Name or short label</label><input id="rcName" maxlength="80" placeholder="e.g. Flat A - Bishan">' +
+    '</div>' +
+    '<div class="rcstep rcstep-off" id="rcStep2">' +
     '<label class="rclab" for="rcUrl">Listing link (optional)</label><input id="rcUrl" maxlength="300" inputmode="url" placeholder="https://...">' +
+    '<p style="margin:2px 0 0"><button type="button" class="rcskip" id="rcSkipUrl" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#bda990;padding:2px 0;font-size:12px;cursor:pointer;min-height:44px">no link - continue \u2192</button></p>' +
+    '</div>' +
+    '<div class="rcstep rcstep-off" id="rcStep3">' +
     '<div style="display:flex;gap:18px;flex-wrap:wrap"><span style="flex:1;min-width:150px"><label class="rclab" for="rcRent">Rent per month</label><input id="rcRent" inputmode="decimal" maxlength="12" placeholder="e.g. 3500"></span>' +
     '<span><label class="rclab" for="rcCur">Currency</label><select id="rcCur" style="background:#4a3629;color:#f6ead6;border:0;border-bottom:1px solid #836d55;font:inherit;padding:4px 0;width:100%">' +
     '<option>HKD</option><option>USD</option><option>GBP</option><option>SGD</option><option>EUR</option><option>CAD</option><option>Other</option></select></span></div>' +
+    '<p style="margin:2px 0 0"><button type="button" class="rcskip" id="rcSkipRent" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#bda990;padding:2px 0;font-size:12px;cursor:pointer;min-height:44px">rent unknown - continue \u2192</button></p>' +
+    '</div>' +
+    '<div class="rcstep rcstep-off" id="rcStep4">' +
     '<details id="rcMore" class="rcmore"><summary>Add costs <span class="muted">(optional - blanks stay unknown)</span></summary>' +
     '<label class="rclab">Extra monthly costs you know - one line per cost (e.g. utilities, management fee, parking); anything not listed stays unknown</label>' +
     '<div id="rcComps"></div>' +
@@ -100,10 +116,21 @@
     '<label class="rclab" for="rcOnce">Other one-off costs - leave blank if unknown</label><input id="rcOnce" inputmode="decimal" maxlength="12" placeholder="blank = unknown">' +
     '<label class="rclab" for="rcDate">Date of these figures (optional)</label><input id="rcDate" maxlength="40" placeholder="e.g. 2026-11-16, from the listing">' +
     '</details>' +
-    '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div></form>' +
+    '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div>' +
+    '</div></form>' +
     '<p class="muted" style="margin-top:10px;font-size:12px">Your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library \u2197</a> holds rentals you save.</p>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
+  // Individual is the clean starting view; corporate planning stays intact behind the switch.
+  var modeCopy={en:['Individual','Corporate','Who are you renting for?'],fr:['Particulier','Entreprise','Pour qui louez-vous ?'],de:['Privat','Unternehmen','Für wen mieten Sie?'],nl:['Particulier','Zakelijk','Voor wie huurt u?'],pl:['Prywatnie','Firma','Dla kogo wynajmujesz?']}[lang]||['Individual','Corporate','Who are you renting for?'];
+  var modeBar=document.createElement('div');modeBar.id='rcMode';modeBar.setAttribute('role','group');modeBar.setAttribute('aria-label',modeCopy[2]);
+  modeBar.innerHTML='<button type="button" id="rcIndividual" aria-pressed="true">'+modeCopy[0]+'</button><button type="button" id="rcCorporate" aria-pressed="false">'+modeCopy[1]+'</button>';
+  v.insertBefore(modeBar,v.firstChild);
+  var corporateSection=v.querySelectorAll('section')[1];corporateSection.id='rcCorporatePlanning';
+  var modeCss=document.createElement('style');modeCss.textContent='#rcMode{display:flex;gap:20px;margin:0 0 28px}#rcMode button{background:none;border:0;border-bottom:1px solid transparent;color:#bda990;min-height:44px;padding:6px 0;font-size:12px;letter-spacing:.06em}#rcMode button[aria-pressed=true]{color:#f1e3c6;border-bottom-color:currentColor;font-weight:700}#rcCorporatePlanning[hidden]{display:none!important}';document.head.appendChild(modeCss);
+  function setRentMode(corporate){v.dataset.rentMode=corporate?'corporate':'individual';corporateSection.hidden=!corporate;v.querySelector('#rcIndividual').setAttribute('aria-pressed',String(!corporate));v.querySelector('#rcCorporate').setAttribute('aria-pressed',String(corporate))}
+  v.querySelector('#rcIndividual').onclick=function(){setRentMode(false)};v.querySelector('#rcCorporate').onclick=function(){setRentMode(true)};
+  setRentMode(false);
   var rp = v.querySelector('#rentPanel');
   if (NOTE[lang]) { var np = document.createElement('p'); np.className = 'asm'; np.style.marginTop = '10px'; np.textContent = NOTE[lang]; v.querySelector('section').appendChild(np); }
 
@@ -111,7 +138,7 @@
   var scf = document.querySelector('#sourcesCredits footer');
   if (scf && !scf.querySelector('.rentsrc')) {
     var sp = document.createElement('p'); sp.className = 'rentsrc';
-    sp.innerHTML = 'Rent: US typical asking rents = Zillow Research ZORI, Sep 2026, modelled - Data Provided by Zillow Group; UK city/area average rents = ONS Price Index of Private Rents, Sep 2026 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0); Singapore Bishan = HDB median approved sublet rents by town and flat type, 2026-Q3 (data.gov.sg, Singapore Open Data Licence). Rental listings: Zillow, Rightmove, 28Hse (external portals, not verified by RE-agent; contacting the agent or landlord happens there). City averages, not quotes for any specific home. Not investment advice.';
+    sp.innerHTML = 'Rent: US typical asking rents = Zillow Research ZORI, Sep 2026, modelled - Data Provided by Zillow Group; UK city/area average rents = ONS Price Index of Private Rents, Sep 2026 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0); Singapore Bishan = HDB median approved sublet rents by town and flat type, 2026-Q3 (data.gov.sg, Singapore Open Data Licence). Rental listings: Zillow, Rightmove, 28Hse, Idealista, Funda, ImmoScout24, SeLoger, Immobiliare.it (external portals, not verified by RE-agent; contacting the agent or landlord happens there). City averages, not quotes for any specific home. Not investment advice.';
     scf.appendChild(sp);
   }
 
@@ -147,8 +174,19 @@
     return '<p class="muted" style="margin-top:10px">Your budget ' + fmt(BUDGET) + '/mo vs ' + what + ' ' + fmt(typical) + '/mo: ' + fmtDiff(fmt, typical - BUDGET) + '.' + BENCH + '</p>';
   }
   var zrent = function (c, stt) { return 'https://www.zillow.com/homes/for_rent/' + c.replace(/ /g, '-') + ',-' + stt + '_rb/'; };
-  var rmrent = function (label) { return 'https://www.rightmove.co.uk/property-to-rent/find.html?searchLocation=' + encodeURIComponent(label); };
+  var rmrent = function (label) { return 'https://www.rightmove.co.uk/property-to-rent.html'; };
   var HSE_RENT = 'https://www.28hse.com/en/rent';
+  // European rental portals: free listing routes; contacting the agent or landlord happens on the portal.
+  var PT_SLUG = { 'lisbon': 'lisboa', 'lisboa': 'lisboa', 'porto': 'porto', 'oporto': 'porto', 'braga': 'braga', 'cascais': 'cascais', 'faro': 'faro', 'coimbra': 'coimbra' };
+  function slugPt(city) { var k = normS(city); if (PT_SLUG[k]) return PT_SLUG[k]; return k.replace(/\s+/g, '-'); }
+  var EU_PORTALS = {
+    'Portugal': { name: 'Idealista', url: function (city) { return 'https://www.idealista.pt/en/arrendar-casas/' + slugPt(city) + '/'; } },
+    'Spain': { name: 'Idealista', url: function () { return 'https://www.idealista.com/en/'; } },
+    'Netherlands': { name: 'Funda', url: function () { return 'https://www.funda.nl/en/huur/'; } },
+    'Germany': { name: 'ImmoScout24', url: function () { return 'https://www.immobilienscout24.de/wohnen/mietwohnungen.html'; } },
+    'France': { name: 'SeLoger', url: function () { return 'https://www.seloger.com/'; } },
+    'Italy': { name: 'Immobiliare.it', url: function () { return 'https://www.immobiliare.it/en/affitto-case/'; } }
+  };
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }); }
   function act(html) { return '<p style="margin-top:10px">' + html + '</p>'; }
@@ -243,11 +281,11 @@
           '<p><span class="count">' + GBP(uk.v) + '/mo</span><br>average private rent, all property types</p>' +
           '<p class="muted">ONS Price Index of Private Rents, ' + UK_RENT_MONTH + ': average monthly rent, private rental stock, ' + uk.area + '. An area average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source ↗</a></p>' +
           budgetNote(GBP, uk.v, 'the area average rent') +
-          act(extBtn(rmrent(label), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
+          act(extBtn(rmrent(label), 'Search on Rightmove (enter your city there)') + ' · ' + CMP_BTN) + '</div>';
       }
       return '<div class="finding"><h3>Renting in ' + label + '</h3>' +
         '<p>Official city-level rent figures are not wired for ' + label + ' yet - nothing invented. What you can do today: open real rental listings on Rightmove and compare typical rents across covered cities.</p>' +
-        act(extBtn(rmrent(label), 'See rentals on Rightmove') + ' · ' + CMP_BTN) + '</div>';
+        act(extBtn(rmrent(label), 'Search on Rightmove (enter your city there)') + ' · ' + CMP_BTN) + '</div>';
     }
     if (typeof CITY_MARKET !== 'undefined' && CITY_MARKET[c]) {
       var m = CITY_MARKET[c];
@@ -277,30 +315,57 @@
   function renderCandRent(cand) {
     if (cand.cov) return renderCoveredRent(cand.cov);
     if (cand.country === 'Singapore') return renderSg();
+    var ep = EU_PORTALS[cand.country] || EU_PORTALS[String(cand.country).replace(/^The /, '')];
+    if (ep) return '<div class="finding"><h3>' + esc(candName(cand)) + '</h3>' + countryCtx(cand) +
+      '<p>Resolved from the GeoNames city database (34,000+ cities). Official city rent figures are not wired for ' + esc(cand.city) + ' yet - said plainly instead of invented. What you can do today: open real rental listings on ' + ep.name + ' and contact the agent or landlord there.</p>' +
+      act(extBtn(ep.url(cand.city), 'See rentals on ' + ep.name)) + '</div>';
     return '<div class="finding"><h3>' + esc(candName(cand)) + '</h3>' + countryCtx(cand) +
       '<p>Resolved from the GeoNames city database (34,000+ cities). Rent figures and a listing route are not wired for ' + esc(cand.city) + ' yet - said plainly instead of invented.</p></div>';
   }
 
   // --- Compare actual rentals: visitor-entered, on-device only (SAU-44) ---------
   var CMP_KEY = 'stRentCmp:v1';
+  var PLANS_KEY = 'stRentPlans:v1';
   var CURS = { HKD: 'HK$', USD: '$', GBP: '\u00a3', SGD: 'S$', EUR: '\u20ac', CAD: 'C$', Other: '' };
-  var rentals = [], EDIT_I = -1;
+  var plans = [], ACTIVE = -1, EDIT_I = -1;
+  function normItem(r) {
+    if (!r.comps) {
+      r.comps = fin(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
+      r.exAll = fin(r.extra);
+      delete r.extra;
+    }
+    return r;
+  }
+  function curPlan() { return ACTIVE >= 0 && ACTIVE < plans.length ? plans[ACTIVE] : null; }
+  function items() { var p = curPlan(); return p ? p.items : []; }
+  function planName() { var p = curPlan(); return p && p.name ? p.name : ''; }
+  function ensurePlan(name) {
+    var p = curPlan();
+    if (!p) { plans.push({ name: name || '', items: [] }); ACTIVE = plans.length - 1; p = plans[ACTIVE]; }
+    return p;
+  }
   function cmpLoad() {
     try {
-      var raw = localStorage.getItem(CMP_KEY); if (!raw) return;
-      var d = JSON.parse(raw);
-      if (d && Array.isArray(d.items)) rentals = d.items;
-      rentals = rentals.map(function (r) {
-        if (!r.comps) {
-          r.comps = fin(r.extra) ? [{ label: 'Extra monthly costs (entered as a total)', amt: r.extra }] : [];
-          r.exAll = fin(r.extra);
-          delete r.extra;
+      var raw = localStorage.getItem(PLANS_KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        if (d && Array.isArray(d.plans)) {
+          plans = d.plans.map(function (p) { return { name: typeof p.name === 'string' ? p.name : '', items: (Array.isArray(p.items) ? p.items : []).map(normItem) }; });
+          ACTIVE = typeof d.active === 'number' && d.active >= 0 && d.active < plans.length ? d.active : (plans.length ? 0 : -1);
         }
-        return r;
-      });
+      }
+      if (!plans.length) {
+        var old = localStorage.getItem(CMP_KEY);
+        if (old) {
+          var o = JSON.parse(old);
+          var oi = o && Array.isArray(o.items) ? o.items : [];
+          var on = o && typeof o.plan === 'string' ? o.plan : '';
+          if (oi.length || on) { plans = [{ name: on, items: oi.map(normItem) }]; ACTIVE = 0; cmpSave(); }
+        }
+      }
     } catch (e) { }
   }
-  function cmpSave() { try { localStorage.setItem(CMP_KEY, JSON.stringify({ ts: Date.now(), items: rentals })); } catch (e) { } }
+  function cmpSave() { try { localStorage.setItem(PLANS_KEY, JSON.stringify({ ts: Date.now(), plans: plans, active: ACTIVE })); } catch (e) { } }
   function num(v) { if (v === undefined || v === null || String(v).trim() === '') return NaN; var n = parseFloat(String(v).replace(/[^0-9.]/g, '')); return isFinite(n) && n >= 0 ? n : NaN; }
   function fin(x) { return typeof x === 'number' && isFinite(x); }
   function fm(cur, n) { var s = CURS[cur] || ''; return (s ? s : '') + Math.round(n).toLocaleString('en-US') + (s ? '' : (cur === 'Other' ? '' : '')); }
@@ -336,8 +401,9 @@
   }
   function exportText() {
     var d = new Date().toISOString().slice(0, 10);
-    var s = 'RENTAL COMPARISON - my figures\nExported ' + d + ' from RE-agent on sauletrust.com. All figures below were entered by me (reported by me, not independently verified). Entries are saved on my device until I remove them; nothing is uploaded unless I choose "save to my account".\n\n';
-    rentals.forEach(function (r, i) { s += rentalText(r, i); });
+    var s = (planName() ? 'RELOCATION PLAN - ' + planName() + '\n' : 'RENTAL COMPARISON - my figures\n') + 'Exported ' + d + ' from RE-agent on sauletrust.com. All figures below were entered by me (reported by me, not independently verified). Entries are saved on my device until I remove them; nothing is uploaded unless I choose "save to my account".\n\n';
+    items().forEach(function (r, i) { s += rentalText(r, i); });
+    s += 'Next steps: open each listing link and contact the agent or landlord there.\n';
     s += 'Note: comparison on the site uses only the figures entered and never compares across currencies.\n';
     return s;
   }
@@ -353,7 +419,7 @@
     if (!ACCT_ORIGIN) return;
     if (acctAuth) { openAccount(); return; }
     if (acctPending) return;
-    var r = rentals[i]; if (!r) return;
+    var r = items()[i]; if (!r) return '';
     acctPending = true; acctBtn = btn; btn.disabled = true; btn.textContent = 'Saving...';
     var text = rentalText(r, i);
     var links = [];
@@ -377,17 +443,17 @@
   });
   function renderCmp() {
     var el = v.querySelector('#rentCmp');
-    if (!rentals.length) { el.innerHTML = ''; return; }
-    var sameCur = rentals.every(function (r) { return r.cur === rentals[0].cur; });
+    if (!items().length) { el.innerHTML = ''; return; }
+    var sameCur = items().every(function (r) { return r.cur === items()[0].cur; });
     var h = '';
-    rentals.forEach(function (r, i) {
+    items().forEach(function (r, i) {
       var f = fmtOne(r);
       h += '<div class="finding rcard" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
         (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing ↗</a>' : '') + '</h3>';
       var qual = f.rentK ? (f.exK ? '' : (f.compsAny ? 'rent + listed extras - more may apply' : 'rent only - extra monthly costs unknown')) : '';
       h += '<p class="rcrent">' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '</b> <span class="muted">/ month rent</span>' : 'Rent: ' + unk(1)) + '</p>';
       h += '<p class="rctotal"><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (qual ? ' <span class="muted">(' + qual + ')</span>' : '') + '</p>';
-      h += '<div class="rcact"><button type="button" class="rcacct rcsave" data-i="' + i + '">\u2606 save to my account</button><button type="button" class="rcedit" data-i="' + i + '">edit</button><button type="button" class="rcdel" data-i="' + i + '">remove</button></div>';
+      h += '<div class="rcact"><button type="button" class="rcacct rcsave" data-i="' + i + '">\u2606 save to my account</button><button type="button" class="rcedit" data-i="' + i + '">edit</button><button type="button" class="rcdel" data-i="' + i + '">remove</button>' + (r.url ? '<a class="rcopen" href="' + esc(r.url) + '" target="_blank" rel="noopener">Open listing - contact there ↗</a>' : '') + '</div>';
       h += '<details class="rcdet"><summary>Full cost breakdown</summary><div class="rcbd">';
       h += '<p>Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + esc(r.cur) : unk(1)) + '</p>';
       if (!f.compsAny) h += '<p>Extra monthly costs: ' + unk(1) + '</p>';
@@ -402,26 +468,42 @@
       h += '<p>First month paid upfront: ' + (f.fiK ? fm(r.cur, r.first) : unk(1)) + ' <span class="muted">(rent paid early - not an extra cost)</span></p>';
       h += '<p class="muted">Figures as of ' + (r.fdate ? esc(r.fdate) : 'no date given') + ' - reported by you, not independently verified.</p></div></details></div>';
     });
-    if (rentals.length > 1) {
+    h += '<div class="finding" style="margin-top:12px"><p><b>Side by side</b></p><div class="rcwrap"><table class="rctable"><thead><tr><th>Home</th><th>Monthly (known so far)</th><th>Upfront cash (known)</th><th>Still unknown</th><th>Listing</th></tr></thead><tbody>';
+    items().forEach(function (r, i) {
+      var f = fmtOne(r);
+      var up = (f.depK ? r.dep : 0) + (f.feeK ? r.fee : 0) + (f.oncK ? r.once : 0) + (f.stK ? r.stamp : 0) + (f.fiK ? r.first : 0);
+      var upAny = f.depK || f.feeK || f.oncK || f.stK || f.fiK, upAll = f.depK && f.feeK && f.oncK && f.stK && f.fiK;
+      var un = [];
+      if (!f.rentK) un.push('rent');
+      if (!f.exK) un.push('extra monthly');
+      if (!f.depK) un.push('deposit');
+      if (!f.feeK) un.push('agency fee');
+      if (!f.stK) un.push('tax/stamp');
+      if (!f.fiK) un.push('first month');
+      if (!f.oncK) un.push('other one-off');
+      h += '<tr><td><b>' + esc(r.name || 'Rental ' + (i + 1)) + '</b></td><td class="num">' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' : 'unknown') + (f.rentK && !f.exK ? '*' : '') + '</td><td class="num">' + (upAny ? fm(r.cur, up) + (upAll ? '' : '*') : 'unknown') + '</td><td>' + (un.length ? esc(un.join(', ')) : 'none') + '</td><td>' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">listing ↗</a>' : '-') + '</td></tr>';
+    });
+    h += '</tbody></table></div><p class="muted" style="font-size:12px;margin-top:8px">Monthly = rent + listed extra monthly costs. Upfront cash = deposit + agency fee + tax/stamp duty + other one-offs + first month paid upfront (includes the refundable deposit: cash out at signing, not a lost cost). * some items still unknown - nothing is estimated. Figures entered by you, not independently verified.</p></div>';
+    if (items().length > 1) {
       h += '<div class="finding" style="margin-top:12px"><p><b>Comparison</b><br>';
       if (!sameCur) h += 'Different currencies - totals are shown per rental, not compared across currencies.';
       else {
-        var full = rentals.filter(function (r) { var f = fmtOne(r); return f.rentK && f.exK; });
-        if (full.length === rentals.length) {
+        var full = items().filter(function (r) { var f = fmtOne(r); return f.rentK && f.exK; });
+        if (full.length === items().length) {
           var minI = 0; full.forEach(function (r, i) { if (fmtOne(r).monthly < fmtOne(full[minI]).monthly) minI = i; });
           h += 'Lowest known monthly total on the figures entered: <b>' + esc(full[minI].name || 'Rental ' + (minI + 1)) + '</b> at ' + fm(full[minI].cur, fmtOne(full[minI]).monthly) + '/mo. ';
-        } else h += 'A full monthly-cost comparison is not possible yet - not all recurring monthly costs are known for ' + (rentals.length - full.length) + ' of ' + rentals.length + ' rentals. ';
+        } else h += 'A full monthly-cost comparison is not possible yet - not all recurring monthly costs are known for ' + (items().length - full.length) + ' of ' + items().length + ' rentals. ';
       }
       h += 'Comparison uses only the figures you entered - check each listing for what is actually included.</p></div>';
     }
-    h += '<p style="margin-top:14px"><button type="button" id="rcCopy" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Copy text</button> <button type="button" id="rcDl" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Download .txt</button> <span class="muted" id="rcCopied" style="font-size:12px"></span></p>';
+    h += '<p style="margin-top:14px"><button type="button" id="rcCopy" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Copy plan text</button> <button type="button" id="rcDl" style="background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px">Download .txt</button> <span class="muted" id="rcCopied" style="font-size:12px"></span></p>';
     el.innerHTML = h;
     el.querySelectorAll('.rcdel').forEach(function (b) {
-      b.onclick = function () { rentals.splice(+b.dataset.i, 1); cmpSave(); renderCmp(); };
+      b.onclick = function () { items().splice(+b.dataset.i, 1); cmpSave(); renderCmp(); };
     });
     el.querySelectorAll('.rcedit').forEach(function (b) {
       b.onclick = function () {
-        var r = rentals[+b.dataset.i]; EDIT_I = +b.dataset.i;
+        var r = items()[+b.dataset.i]; EDIT_I = +b.dataset.i;
         v.querySelector('#rcName').value = r.name || '';
         v.querySelector('#rcUrl').value = r.url || '';
         v.querySelector('#rcRent').value = fin(r.rent) ? r.rent : '';
@@ -437,7 +519,7 @@
         v.querySelector('#rcDate').value = r.fdate || '';
         v.querySelector('#rcSubmit').textContent = 'Save changes →';
         v.querySelector('#rcCancel').style.display = '';
-        v.querySelector('#rcMore').open = true; v.querySelector('#rcName').focus();
+        v.querySelector('#rcMore').open = true; revealAllSteps(); v.querySelector('#rcName').focus();
       };
     });
     el.querySelectorAll('.rcacct').forEach(function (b) {
@@ -476,10 +558,19 @@
   }
   v.querySelector('#rcCompAdd').addEventListener('click', function () { v.querySelector('#rcComps').appendChild(compRow(null)); });
   resetComps(null);
+  function showStep(n) { var s = v.querySelector('#rcStep' + n); if (s) s.classList.remove('rcstep-off'); }
+  function hideSteps(from) { for (var i = from; i <= 4; i++) { var s = v.querySelector('#rcStep' + i); if (s) s.classList.add('rcstep-off'); } }
+  function revealAllSteps() { for (var i = 1; i <= 4; i++) showStep(i); }
+  v.querySelector('#rcName').addEventListener('input', function () { if (this.value.trim()) showStep(2); });
+  v.querySelector('#rcUrl').addEventListener('input', function () { if (this.value.trim()) showStep(3); });
+  v.querySelector('#rcSkipUrl').addEventListener('click', function () { showStep(3); });
+  v.querySelector('#rcRent').addEventListener('input', function () { if (this.value.trim()) showStep(4); });
+  v.querySelector('#rcSkipRent').addEventListener('click', function () { showStep(4); });
   v.querySelector('#rcCancel').addEventListener('click', function () {
     EDIT_I = -1;
     v.querySelector('#addrental').reset();
     resetComps(null);
+    hideSteps(2);
     v.querySelector('#rcSubmit').textContent = 'Add rental →';
     v.querySelector('#rcCancel').style.display = 'none';
   });
@@ -500,14 +591,39 @@
       stamp: num(v.querySelector('#rcStamp').value), first: num(v.querySelector('#rcFirst').value),
       fdate: v.querySelector('#rcDate').value.trim()
     };
-    if (EDIT_I >= 0 && EDIT_I < rentals.length) rentals[EDIT_I] = item; else rentals.push(item);
-    if (rentals.length > 6) rentals = rentals.slice(-6);
+    var actPlan = ensurePlan(v.querySelector('#rcPlan').value.trim());
+    if (EDIT_I >= 0 && EDIT_I < actPlan.items.length) actPlan.items[EDIT_I] = item; else actPlan.items.push(item);
+    if (actPlan.items.length > 6) actPlan.items = actPlan.items.slice(-6);
     EDIT_I = -1;
     v.querySelector('#rcSubmit').textContent = 'Add rental →';
     v.querySelector('#rcCancel').style.display = 'none';
-    cmpSave(); renderCmp(); e.target.reset(); resetComps(null);
+    cmpSave(); renderPlanBar(); renderCmp(); e.target.reset(); resetComps(null); hideSteps(2);
   });
   cmpLoad(); renderCmp();
+  var planInp = v.querySelector('#rcPlan');
+  function syncPlanInput() { if (planInp) planInp.value = planName(); }
+  function resetEntryForm() { var f = v.querySelector('#addrental'); if (f) f.reset(); resetComps(null); hideSteps(2); v.querySelector('#rcSubmit').textContent = 'Add rental \u2192'; v.querySelector('#rcCancel').style.display = 'none'; EDIT_I = -1; }
+  function renderPlanBar() {
+    var sel = v.querySelector('#rcPlanSel'); if (!sel) return;
+    sel.innerHTML = '';
+    if (!plans.length) { var o0 = document.createElement('option'); o0.textContent = 'No plans yet - add a rental to start one'; sel.appendChild(o0); }
+    plans.forEach(function (p, i) { var o = document.createElement('option'); o.value = String(i); o.textContent = p.name || 'Plan ' + (i + 1); sel.appendChild(o); });
+    if (ACTIVE >= 0) sel.value = String(ACTIVE);
+    var del = v.querySelector('#rcPlanDel'); if (del) del.style.display = curPlan() ? '' : 'none';
+  }
+  if (planInp) planInp.addEventListener('input', function () { var p = ensurePlan(); p.name = planInp.value.trim().slice(0, 80); cmpSave(); renderPlanBar(); });
+  var planSel = v.querySelector('#rcPlanSel');
+  if (planSel) planSel.addEventListener('change', function () { if (!plans.length) return; ACTIVE = +planSel.value; resetEntryForm(); cmpSave(); syncPlanInput(); renderCmp(); });
+  var planNew = v.querySelector('#rcPlanNew');
+  if (planNew) planNew.addEventListener('click', function () { plans.push({ name: '', items: [] }); ACTIVE = plans.length - 1; resetEntryForm(); cmpSave(); renderPlanBar(); syncPlanInput(); renderCmp(); if (planInp) planInp.focus(); });
+  var planDel = v.querySelector('#rcPlanDel');
+  if (planDel) planDel.addEventListener('click', function () {
+    var p = curPlan(); if (!p) return;
+    if (p.items.length && !window.confirm('Remove "' + (p.name || 'this plan') + '" and its ' + p.items.length + ' rental' + (p.items.length > 1 ? 's' : '') + '? This cannot be undone.')) return;
+    plans.splice(ACTIVE, 1); ACTIVE = plans.length ? Math.min(ACTIVE, plans.length - 1) : -1; resetEntryForm();
+    cmpSave(); renderPlanBar(); syncPlanInput(); renderCmp();
+  });
+  renderPlanBar(); syncPlanInput();
 
   function bindRent() {
     rp.querySelectorAll('.gobuy').forEach(function (b) {
@@ -524,6 +640,8 @@
 
   async function rentPick(raw, pinned) {
     LAST_RAW = raw; LAST_PINNED = !!pinned;
+    var bs = v.querySelector('#rcSec2Lab'), bf = v.querySelector('#askbudget');
+    if (bs) bs.classList.remove('rcstep-off'); if (bf) bf.classList.remove('rcstep-off');
     if (pinned) {
       if (normS(raw) === 'singapore') { rp.innerHTML = renderSg(); bindRent(); return; }
       var c = resolveCity(raw);
@@ -540,7 +658,7 @@
       });
       return;
     }
-    rp.innerHTML = '<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (GeoNames database, 34,000+ cities over 15k population) found no match for what was typed - check the spelling or try the nearest major city. Rent figures live today: 20 US cities, London and Singapore (Bishan); rental-listing routes for the US, UK and Hong Kong.</p></div>';
+    rp.innerHTML = '<div class="finding warn"><h3>Could not resolve that place</h3><p>Worldwide city search (GeoNames database, 34,000+ cities over 15k population) found no match for what was typed - check the spelling or try the nearest major city. Rent figures live today: 20 US cities, London and Singapore (Bishan); rental-listing routes for the US, UK and Hong Kong, portal links for Portugal, Spain, the Netherlands, Germany, France and Italy.</p></div>';
   }
 
   v.querySelector('#askrentcity').addEventListener('submit', function (e) { e.preventDefault(); rentPick(v.querySelector('#qrc').value); });
