@@ -57,7 +57,7 @@ function renderHomes(){
       if(!stK)un.push('tax/stamp');
       if(!fiK)un.push('first month');
       if(!oncK)un.push('other one-off');
-      h+='<tr><td><b>'+escH(r.name||'Rental '+(i+1))+'</b></td><td class="num">'+(rentK?mny(r.cur,monthly)+'/mo':'unknown')+(rentK&&!exK?'*':'')+'</td><td class="num">'+(upAny?mny(r.cur,up)+(upAll?'':'*'):'unknown')+'</td><td>'+(un.length?escH(un.join(', ')):'none')+'</td><td>'+(r.url?'<a href="'+escH(r.url)+'" target="_blank" rel="noopener" style="color:#dcc9ad">listing \u2197</a>':'-')+'</td></tr>';
+      h+='<tr><td><b>'+escH(r.name||'Rental '+(i+1))+'</b></td><td class="num">'+(rentK?mny(r.cur,monthly)+'/mo':'unknown')+(rentK&&!exK?'*':'')+'</td><td class="num">'+(upAny?mny(r.cur,up)+(upAll?'':'*'):'unknown')+'</td><td>'+(un.length?escH(un.join(', ')):'none')+'</td><td>'+(r.url?'<a href="'+escH(r.url)+'" target="_blank" rel="noopener" style="color:#dcc9ad">listing</a>':'-')+'</td></tr>';
     });
     h+='</tbody></table></div><p class="src" style="margin-top:8px">From the Rent tab shortlist on this device. Monthly = rent + listed extra monthly costs. Upfront cash = deposit + agency fee + tax/stamp duty + other one-offs + first month paid upfront (includes the refundable deposit). * some items still unknown - nothing is estimated. Figures entered by the user, not independently verified.</p>';
   }

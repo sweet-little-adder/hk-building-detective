@@ -57,7 +57,7 @@
   window.addEventListener('message', function (e) {
     if (e.source !== window.parent || e.origin !== parentOrigin || !e.data || e.data.type !== 'reagentSaveResult'||!pending||e.data.requestId!==requestId) return;
     clearTimeout(timer); pending = false; btn.disabled = false;
-    if (e.data.ok) btn.textContent = t[2] + ' \u2713';
+    if (e.data.ok) btn.textContent = t[2] + '';
     else if (e.data.authRequired) { authNeeded = true; btn.textContent = t[3]; }
     else btn.textContent = t[4];
   });

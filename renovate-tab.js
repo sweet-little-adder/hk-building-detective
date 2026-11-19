@@ -94,9 +94,9 @@
     '<div class="finding"><p>Cost tools and public registers are wired for Hong Kong only. Elsewhere none are wired yet, rather than invented.</p></div>' +
     '<details class="rnmore"><summary>Hong Kong</summary>' +
     '<ul style="margin-top:8px">' +
-    '<li><a href="https://designpedia.com.hk/latest_article/renovation-cost-hong-kong/" target="_blank" rel="noopener">Renovation budget ranges ↗</a> - Designpedia\'s planning bands and calculator, on their site (their figures, linked not reproduced)</li>' +
-    '<li><a href="https://www.bd.gov.hk/en/resources/online-tools/registers-search/registrationsearch.html?reg_type=GBC" target="_blank" rel="noopener">Registered general building contractors ↗</a> - Buildings Department register search</li>' +
-    '<li><a href="https://www.bd.gov.hk/en/resources/online-tools/registers-search/registrationsearch.html" target="_blank" rel="noopener">All BD registers ↗</a> - minor works, specialist contractors, authorized persons</li>' +
+    '<li><a href="https://designpedia.com.hk/latest_article/renovation-cost-hong-kong/" target="_blank" rel="noopener">Renovation budget ranges</a> - Designpedia\'s planning bands and calculator, on their site (their figures, linked not reproduced)</li>' +
+    '<li><a href="https://www.bd.gov.hk/en/resources/online-tools/registers-search/registrationsearch.html?reg_type=GBC" target="_blank" rel="noopener">Registered general building contractors</a> - Buildings Department register search</li>' +
+    '<li><a href="https://www.bd.gov.hk/en/resources/online-tools/registers-search/registrationsearch.html" target="_blank" rel="noopener">All BD registers</a> - minor works, specialist contractors, authorized persons</li>' +
     '</ul>' +
     '<p style="margin-top:8px">Government registers, not our partners - we don\'t list, vet or endorse any firm. Interior designers carry no statutory licence in Hong Kong; check a contractor\'s registration before structural work.</p></details></section>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
@@ -136,7 +136,7 @@
     v.querySelector('#fmList').innerHTML = rows.map(function (f) {
       return '<div class="rnrow"><span><b>' + esc(f.n) + '</b> · ' + esc(f.c) + ', ' + esc(f.k) + ' · ' + (f.t === 'build' ? 'builder' : 'interior design') +
         '<span class="rnsub">' + esc(f.d) + '</span>' +
-        '<span class="rnsub"><a href="' + esc(f.w) + '" target="_blank" rel="noopener noreferrer">Official website ↗</a>' +
+        '<span class="rnsub"><a href="' + esc(f.w) + '" target="_blank" rel="noopener noreferrer">Official website</a>' +
         (f.m ? ' · published contact: <a href="mailto:' + esc(f.m) + '">' + esc(f.m) + '</a>' : '') + '</span></span></div>';
     }).join('') || '<p class="asm">No firms in this selection.</p>';
   }

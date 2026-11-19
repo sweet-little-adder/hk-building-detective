@@ -113,7 +113,7 @@
     '</details>' +
     '<div class="controls" style="justify-content:flex-start;gap:18px"><button type="submit" id="rcSubmit">Add rental →</button><button type="button" id="rcCancel" style="display:none;background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:2px 0;font-size:13px;min-width:0">cancel edit</button></div>' +
     '</div></form>' +
-    '<p class="muted" style="margin-top:10px;font-size:12px">Your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library \u2197</a> holds rentals you save.</p>' +
+    '<p class="muted" style="margin-top:10px;font-size:12px">Your <a href="https://sauletrust.com/account/" target="_blank" rel="noopener" style="color:#dcc9ad">account library</a> holds rentals you save.</p>' +
     '<div id="rentCmp"></div>';
   sv.parentNode.insertBefore(v, sv.nextSibling);
   // Individual is the clean starting view; corporate planning stays intact behind the switch.
@@ -185,7 +185,7 @@
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }); }
   function act(html) { return '<p style="margin-top:10px">' + html + '</p>'; }
-  function extBtn(href, label) { return '<a href="' + href + '" target="_blank" rel="noopener">' + label + ' ↗</a>'; }
+  function extBtn(href, label) { return '<a href="' + href + '" target="_blank" rel="noopener">' + label + '</a>'; }
   function goBuy(city, label) { return '<button type="button" class="gobuy" data-g="' + city + '">' + label + '</button>'; }
   var CMP_BTN = '<button type="button" class="gocmp">Compare cities →</button>';
 
@@ -245,7 +245,7 @@
   }
   function countryCtx(c) {
     var w = WORLD && WORLD[c.country]; if (!w) return ''; var s = '';
-    if (w.yoy !== undefined) { var y = (w.yoy > 0 ? '+' : '') + w.yoy + '%'; s += '<p><b>' + esc(c.country) + ' market (country-wide)</b>: residential property prices ' + y + ' year on year in ' + w.q + ' (BIS nominal index, all dwellings). A country-wide trend, not a city or property figure. <a href="https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q.' + w.cc + '.N.628" target="_blank" rel="noopener">Source ↗</a></p>'; }
+    if (w.yoy !== undefined) { var y = (w.yoy > 0 ? '+' : '') + w.yoy + '%'; s += '<p><b>' + esc(c.country) + ' market (country-wide)</b>: residential property prices ' + y + ' year on year in ' + w.q + ' (BIS nominal index, all dwellings). A country-wide trend, not a city or property figure. <a href="https://data.bis.org/topics/RPP/BIS,WS_SPP,1.0/Q.' + w.cc + '.N.628" target="_blank" rel="noopener">Source</a></p>'; }
     if (w.cur) { s += '<p class="muted">Local currency: ' + w.cur + '.</p>'; }
     return s;
   }
@@ -274,7 +274,7 @@
       if (uk) {
         return '<div class="finding"><h3>' + label + ' - rent snapshot</h3>' +
           '<p><span class="count">' + GBP(uk.v) + '/mo</span><br>average private rent, all property types</p>' +
-          '<p class="muted">ONS Price Index of Private Rents, ' + UK_RENT_MONTH + ': average monthly rent, private rental stock, ' + uk.area + '. An area average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source ↗</a></p>' +
+          '<p class="muted">ONS Price Index of Private Rents, ' + UK_RENT_MONTH + ': average monthly rent, private rental stock, ' + uk.area + '. An area average, not a quote for any home. <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" target="_blank" rel="noopener">Source</a></p>' +
           budgetNote(GBP, uk.v, 'the area average rent') +
           act(extBtn(rmrent(label), 'Search on Rightmove (enter your city there)') + ' · ' + CMP_BTN) + '</div>';
       }
@@ -286,7 +286,7 @@
       var m = CITY_MARKET[c];
       var h = '<div class="finding"><h3>' + c + ', ' + m.st + ' - rent snapshot</h3>' +
         '<p><span class="count">' + USD(m.zori) + '/mo</span><br>typical asking rent, all rentals incl. multifamily</p>' +
-        '<p class="muted">Zillow Research ZORI, ' + CITY_MARKET._meta.zori_month.slice(0, 7) + '. A city-level typical - neighbourhoods and flats vary widely, and it is not a quote for any specific home. <a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener">Source ↗</a></p>' +
+        '<p class="muted">Zillow Research ZORI, ' + CITY_MARKET._meta.zori_month.slice(0, 7) + '. A city-level typical - neighbourhoods and flats vary widely, and it is not a quote for any specific home. <a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener">Source</a></p>' +
         budgetNote(USD, m.zori, 'the city-typical asking rent');
       var acts = CMP_BTN;
       if (c === 'New York') acts += ' · ' + goBuy('New York', 'Check a building\'s DOB record →');
@@ -302,7 +302,7 @@
     }).join('');
     return '<div class="finding"><h3>Singapore - rent snapshot (' + SG_RENT.town + ')</h3>' +
       '<div class="vrow">' + rows + '</div>' +
-      '<p class="muted" style="margin-top:10px">HDB median approved sublet rents by flat type, ' + SG_RENT.town + ' town, ' + SG_RENT.period + ' (data.gov.sg, Singapore Open Data Licence). Medians for one town, whole flats; HDB rental eligibility rules apply. Not a quote for any specific flat. <a href="https://data.gov.sg/datasets/d_23000a00c52996c55106084ed0339566/view" target="_blank" rel="noopener">Source ↗</a></p>' +
+      '<p class="muted" style="margin-top:10px">HDB median approved sublet rents by flat type, ' + SG_RENT.town + ' town, ' + SG_RENT.period + ' (data.gov.sg, Singapore Open Data Licence). Medians for one town, whole flats; HDB rental eligibility rules apply. Not a quote for any specific flat. <a href="https://data.gov.sg/datasets/d_23000a00c52996c55106084ed0339566/view" target="_blank" rel="noopener">Source</a></p>' +
       (BUDGET > 0 ? '<p class="muted" style="margin-top:10px">Your budget ' + SGD(BUDGET) + '/mo vs Bishan medians: ' + SG_RENT.rows.map(function (r) { return 'HDB ' + r[0] + ' ' + SGD(r[1]) + ' (' + fmtDiff(SGD, r[1] - BUDGET) + ')'; }).join(' · ') + '.' + BENCH + '</p>' : '') +
       act(CMP_BTN) + '</div>';
   }
@@ -432,7 +432,7 @@
     clearTimeout(acctTimer);
     var btn = acctBtn; acctPending = false;
     if (!btn) return;
-    if (e.data.ok) { btn.disabled = true; btn.textContent = 'Saved \u2713 - in your account library'; acctAuth = false; }
+    if (e.data.ok) { btn.disabled = true; btn.textContent = 'Saved - in your account library'; acctAuth = false; }
     else if (e.data.authRequired) { acctAuth = true; btn.disabled = false; btn.textContent = 'Sign in to save (opens your account page)'; }
     else { btn.disabled = false; btn.textContent = 'Save failed - try again'; }
   });
@@ -444,11 +444,11 @@
     items().forEach(function (r, i) {
       var f = fmtOne(r);
       h += '<div class="finding rcard" style="margin-top:12px"><h3>' + esc(r.name || 'Rental ' + (i + 1)) +
-        (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing ↗</a>' : '') + '</h3>';
+        (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:12px">listing</a>' : '') + '</h3>';
       var qual = f.rentK ? (f.exK ? '' : (f.compsAny ? 'rent + listed extras - more may apply' : 'rent only - extra monthly costs unknown')) : '';
       h += '<p class="rcrent">' + (f.rentK ? '<b>' + fm(r.cur, r.rent) + '</b> <span class="muted">/ month rent</span>' : 'Rent: ' + unk(1)) + '</p>';
       h += '<p class="rctotal"><b>' + (f.rentK ? (f.exK ? 'Known monthly total: ' : 'Known so far: ') + fm(r.cur, f.monthly) + '/mo' : 'Monthly total: unknown') + '</b>' + (qual ? ' <span class="muted">(' + qual + ')</span>' : '') + '</p>';
-      h += '<div class="rcact"><button type="button" class="rcacct rcsave" data-i="' + i + '">\u2606 save to my account</button><button type="button" class="rcedit" data-i="' + i + '">edit</button><button type="button" class="rcdel" data-i="' + i + '">remove</button>' + (r.url ? '<a class="rcopen" href="' + esc(r.url) + '" target="_blank" rel="noopener">Open listing - contact there ↗</a>' : '') + '</div>';
+      h += '<div class="rcact"><button type="button" class="rcacct rcsave" data-i="' + i + '">\u2606 save to my account</button><button type="button" class="rcedit" data-i="' + i + '">edit</button><button type="button" class="rcdel" data-i="' + i + '">remove</button>' + (r.url ? '<a class="rcopen" href="' + esc(r.url) + '" target="_blank" rel="noopener">Open listing - contact there</a>' : '') + '</div>';
       h += '<details class="rcdet"><summary>Full cost breakdown</summary><div class="rcbd">';
       h += '<p>Rent: ' + (f.rentK ? fm(r.cur, r.rent) + '/mo ' + esc(r.cur) : unk(1)) + '</p>';
       if (!f.compsAny) h += '<p>Extra monthly costs: ' + unk(1) + '</p>';
@@ -476,7 +476,7 @@
       if (!f.stK) un.push('tax/stamp');
       if (!f.fiK) un.push('first month');
       if (!f.oncK) un.push('other one-off');
-      h += '<tr><td><b>' + esc(r.name || 'Rental ' + (i + 1)) + '</b></td><td class="num">' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' : 'unknown') + (f.rentK && !f.exK ? '*' : '') + '</td><td class="num">' + (upAny ? fm(r.cur, up) + (upAll ? '' : '*') : 'unknown') + '</td><td>' + (un.length ? esc(un.join(', ')) : 'none') + '</td><td>' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">listing ↗</a>' : '-') + '</td></tr>';
+      h += '<tr><td><b>' + esc(r.name || 'Rental ' + (i + 1)) + '</b></td><td class="num">' + (f.rentK ? fm(r.cur, f.monthly) + '/mo' : 'unknown') + (f.rentK && !f.exK ? '*' : '') + '</td><td class="num">' + (upAny ? fm(r.cur, up) + (upAll ? '' : '*') : 'unknown') + '</td><td>' + (un.length ? esc(un.join(', ')) : 'none') + '</td><td>' + (r.url ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">listing</a>' : '-') + '</td></tr>';
     });
     h += '</tbody></table></div><p class="muted" style="font-size:12px;margin-top:8px">Monthly = rent + listed extra monthly costs. Upfront cash = deposit + agency fee + tax/stamp duty + other one-offs + first month paid upfront (includes the refundable deposit: cash out at signing, not a lost cost). * some items still unknown - nothing is estimated. Figures entered by you, not independently verified.</p></div>';
     if (items().length > 1) {
