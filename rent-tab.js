@@ -40,25 +40,20 @@
   var NOTE = { fr: 'Page en anglais.', de: 'Inhalt auf Englisch.', nl: 'Inhoud in het Engels.', pl: 'Treść po angielsku.' };
   var T = {
     en: { sec: '01 / The city', aria: 'City you want to rent in', ph: 'e.g. London, New York City, Hong Kong, Singapore', go: 'Explore →',
-      sec2: '02 / Your budget (optional)', ariaBudget: 'Your monthly rent budget', budgetPh: 'e.g. 3500 - number only, matched to each city\'s currency',
-      intro: 'No listings of our own and nothing invented. See what public data says about rents in a city, open real rental listings on the portals - where you contact the agent or landlord - and check the building\'s public record before you sign.' },
+      sec2: '02 / Your budget (optional)', ariaBudget: 'Your monthly rent budget', budgetPh: 'e.g. 3500 - number only, matched to each city\'s currency' },
     fr: { sec: '01 / La ville', aria: 'Ville où vous voulez louer', ph: 'p. ex. London, New York City, Hong Kong, Singapore', go: 'Explorer →',
-      sec2: '02 / Votre budget (facultatif)', ariaBudget: 'Votre budget loyer mensuel', budgetPh: 'p. ex. 3500 - chiffre seul, dans la devise de la ville',
-      intro: 'Pas d\'annonces à nous et rien d\'inventé. Voyez ce que les données publiques disent des loyers d\'une ville, ouvrez de vraies annonces de location sur les portails - où vous contactez l\'agent ou le propriétaire - et vérifiez le dossier public de l\'immeuble avant de signer.' },
+      sec2: '02 / Votre budget (facultatif)', ariaBudget: 'Votre budget loyer mensuel', budgetPh: 'p. ex. 3500 - chiffre seul, dans la devise de la ville' },
     de: { sec: '01 / Die Stadt', aria: 'Stadt, in der Sie mieten möchten', ph: 'z. B. London, New York City, Hong Kong, Singapore', go: 'Entdecken →',
-      sec2: '02 / Ihr Budget (optional)', ariaBudget: 'Ihr monatliches Mietbudget', budgetPh: 'z. B. 3500 - nur Zahl, in der Währung der Stadt',
-      intro: 'Keine eigenen Inserate und nichts Erfundenes. Sehen Sie, was öffentliche Daten über Mieten in einer Stadt sagen, öffnen Sie echte Mietinserate auf den Portalen - dort kontaktieren Sie den Makler oder Eigentümer - und prüfen Sie die öffentlichen Unterlagen des Gebäudes vor der Unterschrift.' },
+      sec2: '02 / Ihr Budget (optional)', ariaBudget: 'Ihr monatliches Mietbudget', budgetPh: 'z. B. 3500 - nur Zahl, in der Währung der Stadt' },
     nl: { sec: '01 / De stad', aria: 'Stad waar u wilt huren', ph: 'bijv. London, New York City, Hong Kong, Singapore', go: 'Verkennen →',
-      sec2: '02 / Uw budget (optioneel)', ariaBudget: 'Uw maandelijkse huurbudget', budgetPh: 'bijv. 3500 - alleen cijfer, in de valuta van de stad',
-      intro: 'Geen eigen advertenties en niets verzonnen. Bekijk wat openbare data over huren in een stad zeggen, open echte huuradvertenties op de portalen - waar u contact opneemt met de makelaar of verhuurder - en controleer de openbare gegevens van het gebouw vóór u tekent.' },
+      sec2: '02 / Uw budget (optioneel)', ariaBudget: 'Uw maandelijkse huurbudget', budgetPh: 'bijv. 3500 - alleen cijfer, in de valuta van de stad' },
     pl: { sec: '01 / Miasto', aria: 'Miasto, w którym chcesz wynająć', ph: 'np. London, New York City, Hong Kong, Singapore', go: 'Odkryj →',
-      sec2: '02 / Twój budżet (opcjonalnie)', ariaBudget: 'Twój miesięczny budżet na czynsz', budgetPh: 'np. 3500 - sama liczba, w walucie miasta',
-      intro: 'Żadnych własnych ogłoszeń i nic zmyślonego. Zobacz, co dane publiczne mówią o czynszach w mieście, otwórz prawdziwe oferty wynajmu w portalach - tam skontaktujesz się z agentem lub właścicielem - i sprawdź publiczne dane budynku przed podpisaniem.' }
+      sec2: '02 / Twój budżet (opcjonalnie)', ariaBudget: 'Twój miesięczny budżet na czynsz', budgetPh: 'np. 3500 - sama liczba, w walucie miasta' }
   };
   var t = T[lang] || T.en;
 
   var st = document.createElement('style');
-  st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}' +
+  st.textContent = '.tabs{flex-wrap:wrap;row-gap:12px}#rentView{display:none}#rentPanel:empty{display:none}' +
     '.rcmore{margin-top:14px;border-top:1px solid #6b5546;padding-top:4px}.rcmore summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;padding:12px 0;min-height:44px}.rcmore summary::-webkit-details-marker{display:none}.rcmore summary:before{content:"+ "}.rcmore[open] summary:before{content:"\\2212 "}.rcard .rcrent{font-size:24px;margin:6px 0 2px}.rcard .rcrent .muted{font-size:13px}.rcard .rctotal{margin:0 0 4px;font-size:15px}.rcard .rcact{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 0}.rcard .rcact button{background:none;border:0;border-bottom:1px solid #7c6650;color:#dcc9ad;padding:0 6px;font-size:14px;min-width:0;min-height:44px}.rcard .rcact .rcsave{border-bottom-color:#dcc9ad;margin-right:10px;padding-left:0}.rcdet{margin-top:2px;border-top:1px solid #6b5546}.rcdet summary{cursor:pointer;list-style:none;font-size:13px;color:#dcc9ad;min-height:44px;display:flex;align-items:center}.rcdet summary::-webkit-details-marker{display:none}.rcdet summary:before{content:"+ ";margin-right:6px}.rcdet[open] summary:before{content:"\\2212 "}.rcbd p{margin:0 0 6px;font-size:13px;line-height:1.55}.rclab{display:block;font-size:11px;letter-spacing:.04em;color:#bda990;margin:12px 0 2px}.rcwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}.rctable{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px;min-width:680px}.rctable th,.rctable td{text-align:left;padding:9px 10px;border-bottom:1px solid #6e5847;vertical-align:top}.rctable th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#bda990;font-weight:400}.rctable td{color:#e3d2b6}.rctable td b{color:#f8efdc;font-weight:600}.rctable .num{font-family:Georgia,serif;font-size:15px;color:#f8efdc;white-space:nowrap}.rcard .rcact a.rcopen{color:#dcc9ad;border-bottom:1px solid #dcc9ad;padding:0 6px;font-size:14px;min-height:44px;display:inline-flex;align-items:center}.rcstep-off{display:none}.rcstep{animation:rcfade .32s ease}@keyframes rcfade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}.rcskip{background:none;border:0;border-bottom:1px solid #7c6650;color:#bda990;padding:2px 0;font-size:12px;cursor:pointer;min-height:44px}';
   document.head.appendChild(st);
 
@@ -78,7 +73,7 @@
     '<div class="controls"><button type="submit">' + t.go + '</button></div></form>' +
     '<p class="label rcstep rcstep-off" id="rcSec2Lab" style="margin-top:22px">' + t.sec2 + '</p>' +
     '<form id="askbudget" class="rcstep rcstep-off" autocomplete="off"><input id="qbudget" inputmode="numeric" maxlength="12" aria-label="' + t.ariaBudget + '" placeholder="' + t.budgetPh + '"></form>' +
-    '<div id="rentPanel" style="margin-top:16px"><div class="finding"><p>' + t.intro + '</p></div></div></section>' +
+    '<div id="rentPanel" style="margin-top:16px"></div></section>' +
     '<section><p class="label" style="margin-top:26px">03 / Your shortlist - compare candidate homes</p>' +
     '<div class="finding"><p>Add rentals to the employee plan selected below - switch plans or start a new one any time. Costs you leave blank stay marked unknown and totals say "known so far" - nothing is estimated. Plans and entries stay on this device only; signed in on sauletrust.com you can save a rental to your own account library. A shared company workspace (colleagues seeing the same plans) is not available yet - to share a plan, copy or download its text below.</p></div>' +
     '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:16px 0 2px">' +
