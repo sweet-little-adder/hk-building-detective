@@ -633,9 +633,14 @@
     });
   }
 
+  var rentGeneration=0;
+  v.querySelector('#qrc').addEventListener('input',function(){rentGeneration++;});
   async function rentPick(raw, pinned) {
+    var requestGeneration=++rentGeneration;
+    window.cancelListingLoad?.(rp);
     LAST_RAW = raw; LAST_PINNED = !!pinned;
     if (window.renderRentalResearch && await window.renderRentalResearch(raw, rp)) return;
+    if(requestGeneration!==rentGeneration)return;
     var bs = v.querySelector('#rcSec2Lab'), bf = v.querySelector('#askbudget');
     if (bs) bs.classList.remove('rcstep-off'); if (bf) bf.classList.remove('rcstep-off');
     if (pinned) {
@@ -645,6 +650,7 @@
     }
     rp.innerHTML = '<p class="muted">Resolving ' + esc(raw) + '…</p>';
     var res = await resolveInput(raw);
+    if(requestGeneration!==rentGeneration)return;
     if (res.kind === 'one') { rp.innerHTML = renderCandRent(res.cand); bindRent(); return; }
     if (res.kind === 'pick') {
       window._rcands = res.cands;

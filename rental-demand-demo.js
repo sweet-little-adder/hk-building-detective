@@ -2,9 +2,9 @@ const listingStyle=document.createElement('style');listingStyle.textContent='.li
 (function(){
 
  const el=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=value;if(cls)e.className=cls;return e};
- let generation=0;
+ let generation=0;document.getElementById('qrc')?.addEventListener('input',()=>generation++);
  window.renderRentalResearch=async function(raw,panel){
- if(!/^(monaco(?:, monaco)?|new york|new york city|nyc|vancouver(?:, (?:bc|canada))?)$/i.test(raw.trim())){generation++;return false;}
+ if(!/^(monaco(?:, monaco)?|new york|new york city|nyc|vancouver(?:, (?:bc|canada))?)$/i.test(raw.trim())){generation++;panel.replaceChildren(el('h2',raw.trim()+' / Rental search'),el('p','We do not have a connected listing source for this city yet. This does not mean there are no rentals. Results will appear here when coverage is connected.'));return true;}
  const requestId=++generation,loading=window.beginListingLoad(panel);
  panel.replaceChildren(el('p','Fetching source listing index and matching property photos now...','muted'));
  let data;try{const r=await fetch('/api/rental-search?city='+encodeURIComponent(raw),{signal:loading.signal});if(!r.ok)throw Error('Source unavailable');data=await r.json();if(requestId!==generation||!loading.active)return true}catch{if(requestId!==generation||!loading.active)return true;panel.replaceChildren(el('p','Source unavailable. This is not a zero-rentals result.'));return true}finally{loading.finish()}

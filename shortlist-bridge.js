@@ -97,9 +97,9 @@
  function schedule(){if(restoring)return;clearTimeout(timer);timer=setTimeout(capture,180)}
  function showNotice(at){
   var old=document.getElementById('restoredResearchNotice');if(old)old.remove();
-  var box=document.createElement('div');box.id='restoredResearchNotice';box.setAttribute('role','status');box.style.cssText='border:1px solid #8b735e;padding:12px 14px;margin:24px 0;font-size:12px;line-height:1.7;color:#dcc9ad';
+  var box=document.createElement('div');box.id='restoredResearchNotice';box.setAttribute('role','status');box.style.cssText='margin:12px 0;font-size:12px;line-height:1.5;color:#bda990';
   var p=document.createElement('p');p.textContent=words[0]+new Date(at).toLocaleString(lang)+'. '+words[1];box.appendChild(p);
-  var b=document.createElement('button');b.type='button';b.textContent=words[2];b.style.cssText='background:none;color:inherit;border-bottom:1px solid #8b735e;padding:8px 0;font-size:12px;min-height:44px;font-weight:400';b.onclick=function(){forget=true;send({type:'reagentStateClear'});box.remove()};box.appendChild(b);
+
   var tabs=document.querySelector('.tabs');tabs.parentNode.insertBefore(box,tabs.nextSibling);
  }
  window.addEventListener('message',function(e){

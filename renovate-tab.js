@@ -84,15 +84,17 @@
     '<div class="rnstep rnstep-off" id="qts2"><label class="rnlab" for="qScope">What the price includes (optional)</label><input id="qScope" maxlength="160" placeholder="e.g. demolition, plumbing, tiling; excludes appliances">' +
     '<div class="controls" style="justify-content:flex-start"><button type="submit">Add quotation →</button></div></div></form>' +
     '<div id="quoteList" style="margin-top:6px"></div></section>' +
-    '<section><p class="label" style="margin-top:26px">03 / Firms to contact yourself - Europe</p>' +
-    '<div class="finding"><p>A reference list of 21 firms and the websites they publish themselves. Not partners, not vetted, not recommendations: SauleTrust does not contact them or pass your brief on. Open a firm\'s own site to reach them. Facts checked 17 Nov 2026.</p></div>' +
+    '<section><p class="label" style="margin-top:26px">03 / Find firms</p>' +
+    '<div class="finding"><p>Search by firm name, base city or type. Service areas are unverified. Not endorsements. Checked 17 Nov 2026.</p></div>' +
+    '<form id="fmSearch" autocomplete="off"><label class="rnlab" for="fmQuery">Firm name or base city/country</label><input id="fmQuery" maxlength="100" placeholder="e.g. Paris, Italy, Liaigre">' +
     '<div class="chips" id="fmCity" style="margin-top:8px"></div>' +
     '<div class="chips" id="fmKind" style="margin-top:4px"><button type="button" data-k="">All</button><button type="button" data-k="build">Builders</button><button type="button" data-k="design">Interior design</button></div>' +
+    '<div class="controls" style="justify-content:flex-start"><button type="submit">Search firms →</button></div></form>' +
     '<div class="controls" style="justify-content:flex-start"><button type="button" id="fmCopy" style="background:transparent;color:#f1e3c6;border:1px solid #f1e3c6">Copy my latest brief</button><span id="fmMsg" class="asm" style="margin-left:10px" role="status"></span></div>' +
-    '<div id="fmList" style="margin-top:6px"></div></section>' +
-    '<section><p class="label" style="margin-top:26px">04 / Regional tools</p>' +
-    '<div class="finding"><p>Cost tools and public registers are wired for Hong Kong only. Elsewhere none are wired yet, rather than invented.</p></div>' +
-    '<details class="rnmore"><summary>Hong Kong</summary>' +
+    '<p id="fmStatus" class="asm" role="status"></p><div id="fmList" style="margin-top:6px"></div><div id="fmMore" class="asm" style="min-height:1px"></div></section>' +
+    '<section><p class="label" style="margin-top:26px">04 / Hong Kong renovation checks</p>' +
+    '<div class="finding"><p>Renovating in Hong Kong? Use these links to plan a budget and check contractor registration.</p></div>' +
+    '<details class="rnmore"><summary>Budget guidance and contractor registers</summary>' +
     '<ul style="margin-top:8px">' +
     '<li><a href="https://designpedia.com.hk/latest_article/renovation-cost-hong-kong/" target="_blank" rel="noopener">Renovation budget ranges</a> - Designpedia\'s planning bands and calculator, on their site (their figures, linked not reproduced)</li>' +
     '<li><a href="https://www.bd.gov.hk/en/resources/online-tools/registers-search/registrationsearch.html?reg_type=GBC" target="_blank" rel="noopener">Registered general building contractors</a> - Buildings Department register search</li>' +
@@ -130,18 +132,39 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
-  function renderFirms() {
-    mark(cityBox, 'data-c', fmCity); mark(kindBox, 'data-k', fmKind);
-    var rows = FIRMS.filter(function (f) { return (!fmCity || f.c === fmCity) && (!fmKind || f.t === fmKind); });
-    v.querySelector('#fmList').innerHTML = rows.map(function (f) {
-      return '<div class="rnrow"><span><b>' + esc(f.n) + '</b> · ' + esc(f.c) + ', ' + esc(f.k) + ' · ' + (f.t === 'build' ? 'builder' : 'interior design') +
-        '<span class="rnsub">' + esc(f.d) + '</span>' +
-        '<span class="rnsub"><a href="' + esc(f.w) + '" target="_blank" rel="noopener noreferrer">Official website</a>' +
-        (f.m ? ' · published contact: <a href="mailto:' + esc(f.m) + '">' + esc(f.m) + '</a>' : '') + '</span></span></div>';
-    }).join('') || '<p class="asm">No firms in this selection.</p>';
+  var firmRows=[], shown=0, searched=false, firmPageSize=6;
+  var firmList=v.querySelector('#fmList'), firmStatus=v.querySelector('#fmStatus'), more=v.querySelector('#fmMore'), query=v.querySelector('#fmQuery');
+  function renderFirm(f) {
+    return '<div class="rnrow" data-firm="'+esc(f.w)+'"><span><b>' + esc(f.n) + '</b> · ' + esc(f.c) + ', ' + esc(f.k) + ' · ' + (f.t === 'build' ? 'builder' : 'interior design') +
+      '<span class="rnsub">' + esc(f.d) + '</span><span class="rnsub"><a href="' + esc(f.w) + '" target="_blank" rel="noopener noreferrer">Official website</a>' +
+      (f.m ? ' · published contact: <a href="mailto:' + esc(f.m) + '">' + esc(f.m) + '</a>' : '') + '</span></span></div>';
   }
-  cityBox.onclick = function (e) { var b = e.target.closest('button'); if (!b) return; fmCity = b.getAttribute('data-c') || ''; renderFirms(); };
-  kindBox.onclick = function (e) { var b = e.target.closest('button'); if (!b) return; fmKind = b.getAttribute('data-k') || ''; renderFirms(); };
+  function appendFirmPage() {
+    if(!searched||shown>=firmRows.length)return;
+    var page=firmRows.slice(shown,shown+firmPageSize);shown+=page.length;
+    firmList.insertAdjacentHTML('beforeend',page.map(renderFirm).join(''));
+    firmStatus.textContent='Showing '+shown+' of '+firmRows.length+' directory matches.';
+    more.textContent=shown<firmRows.length?'Scroll for more matches.':'End of directory matches.';
+  }
+  function resetFirmSearch() {
+    searched=false;firmRows=[];shown=0;firmList.replaceChildren();more.textContent='';
+    firmStatus.textContent='Choose a location or type, or enter a name, then search.';
+    mark(cityBox,'data-c',fmCity);mark(kindBox,'data-k',fmKind);
+  }
+  v.querySelector('#fmSearch').addEventListener('submit',function(e){
+    e.preventDefault();var term=query.value.trim().toLocaleLowerCase();
+    resetFirmSearch();if(!term&&!fmCity&&!fmKind)return;
+    var seen=new Set();firmRows=FIRMS.filter(function(f){var match=(!fmCity||f.c===fmCity)&&(!fmKind||f.t===fmKind)&&(!term||[f.n,f.c,f.k].join(' ').toLocaleLowerCase().includes(term));if(!match||seen.has(f.w))return false;seen.add(f.w);return true});
+    searched=true;if(!firmRows.length){firmStatus.textContent='No directory matches for these filters. This does not mean no firms serve this area.';return}appendFirmPage();
+  });
+  cityBox.onclick=function(e){var b=e.target.closest('button');if(!b)return;fmCity=b.getAttribute('data-c')||'';resetFirmSearch()};
+  kindBox.onclick=function(e){var b=e.target.closest('button');if(!b)return;fmKind=b.getAttribute('data-k')||'';resetFirmSearch()};
+  query.addEventListener('input',resetFirmSearch);
+  // Observe page position, not an inner scrolling box. IO also handles the embedded viewport.
+  var firmScrollQueued=false;
+  function checkFirmScroll(){firmScrollQueued=false;var rect=more.getBoundingClientRect();if(v.offsetParent!==null&&rect.top<innerHeight+160&&rect.bottom>=0)appendFirmPage()}
+  window.addEventListener('scroll',function(){if(!firmScrollQueued){firmScrollQueued=true;requestAnimationFrame(checkFirmScroll)}},{passive:true});
+  new IntersectionObserver(function(entries){if(entries.some(function(e){return e.isIntersecting}))appendFirmPage()},{root:null,rootMargin:'0px 0px 160px 0px'}).observe(more);
   v.querySelector('#fmCopy').onclick = function () {
     var msg = v.querySelector('#fmMsg'), b = briefs[briefs.length - 1];
     if (!b) { msg.textContent = 'Save a brief in section 01 first.'; return; }
@@ -150,7 +173,7 @@
     function fail() { msg.textContent = 'Could not copy - select the brief text and copy it manually.'; }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fail); else fail();
   };
-  renderFirms();
+  resetFirmSearch();
 
   // --- Briefs ----------------------------------------------------------------------
   var needBox = v.querySelector('#brNeed');
