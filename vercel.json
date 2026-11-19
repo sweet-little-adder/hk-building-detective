@@ -2,6 +2,9 @@
   "functions": {
     "api/rental-search.mjs": {
       "maxDuration": 30
+    },
+    "api/buy-search.mjs": {
+      "maxDuration": 30
     }
   }
 }

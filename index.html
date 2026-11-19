@@ -193,8 +193,9 @@ const MS_E='<p><b>Market snapshot - Edmonton, October 2026</b> (<a href="https:/
 const MS_H='<p><b>Market snapshot - Hong Kong, September 2026 (provisional)</b> (<a href="https://www.rvd.gov.hk/en/publications/property_market_statistics.html" target="_blank" rel="noopener">Rating &amp; Valuation Department</a>): a typical 40-70 m&sup2; flat averaged HK$157,538/m&sup2; on Hong Kong Island, HK$136,529/m&sup2; in Kowloon and HK$109,898/m&sup2; in the New Territories. HKD per m&sup2;, city-wide averages - not for any specific flat.</p>';
 function renderCoveredBuy(c,cp,r){renderCoveredBuyRaw(c,cp,r);const d=cp.querySelector(".finding");if(!d||d.dataset.snap)return;const h=d.querySelector("h3");if(!h)return;const t=h.textContent.toLowerCase();let s="";if(t.indexOf("vancouver")>=0)s=MS_V;else if(t.indexOf("toronto")>=0)s=MS_T;else if(t.indexOf("calgary")>=0)s=MS_C;else if(t.indexOf("edmonton")>=0)s=MS_E;else if(t.indexOf("hong kong")>=0)s=MS_H;if(s){d.dataset.snap="1";h.insertAdjacentHTML("afterend",s)}}
 function renderCandBuy(c,cp,r){if(c.cov){renderCoveredBuy(c.cov,cp,r);return}cp.innerHTML=worldPanelCand(c);r.innerHTML='City resolved above. Records and bundled market data do not cover it yet.'}
-async function pick(raw,pinned){const r=document.querySelector('#report');showCityPhoto(null);
+async function pick(raw,pinned){window.cancelBuyResearch?.();const r=document.querySelector('#report');showCityPhoto(null);
 hkF.style.display='none';nycF.style.display='none';chiF.style.display='none';vanF.style.display='none';torF.style.display='none';calF.style.display='none';edmF.style.display='none';hkL.style.display='none';
+if(window.renderBuyResearch&&/^monaco(?:, monaco)?$/i.test(raw.trim())){cp.replaceChildren();await window.renderBuyResearch(raw,r);return}
 if(pinned){const c=resolveCity(raw);if(c&&c!=='OTHER'){showCityPhoto({city:raw});renderCoveredBuy(c,cp,r);return}}
 cp.innerHTML='<p class="muted">Resolving '+esc(raw)+'…</p>';
 const res=await resolveInput(raw);
@@ -450,4 +451,5 @@ for(const [key,b] of Object.entries(R)){
 })();
 
 </script><script src="compare-data.js"></script><script src="compare-tab.js?v=20261113-responsive"></script><script src="rent-tab.js?v=20261118-modes"></script><script src="renovate-tab.js?v=20261117-fc"></script>
-<script src="shortlist-bridge.js?v=20261116-hashrestore"></script><script src="sell-draft.js?v=20261112-sd2"></script><script src="terminal-theme.js?v=20261118-tab-colours"></script><script src="terminal-navigation.js?v=20261118-rent-first"></script><script src="rental-gallery.js?v=20261119-live"></script><script src="rental-favourite.js?v=20261119-live"></script><script src="rental-detail.js?v=20261119-live"></script><script src="rental-demand-demo.js?v=20261119-live"></script><script src="public-search.js?v=20261119-selected-city"></script></body></html>
+<script src="shortlist-bridge.js?v=20261116-hashrestore"></script><script src="sell-draft.js?v=20261112-sd2"></script><script src="terminal-theme.js?v=20261118-tab-colours"></script><script src="terminal-navigation.js?v=20261118-rent-first"></script><script src="rental-gallery.js?v=20261119-live"></script><script src="rental-favourite.js?v=20261119-buy"></script><script src="rental-detail.js?v=20261119-buy"></script><script src="rental-demand-demo.js?v=20261119-live"></script><script src="buy-listings.js?v=20261119-buy"></script><script src="public-search.js?v=20261119-selected-city"></script>
+</body></html>
