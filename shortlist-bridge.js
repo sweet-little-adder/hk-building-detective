@@ -22,7 +22,7 @@
   btn.type = 'button'; btn.id = 'saveShort';
   btn.style.cssText = 'display:none;margin-top:14px;background:none;border:1px solid #7c6650;color:#dcc9ad;font-size:12.5px;padding:8px 14px;letter-spacing:.04em;font-weight:400;max-width:100%;white-space:normal;text-align:left;line-height:1.5;min-height:44px';
   sec.appendChild(btn);
-  var pending = false, authNeeded = false, timer;
+  var pending = false, authNeeded = false, timer,requestId;
   var home = lang === 'en' ? '/' : '/' + lang + '/';
   var account = parentOrigin + '/account/?lang=' + lang;
   function reset() { btn.disabled = false; btn.textContent = '\u2606 ' + t[0]; }
@@ -40,7 +40,7 @@
     if (authNeeded) { window.top.location.href = account; return; }
     if (pending) return;
     var q = currentQuery();
-    pending = true; btn.disabled = true; btn.textContent = t[1];
+    pending = true;requestId='shortlist:'+crypto.randomUUID(); btn.disabled = true; btn.textContent = t[1];
     var cityPanel=document.getElementById('cityPanel');
     var content=rep.querySelector('h3')?rep:(cityPanel&&cityPanel.innerText.trim()?cityPanel:rep);
     var fullText = content.innerText.trim();
@@ -50,12 +50,12 @@
     });
     while(JSON.stringify(snap).length>3800 && snap.text.length>100){snap.text=snap.text.slice(0,-100);snap.truncated=true;}
     while(JSON.stringify(snap).length>3800 && snap.links.length){snap.links.pop();}
-    window.parent.postMessage({type: 'reagentSave' , url: parentOrigin + home + '#lookup', label: content.querySelector('h3') ? content.querySelector('h3').innerText.trim().slice(0,200) : (q ? t[5] + q : ((document.getElementById('qc')||{}).value || t[6])), notes: JSON.stringify(snap)}, parentOrigin);
+    window.parent.postMessage({type: 'reagentSave',requestId:requestId,url: parentOrigin + home + '#lookup', label: content.querySelector('h3') ? content.querySelector('h3').innerText.trim().slice(0,200) : (q ? t[5] + q : ((document.getElementById('qc')||{}).value || t[6])), notes: JSON.stringify(snap)}, parentOrigin);
     clearTimeout(timer);
     timer = setTimeout(function () { if (pending) { pending = false; reset(); } }, 8000);
   });
   window.addEventListener('message', function (e) {
-    if (e.source !== window.parent || e.origin !== parentOrigin || !e.data || e.data.type !== 'reagentSaveResult') return;
+    if (e.source !== window.parent || e.origin !== parentOrigin || !e.data || e.data.type !== 'reagentSaveResult'||!pending||e.data.requestId!==requestId) return;
     clearTimeout(timer); pending = false; btn.disabled = false;
     if (e.data.ok) btn.textContent = t[2] + ' \u2713';
     else if (e.data.authRequired) { authNeeded = true; btn.textContent = t[3]; }

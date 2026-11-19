@@ -4,9 +4,9 @@
  let generation=0;window.cancelBuyResearch=()=>{generation++};
  window.renderBuyResearch=async function(raw,panel){
  if(!/^monaco(?:, monaco)?$/i.test(raw.trim())){generation++;return false;}
- const requestId=++generation;
+ const requestId=++generation,loading=window.beginListingLoad(panel);
  panel.replaceChildren(el('p','Fetching source listing index and matching property photos now...','muted'));
- let data;try{const r=await fetch('/api/buy-search?city='+encodeURIComponent(raw));data=await r.json();if(requestId!==generation)return true}catch{if(requestId!==generation)return true;panel.replaceChildren(el('p','Source unavailable. This is not a zero-homes result.'));return true}
+ let data;try{const r=await fetch('/api/buy-search?city='+encodeURIComponent(raw),{signal:loading.signal});if(!r.ok)throw Error('Source unavailable');data=await r.json();if(requestId!==generation||!loading.active)return true}catch{if(requestId!==generation||!loading.active)return true;panel.replaceChildren(el('p','Source unavailable. This is not a zero-homes result.'));return true}finally{loading.finish()}
  panel.replaceChildren(el('h2',data.city?data.city+' / Homes for sale':'City coverage'));if(!Array.isArray(data.listings))data.listings=[];
  panel.append(el('p','Source-advertised properties, not verified available inventory. Sale status, buyer fees, taxes and full acquisition costs need confirmation.','listing-preview-note'));
  if(!data.listings.length){panel.append(el('p',data.message||'Source unavailable.'));return true}
